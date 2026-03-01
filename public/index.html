@@ -91,6 +91,21 @@
     .dark .bg-\[\#FF008308\]{background:rgba(255,0,131,.1)!important}
     .dark .bg-\[\#FF008310\]{background:rgba(255,0,131,.12)!important}
     .reduce-motion *{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+    /* ── SPRINT 6: SHAKE ANIMATION ── */
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    .shake{animation:shake .4s ease-out}
+    /* ── SPRINT 6: SIDEBAR DRAWER ── */
+    .sidebar-drawer{transition:transform .25s ease-out}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:45;transition:opacity .25s ease-out}
+    /* ── SPRINT 6: BENCHMARK BAR ANIMATION ── */
+    .bench-bar{transition:width 1s ease-out}
+    /* ── SPRINT 6: DRAG & DROP ── */
+    .drag-over-line{border-top:2px solid #FF0083}
+    .dragging-item{opacity:.5}
+    /* ── SPRINT 6: SPOTLIGHT CARD ── */
+    .spotlight-border{background:linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b);padding:2px;border-radius:16px}
+    .spotlight-inner{background:white;border-radius:14px}
+    .dark .spotlight-inner{background:#1e293b}
   </style>
 </head>
 <body>
@@ -699,7 +714,7 @@ const AIU=({emp})=>{
   const[drillBar,setDrillBar]=useState(null);const[drillLine,setDrillLine]=useState(null);
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">AI Usage</h1><p className="text-[14px] text-[#6B7280] mt-1">Track how you use AI in your work</p></div>
-    <div className="grid grid-cols-2 gap-5 mb-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI vs Human Contribution <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
         <ResponsiveContainer width="100%" height={200}><BarChart data={bd} barGap={2}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI" fill="#FF0083" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/><Bar dataKey="human" name="Human" fill="#10b981" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/></BarChart></ResponsiveContainer>
         {drillBar&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillBar._src.ti}</h4><button onClick={()=>setDrillBar(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-3 text-center"><div><p className="text-[20px] font-bold text-[#FF0083]">{drillBar.ai}%</p><p className="text-[10px] text-[#9CA3AF]">AI Generated</p></div><div><p className="text-[20px] font-bold text-[#10b981]">{drillBar.human}%</p><p className="text-[10px] text-[#9CA3AF]">Human Written</p></div><div><StP s={drillBar._src.st}/><p className="text-[10px] text-[#9CA3AF] mt-1">{drillBar._src.ty}</p></div></div></div>}
@@ -795,7 +810,7 @@ const CompanionPanel=({open,onClose,scr,setScr,role,emp,personality})=>{
   const topicCount=msgs.filter(m=>m.r==="u").length;
   const chips=getChips();
   if(!open)return null;
-  return<div className="fixed top-0 right-0 h-full w-[380px] bg-white border-l border-[#E5E7EB] shadow-2xl z-50 flex flex-col fi" style={{boxShadow:"-8px 0 30px rgba(0,0,0,.08)"}}>
+  return<div className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white border-l border-[#E5E7EB] shadow-2xl z-50 flex flex-col fi" style={{boxShadow:"-8px 0 30px rgba(0,0,0,.08)"}}>
     <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between flex-shrink-0">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-sm">
@@ -810,6 +825,7 @@ const CompanionPanel=({open,onClose,scr,setScr,role,emp,personality})=>{
       <p className="text-[12px] text-[#1A1A2E] leading-relaxed">{insight.tx}</p>
     </div>}
     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      {msgs.length<=1&&<EmptyIllustration type="companion"/>}
       {msgs.map((m,i)=><div key={i} className={`flex ${m.r==="u"?"justify-end":"justify-start"}`}>
         <div>
         <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${m.r==="u"?"text-white shadow-sm":"bg-[#F7F7F7] border border-[#E5E7EB] text-[#6B7280]"}`} style={m.r==="u"?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>
@@ -846,7 +862,8 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
   const byDept={};emps.forEach(e=>{if(!byDept[e.dp])byDept[e.dp]=[];byDept[e.dp].push(e)});
   const toggleCompare=(id)=>{if(!onCompare)return;if(compareIds.includes(id)){onCompare(compareIds.filter(x=>x!==id))}else if(compareIds.length<2){onCompare([...compareIds,id])}};
   return<div className="fi">
-  <div className="mb-6 flex items-center justify-between"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding — {emps.length} reports</p></div>
+  <SpotlightCard emps={emps}/>
+  <div className="mb-6 flex items-center justify-between"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding &mdash; {emps.length} reports</p></div>
     <div className="flex items-center gap-2">
       {compareIds&&compareIds.length>0&&<button onClick={()=>onCompare([])} className="text-[12px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear ({compareIds.length})</button>}
       {compareIds&&compareIds.length===2&&<button onClick={onShowCompare} className="text-[12px] px-4 py-1.5 rounded-full bg-[#FF0083] text-white font-semibold btn-p flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Compare</button>}
@@ -873,7 +890,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
       <button key={k} onClick={()=>setFilter(k)} className={`text-[12px] px-3.5 py-1.5 rounded-full border font-medium transition-all ${filter===k?"text-white shadow-sm":"hover:border-current"}`} style={filter===k?{background:co,borderColor:co,color:"white"}:{borderColor:"#E5E7EB",color:co}}>{lb}</button>
     )}
   </div>
-  <div className="grid grid-cols-3 gap-4">{filtered.map(e=>{const ph=pInfo(e.day);const lc=e.co[0];return(
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{filtered.map(e=>{const ph=pInfo(e.day);const lc=e.co[0];return(
     <div key={e.id} className={`bg-white border rounded-[14px] p-5 shadow-sm card-h ${e.hp<65?"border-[#ef444450]":"border-[#E5E7EB]"}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3"><Av e={e} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · {e.dp}</p></div></div>
@@ -924,14 +941,14 @@ const EmpDetail=({emp,onBack,onUpd})=>{
 };
 
 const ReviewAssist=({emps})=>{
-  const[sid,setSid]=useState(emps[0]?.id||"");const[cov,setCov]=useState("");const[pat,setPat]=useState("");const[ssk,setSsk]=useState([]);const[dn,setDn]=useState(false);
+  const[sid,setSid]=useState(emps[0]?.id||"");const[cov,setCov]=useState("");const[pat,setPat]=useState("");const[ssk,setSsk]=useState([]);const[dn,setDn]=useState(false);const[revErr,setRevErr]=useState(false);
   const emp=emps.find(e=>e.id===sid);const lc=emp?.co[0];
   const qs={Engineer:["Why this data structure?","What if this API call fails?","How would you test this edge case?","Performance implications?"],Designer:["What does this look like on mobile?","What accessibility standard?","How does it degrade on slow connections?","What user feedback informed this?"],PM:["What assumption invalidates the spec?","How would you measure success?","What's the smallest shippable version?","Who are the stakeholders?"]};
   const brief=[["Context","My approach and key decisions"],["AI Usage","AI for scaffolding, refined with conventions"],["Uncertainties","Not confident about error handling"],["Learn Goal","Understand internal API patterns better"],["Feedback Request","Code structure and naming feedback"]];
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Review Assistant</h1><p className="text-[14px] text-[#6B7280] mt-1">Structured contribution review</p></div>
     <select value={sid} onChange={e=>{setSid(e.target.value);setDn(false)}} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] mb-6 shadow-sm">{emps.map(e=><option key={e.id} value={e.id}>{e.nm} — {e.rl}</option>)}</select>
-    {emp&&lc&&!dn&&<div className="grid grid-cols-2 gap-5">
+    {emp&&lc&&!dn&&<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-4 shadow-sm">
           <div className="flex items-center gap-2 mb-4"><TyB t={lc.ty}/><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{lc.ti}</h3><StP s={lc.st}/></div>
@@ -944,12 +961,13 @@ const ReviewAssist=({emps})=>{
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Review Form</h3>
         <div className="space-y-4">
-          <div><label className="text-[14px] text-[#6B7280] mb-1.5 block">What was covered</label><textarea value={cov} onChange={e=>setCov(e.target.value)} className="w-full bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3 text-[14px] text-[#1A1A2E] placeholder-[#D1D5DB] resize-none focus:outline-none focus:border-[#FF0083]" rows={3} placeholder="Describe discussion..."/></div>
+          <div><label className="text-[14px] text-[#6B7280] mb-1.5 block">What was covered <span className="text-red-400">*</span></label><textarea value={cov} onChange={e=>{setCov(e.target.value);if(e.target.value.trim())setRevErr(false)}} className={`w-full bg-[#F7F7F7] border rounded-xl p-3 text-[14px] text-[#1A1A2E] placeholder-[#D1D5DB] resize-none focus:outline-none focus:border-[#FF0083] ${revErr&&!cov.trim()?"border-red-500 shake":"border-[#E5E7EB]"}`} rows={3} placeholder="Describe discussion... (required)"/></div>
           <div><label className="text-[14px] text-[#6B7280] mb-1.5 block">Pattern to watch</label><textarea value={pat} onChange={e=>setPat(e.target.value)} className="w-full bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3 text-[14px] text-[#1A1A2E] placeholder-[#D1D5DB] resize-none focus:outline-none focus:border-[#FF0083]" rows={2} placeholder="Recurring patterns..."/></div>
           <div><label className="text-[14px] text-[#6B7280] mb-2 block">Skills to verify</label>
             <div className="space-y-2">{emp.sk.filter(s=>s.lv==="practicing"||s.lv==="proficient").map((s,i)=><label key={i} className="flex items-center gap-2.5 text-[14px] text-[#6B7280] cursor-pointer hover:text-[#1A1A2E]"><input type="checkbox" checked={ssk.includes(s.nm)} onChange={e=>setSsk(p=>e.target.checked?[...p,s.nm]:p.filter(n=>n!==s.nm))} className="accent-[#FF0083] w-4 h-4 rounded"/>{s.nm}</label>)}</div>
           </div>
-          <button onClick={()=>setDn(true)} className="w-full bg-[#FF0083] text-white rounded-xl py-3 text-[14px] font-semibold btn-p">Submit Review</button>
+          <button onClick={()=>{if(!cov.trim()){setRevErr(true);return}setRevErr(false);setDn(true)}} className={`w-full text-white rounded-xl py-3 text-[14px] font-semibold btn-p ${!cov.trim()?"bg-[#FF008380] cursor-not-allowed":"bg-[#FF0083]"}`}>Submit Review</button>
+          {revErr&&<p className="text-[12px] text-red-500 mt-2 shake">Please describe what was covered before submitting.</p>}
         </div>
       </div>
     </div>}
@@ -975,8 +993,9 @@ const StratOver=()=>{
   const si=c=>sCol===c?(sDir==="asc"?"↑":"↓"):"";
   const sorted=[...E].sort((a,b)=>{const d=sDir==="asc"?1:-1;if(sCol==="nm")return a.nm.localeCompare(b.nm)*d;if(sCol==="rl")return a.rl.localeCompare(b.rl)*d;if(sCol==="dp")return a.dp.localeCompare(b.dp)*d;if(sCol==="day")return(a.day-b.day)*d;if(sCol==="hp")return(a.hp-b.hp)*d;if(sCol==="co")return(a.co.length-b.co.length)*d;return 0});
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics — {E.length} active makers</p></div>
-    <div className="grid grid-cols-3 gap-4 mb-6">{kpis.map((k,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+    <SpotlightCard emps={E}/>
+    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics &mdash; {E.length} active makers</p></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">{kpis.map((k,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-3"><CI n={k.ic} sz={18} co={k.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{k.lb}</p></div>
       <p className="text-3xl font-bold tracking-tight" style={{color:k.co}}>{k.v}</p>
       <p className="text-[11px] text-[#6B7280] mt-1">{k.tr}</p>
@@ -1149,7 +1168,7 @@ const AILogForm=({emp})=>{
         {c.rv&&<div className="mt-3 bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><span className="text-[11px] font-semibold text-[#3b82f6]">Review Feedback</span><p className="text-[12px] text-[#6B7280] mt-1">{c.rv}</p></div>}
       </div>}
     </div>)}</div>
-    {emp.co.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><p className="text-[14px] text-[#9CA3AF]">No contributions yet. Once you submit your first PR, design, or brief — your AI log will appear here automatically.</p></div>}
+    {emp.co.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><EmptyIllustration type="contributions"/><p className="text-[14px] text-[#9CA3AF] mt-3">No contributions yet. Once you submit your first PR, design, or brief — your AI log will appear here automatically.</p></div>}
   </div>
 };
 
@@ -1182,7 +1201,7 @@ const CrisisSim=()=>{
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Crisis Simulation</h1><p className="text-[14px] text-[#6B7280] mt-1">Spot the flaws in AI-generated output</p></div>
     <div className="flex gap-2 mb-6">{scenarios.map((s,i)=><button key={i} onClick={()=>{setSel(i);setRevealed(false)}} className={`px-4 py-2 rounded-[14px] text-[14px] font-medium transition-all ${sel===i?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{s.title}</button>)}</div>
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
           <p className="text-[14px] text-[#6B7280] mb-4">{sc.desc}</p>
@@ -1214,7 +1233,8 @@ const CrisisSim=()=>{
 };
 
 // ───────────────── NEW: INTEGRATIONS ─────────────────
-const Integrations=({emp})=>{
+const Integrations=({emp,toast})=>{
+  const copyId=(id)=>{navigator.clipboard.writeText(id).then(()=>{toast&&toast("Copied "+id+" to clipboard")}).catch(()=>{})};
   const allTabs=[["slack","Slack","bubble",["Engineer","Designer","PM"],"Connected ↔"],["github","GitHub","octopus",["Engineer"],"Connected ↔"],["jira","Jira","ticket",["Engineer","Designer","PM"],"Connected ↔"],["figma","Figma","paint",["Designer","Engineer"],"Connected ↔"],["confluence","Confluence","book",["PM"],"Connected ↔"],["monday","Monday","clipboard",["Engineer","Designer","PM"],"Connected ↔"],["mixpanel","Mixpanel","bar-chart",["Designer","PM"],"Connected ↔"]];
   const tabs=allTabs.filter(([,,,r])=>r.includes(emp.rl));
   const[tab,setTab]=useState("slack");
@@ -1275,7 +1295,7 @@ const Integrations=({emp})=>{
     <div className="flex gap-2 mb-6 flex-wrap">{tabs.map(([id,lb,ic,,sync])=>
       <button key={id} onClick={()=>setTab(id)} className={`px-5 py-2.5 rounded-[14px] text-[14px] font-medium transition-all flex items-center gap-2 ${tab===id?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}><CI n={ic} sz={16} co={tab===id?"#fff":"#6B7280"}/> {lb}</button>
     )}</div>
-    <div className="flex items-center gap-1.5 mb-5 px-1"><span className="w-2 h-2 rounded-full bg-[#10b981]"/><span className="text-[11px] text-[#6B7280]">All integrations connected via 2-way API sync</span></div>
+    <div className="flex items-center gap-3 mb-5 px-1"><span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10b981]"/><span className="text-[11px] text-[#6B7280]">All integrations connected via 2-way API sync</span></span><span className="text-[10px] text-[#9CA3AF]">Last synced: 2 min ago</span></div>
 
     {tab==="slack"&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
       <div className="bg-[#F7F7F7] border-b border-[#E5E7EB] px-5 py-3 flex items-center gap-2"><span className="text-[14px] font-semibold text-[#1A1A2E]"># onboarding-2026</span><span className="text-[12px] text-[#9CA3AF]">6 members</span></div>
@@ -1286,7 +1306,7 @@ const Integrations=({emp})=>{
       </div>)}</div>
     </div>}
 
-    {tab==="monday"&&<div className="grid grid-cols-3 gap-4">{fiberyTasks.map((col,i)=>
+    {tab==="monday"&&<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{fiberyTasks.map((col,i)=>
       <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between"><span className="text-[13px] font-semibold text-[#1A1A2E]">{col.col}</span><span className="text-[11px] text-[#9CA3AF] bg-[#F3F4F6] rounded-full px-2 py-0.5">{col.tasks.length}</span></div>
         <div className="p-3 space-y-2">{col.tasks.map((t,j)=><div key={j} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3">
@@ -1297,7 +1317,7 @@ const Integrations=({emp})=>{
     )}</div>}
 
     {tab==="mixpanel"&&<div>
-      <div className="grid grid-cols-4 gap-4 mb-5">{mixMetrics.map((m,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">{mixMetrics.map((m,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm">
         <p className="text-[11px] text-[#9CA3AF] uppercase tracking-wider font-semibold mb-1">{m.lb}</p>
         <p className="text-[28px] font-bold text-[#1A1A2E]">{m.v}</p>
         <span className={`text-[12px] font-medium ${m.up?"text-[#10b981]":"text-[#ef4444]"}`}>{m.ch}</span>
@@ -1318,12 +1338,12 @@ const Integrations=({emp})=>{
           <span className="text-[12px] text-[#9CA3AF]">4 open PRs</span>
         </div>
         <div className="divide-y divide-[#E5E7EB]">{ghPRs.map((p,i)=><div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-[#F7F7F7] transition-colors">
-          <span className="text-[13px] font-mono text-[#FF0083] font-bold w-12">{p.id}</span>
+          <button onClick={()=>copyId(p.id)} title="Copy ID" className="text-[13px] font-mono text-[#FF0083] font-bold w-12 hover:underline cursor-pointer">{p.id}</button>
           <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{p.ti}</p><p className="text-[11px] text-[#9CA3AF] font-mono">{p.br}</p></div>
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${p.st==="merged"?"bg-[#f0fdf4] text-[#10b981]":p.st==="review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#eff6ff] text-[#3b82f6]"}`}>{p.st==="review"?"In Review":p.st[0].toUpperCase()+p.st.slice(1)}</span>
           <span className="text-[11px] text-[#9CA3AF] w-24 text-right truncate">{p.rev}</span>
           <div className="flex items-center gap-1.5 text-[11px]"><span className="text-[#10b981]">{p.add}</span><span className="text-[#ef4444]">{p.del}</span></div>
-          <span className="text-[10px] text-[#FF0083] font-medium cursor-pointer hover:underline flex-shrink-0">View on GitHub ↗</span>
+          <a href={`https://github.com/lemonade-inc/core/pull/${p.id.replace("#","")}`} target="_blank" rel="noopener" className="text-[10px] text-[#FF0083] font-medium hover:underline flex-shrink-0">View on GitHub &#x2197;</a>
         </div>)}</div>
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1354,25 +1374,25 @@ const Integrations=({emp})=>{
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
         <div className="divide-y divide-[#E5E7EB]">{jiraTickets.map((t,i)=><div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-[#F7F7F7] transition-colors">
-          <span className="text-[12px] font-mono text-[#FF0083] font-semibold w-20">{t.id}</span>
+          <button onClick={()=>copyId(t.id)} title="Copy ID" className="text-[12px] font-mono text-[#FF0083] font-semibold w-20 hover:underline cursor-pointer text-left">{t.id}</button>
           <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{t.ti}</p><span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{t.ep}</span></div>
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${t.st==="Done"?"bg-[#f0fdf4] text-[#10b981]":t.st==="In Progress"?"bg-[#eff6ff] text-[#3b82f6]":t.st==="In Review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>{t.st}</span>
           <span className="text-[11px] text-[#9CA3AF] bg-[#F3F4F6] rounded px-1.5 py-0.5 font-mono">{t.pt}pt</span>
           <span className="text-[11px] text-[#9CA3AF] w-8 text-center">{t.as}</span>
-          <span className="text-[10px] text-[#FF0083] font-medium cursor-pointer hover:underline flex-shrink-0">Open in Jira ↗</span>
+          <a href={`https://lemonade.atlassian.net/browse/${t.id}`} target="_blank" rel="noopener" className="text-[10px] text-[#FF0083] font-medium hover:underline flex-shrink-0">Open in Jira &#x2197;</a>
         </div>)}</div>
       </div>
     </div>}
 
     {tab==="figma"&&<div>
-      <div className="grid grid-cols-2 gap-4 mb-4">{figmaFiles.map((f,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">{figmaFiles.map((f,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2"><CI n={f.ic} sz={18}/><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${f.st==="Published"?"bg-[#f0fdf4] text-[#10b981]":f.st==="Shipped"?"bg-[#FF008315] text-[#FF0083]":f.st==="In Review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>{f.st}</span></div>
           <span className="text-[11px] text-[#9CA3AF]">{f.up}</span>
         </div>
         <h4 className="text-[14px] font-semibold text-[#1A1A2E] mb-1">{f.nm}</h4>
         <p className="text-[12px] text-[#6B7280] mb-3">{f.pg} pages · {f.cmp} components · {f.by}</p>
-        <span className="text-[12px] text-[#FF0083] font-medium cursor-pointer hover:underline">Open in Figma →</span>
+        <a href={`https://figma.com/file/lemonade-ds/${f.nm.replace(/\s+/g,'-').toLowerCase()}`} target="_blank" rel="noopener" className="text-[12px] text-[#FF0083] font-medium hover:underline">Open in Figma &#x2192;</a>
       </div>)}</div>
       {emp.rl==="Engineer"&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Dev Mode — Design Tokens</h3>
@@ -1555,17 +1575,22 @@ const MakerDash=({emp,setScr})=>{
 // ───────────────── NEW: WEEKLY GOALS ─────────────────
 const WeeklyGoals=({toast,onCelebrate})=>{
   const[goals,setGoals]=useState(GOALS);const[prevW,setPrevW]=useState(false);
+  const[dragIdx,setDragIdx]=useState(null);const[hoverIdx,setHoverIdx]=useState(null);
   const done=goals.filter(g=>g.cur>=g.tgt).length;
   const toggle=id=>{setGoals(p=>{const ng=p.map(g=>g.id===id?{...g,cur:g.cur>=g.tgt?0:g.tgt}:g);if(ng.every(g=>g.cur>=g.tgt))onCelebrate?.();return ng});toast("Goal updated")};
+  const onDragStart=(e,i)=>{setDragIdx(i);e.dataTransfer.effectAllowed="move"};
+  const onDragOver=(e,i)=>{e.preventDefault();e.dataTransfer.dropEffect="move";setHoverIdx(i)};
+  const onDragEnd=()=>{if(dragIdx!==null&&hoverIdx!==null&&dragIdx!==hoverIdx){setGoals(p=>{const ng=[...p];const[item]=ng.splice(dragIdx,1);ng.splice(hoverIdx,0,item);return ng});toast("Goals reordered")}setDragIdx(null);setHoverIdx(null)};
   return<div className="fi">
     <div className="flex items-center justify-between mb-8">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Weekly Goals</h1><p className="text-[14px] text-[#6B7280] mt-1">Week 2 objectives</p></div>
+      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Weekly Goals</h1><p className="text-[14px] text-[#6B7280] mt-1">Week 2 objectives &mdash; drag to reorder</p></div>
       <div className="flex items-center gap-4"><HR s={Math.round(done/goals.length*100)} sz={56}/><div><p className="text-[14px] font-bold text-[#1A1A2E]">{done}/{goals.length}</p><p className="text-[12px] text-[#6B7280]">completed</p></div></div>
     </div>
-    <div className="space-y-3 mb-6">{goals.map(g=>{const dn=g.cur>=g.tgt;return<div key={g.id} onClick={()=>toggle(g.id)} className={`bg-white border rounded-[14px] p-4 flex items-center gap-4 shadow-sm transition-all cursor-pointer ${dn?"border-[#10b981] bg-[#f0fdf4]":"border-[#E5E7EB] hover:border-[#FF0083]"}`}>
-      <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${dn?"bg-[#10b981] border-[#10b981] text-white":"border-[#D1D5DB]"}`}>{dn&&<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}</div>
+    <div className="space-y-3 mb-6">{goals.map((g,gi)=>{const dn=g.cur>=g.tgt;return<div key={g.id} draggable="true" onDragStart={e=>onDragStart(e,gi)} onDragOver={e=>onDragOver(e,gi)} onDragEnd={onDragEnd} className={`bg-white border rounded-[14px] p-4 flex items-center gap-4 shadow-sm transition-all cursor-pointer select-none ${dragIdx===gi?"dragging-item":""} ${hoverIdx===gi&&dragIdx!==null&&dragIdx!==gi?"drag-over-line":""} ${dn?"border-[#10b981] bg-[#f0fdf4]":"border-[#E5E7EB] hover:border-[#FF0083]"}`}>
+      <span className="text-[#D1D5DB] cursor-grab active:cursor-grabbing flex-shrink-0 text-[16px]" title="Drag to reorder">&#x2807;</span>
+      <div onClick={()=>toggle(g.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${dn?"bg-[#10b981] border-[#10b981] text-white":"border-[#D1D5DB]"}`}>{dn&&<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}</div>
       <span className="flex-shrink-0"><CI n={g.ic} sz={18}/></span>
-      <div className="flex-1"><span className={`text-[14px] font-medium ${dn?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{g.tx}</span>
+      <div className="flex-1" onClick={()=>toggle(g.id)}><span className={`text-[14px] font-medium ${dn?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{g.tx}</span>
         <div className="flex items-center gap-2 mt-1"><div className="w-24 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${(g.cur/g.tgt)*100}%`,background:dn?"#10b981":"#FF0083"}}/></div><span className="text-[11px] text-[#9CA3AF]">{g.cur}/{g.tgt}</span></div>
       </div>
       <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{g.cat}</span>
@@ -1583,7 +1608,7 @@ const Calendar=({toast})=>{
   const[events,setEvents]=useState(SCHEDULE);const[adding,setAdding]=useState(false);const[newEv,setNewEv]=useState({nm:"",dt:"",ty:"meeting",wi:""});
   const groups=[{lb:"Today",items:events.filter(s=>s.dt.startsWith("Today"))},{lb:"Tomorrow",items:events.filter(s=>s.dt.startsWith("Tomorrow"))},{lb:"This Week",items:events.filter(s=>!s.dt.startsWith("Today")&&!s.dt.startsWith("Tomorrow"))}];
   const tyCo={meeting:"#3b82f6",ceremony:"#FF0083",collab:"#8b5cf6",milestone:"#10b981",learning:"#f59e0b"};
-  const addEvent=()=>{if(!newEv.nm.trim())return;setEvents(p=>[...p,{id:"s"+Date.now(),nm:newEv.nm,dt:newEv.dt||"Today 12:00",ty:newEv.ty,wi:newEv.wi||"—",co:tyCo[newEv.ty]||"#6B7280"}]);setNewEv({nm:"",dt:"",ty:"meeting",wi:""});setAdding(false);toast&&toast("Event added to calendar")};
+  const addEvent=()=>{if(!newEv.nm.trim()){setNewEv(p=>({...p,_errNm:true}));return}setEvents(p=>[...p,{id:"s"+Date.now(),nm:newEv.nm,dt:newEv.dt||"Today 12:00",ty:newEv.ty,wi:newEv.wi||"\u2014",co:tyCo[newEv.ty]||"#6B7280"}]);setNewEv({nm:"",dt:"",ty:"meeting",wi:""});setAdding(false);toast&&toast("Event added to calendar")};
   return<div className="fi">
     <div className="flex items-center justify-between mb-6">
       <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Calendar</h1><p className="text-[14px] text-[#6B7280] mt-1">Upcoming events and milestones</p></div>
@@ -1594,12 +1619,13 @@ const Calendar=({toast})=>{
     </div>
     {adding&&<div className="bg-white border border-[#FF008330] rounded-[14px] p-5 shadow-sm mb-5 fi">
       <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">New Event</h3>
-      <div className="grid grid-cols-4 gap-3 mb-3">
-        <input value={newEv.nm} onChange={e=>setNewEv(p=>({...p,nm:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Event name"/>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+        <input value={newEv.nm} onChange={e=>setNewEv(p=>({...p,nm:e.target.value}))} className={`bg-[#F7F7F7] border rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] ${newEv._errNm?"border-red-500 shake":"border-[#E5E7EB]"}`} placeholder="Event name *"/>
         <input value={newEv.dt} onChange={e=>setNewEv(p=>({...p,dt:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Today 15:00"/>
         <select value={newEv.ty} onChange={e=>setNewEv(p=>({...p,ty:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]"><option value="meeting">Meeting</option><option value="ceremony">Ceremony</option><option value="collab">Collaboration</option><option value="milestone">Milestone</option><option value="learning">Learning</option></select>
         <input value={newEv.wi} onChange={e=>setNewEv(p=>({...p,wi:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Participants"/>
       </div>
+      {newEv._errNm&&<p className="text-[12px] text-red-500 mb-2">Event name is required</p>}
       <div className="flex gap-2"><button onClick={addEvent} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p">Add</button><button onClick={()=>setAdding(false)} className="text-[13px] text-[#6B7280] hover:text-[#1A1A2E] px-4 py-2">Cancel</button></div>
     </div>}
     <div className="space-y-6">{groups.map((g,gi)=>g.items.length>0&&<div key={gi}>
@@ -1653,9 +1679,9 @@ const FAQS=[
 ];
 const IMP_LINKS=[
   {cat:"Slack Channels",links:[{nm:"#onboarding-2026",ds:"Your cohort's main channel",ur:"slack://channel/onboarding-2026"},{nm:"#engineering-help",ds:"Quick engineering questions",ur:"slack://channel/engineering-help"},{nm:"#design-crit",ds:"Design feedback and critique",ur:"slack://channel/design-crit"},{nm:"#product-all",ds:"Product announcements",ur:"slack://channel/product-all"},{nm:"#lemon-ask",ds:"AI-powered Q&A bot",ur:"slack://channel/lemon-ask"}]},
-  {cat:"Knowledge Bases",links:[{nm:"Confluence Wiki",ds:"Internal documentation hub",ur:"#"},{nm:"Notion Handbook",ds:"Company policies and guides",ur:"#"},{nm:"Design System Docs",ds:"Component library reference",ur:"#"},{nm:"API Documentation",ds:"Internal API reference",ur:"#"}]},
+  {cat:"Knowledge Bases",links:[{nm:"Confluence Wiki",ds:"Internal documentation hub",ur:"https://lemonade.atlassian.net/wiki"},{nm:"Notion Handbook",ds:"Company policies and guides",ur:"https://notion.so/lemonade-inc/handbook"},{nm:"Design System Docs",ds:"Component library reference",ur:"https://figma.com/file/lemonade-ds/design-system-v3"},{nm:"API Documentation",ds:"Internal API reference",ur:"https://docs.internal.lemonade.com/api"}]},
   {cat:"Mailing Lists",links:[{nm:"eng-all@lemonade.com",ds:"All engineering updates",ur:"mailto:eng-all@lemonade.com"},{nm:"design-all@lemonade.com",ds:"Design team updates",ur:"mailto:design-all@lemonade.com"},{nm:"product-all@lemonade.com",ds:"Product announcements",ur:"mailto:product-all@lemonade.com"},{nm:"new-joiners@lemonade.com",ds:"Onboarding cohort updates",ur:"mailto:new-joiners@lemonade.com"}]},
-  {cat:"Key Tools",links:[{nm:"Monday.com",ds:"Sprint boards and project management",ur:"#"},{nm:"Mixpanel",ds:"Product analytics dashboards",ur:"#"},{nm:"Figma",ds:"Design files and prototypes",ur:"#"},{nm:"GitHub",ds:"Code repositories",ur:"#"},{nm:"Jira",ds:"Ticket tracking",ur:"#"},{nm:"Google Calendar",ds:"Team schedules and meetings",ur:"#"}]}
+  {cat:"Key Tools",links:[{nm:"Monday.com",ds:"Sprint boards and project management",ur:"https://lemonade-inc.monday.com"},{nm:"Mixpanel",ds:"Product analytics dashboards",ur:"https://mixpanel.com/project/lemonade"},{nm:"Figma",ds:"Design files and prototypes",ur:"https://figma.com/files/team/lemonade-inc"},{nm:"GitHub",ds:"Code repositories",ur:"https://github.com/lemonade-inc"},{nm:"Jira",ds:"Ticket tracking",ur:"https://lemonade.atlassian.net"},{nm:"Google Calendar",ds:"Team schedules and meetings",ur:"https://calendar.google.com"}]}
 ];
 const FAQLinks=()=>{
   const[openQ,setOpenQ]=useState(null);const[tab,setTab]=useState("faq");
@@ -1767,7 +1793,7 @@ const AlertCenter=({emps,toast})=>{
         <button onClick={()=>{setAcked(p=>({...p,[a.id]:true}));toast("Alert acknowledged")}} className="text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium flex-shrink-0">Acknowledge</button>
       </div>
     </div>})}</div>
-    {active.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><div className="mb-2 flex justify-center"><CI n="party" sz={28} co="#FF0083"/></div><p className="text-[14px] text-[#6B7280]">All clear! No active alerts.</p></div>}
+    {active.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><EmptyIllustration type="alerts"/><div className="mb-2 flex justify-center mt-3"><CI n="party" sz={28} co="#FF0083"/></div><p className="text-[14px] text-[#6B7280]">All clear! No active alerts.</p></div>}
   </div>
 };
 
@@ -1792,7 +1818,7 @@ const CompareView=({emp1,emp2,onClear})=>{
       <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
       <button onClick={onClear} className="text-[12px] px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear Comparison</button>
     </div>
-    <div className="grid grid-cols-2 gap-5 mb-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       {[emp1,emp2].map((e,i)=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <div className="flex items-center gap-3 mb-4"><Av e={e} sz={48}/><div><h3 className="text-[16px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[12px] text-[#6B7280]">{e.rl} · {e.dp} · Day {e.day}</p></div><div className="ml-auto"><HR s={e.hp} sz={56}/></div></div>
         <div className="flex flex-wrap gap-1.5">{e.sk.slice(0,5).map((s,j)=><span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#6B7280] border border-[#E5E7EB]">{s.nm}</span>)}{e.sk.length>5&&<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF]">+{e.sk.length-5}</span>}</div>
@@ -1868,7 +1894,7 @@ const TeamAnalytics=({emps,onSel})=>{
   const[drillHealth,setDrillHealth]=useState(null);const[drillContrib,setDrillContrib]=useState(null);
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Performance insights for your {emps.length} reports</p></div>
-    <div className="grid grid-cols-2 gap-5 mb-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trend (per employee)</h3>
           <div className="flex flex-wrap gap-1">{emps.map((e,i)=><button key={e.id} onClick={()=>setShowLines(p=>({...p,[e.id]:!p[e.id]}))} className="text-[10px] px-2 py-0.5 rounded-full border transition-all" style={showLines[e.id]?{borderColor:empColors[i%empColors.length],color:empColors[i%empColors.length],background:empColors[i%empColors.length]+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{e.nm.split(" ")[0]}</button>)}</div>
@@ -1912,21 +1938,28 @@ const TeamAnalytics=({emps,onSel})=>{
 };
 
 // ───────────────── NEW: BENCHMARKS ─────────────────
+const BenchCounter=({target,loaded,suffix})=>{
+  const[val,setVal]=useState(0);
+  useEffect(()=>{if(!loaded){setVal(0);return}let start=0;const end=target;const dur=1000;const startTime=Date.now();const tick=()=>{const elapsed=Date.now()-startTime;const progress=Math.min(elapsed/dur,1);const eased=1-Math.pow(1-progress,3);const current=Number.isInteger(end)?Math.round(eased*end):parseFloat((eased*end).toFixed(1));setVal(current);if(progress<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)},[loaded,target]);
+  return<span>{val}{suffix||""}</span>
+};
 const BenchmarkView=()=>{
+  const[loaded,setLoaded]=useState(false);
+  useEffect(()=>{const t=setTimeout(()=>setLoaded(true),200);return()=>clearTimeout(t)},[]);
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Benchmarks</h1><p className="text-[14px] text-[#6B7280] mt-1">How Lemonade compares to industry standards</p></div>
-    <div className="grid grid-cols-2 gap-5 mb-6">{BENCHMARKS.map((b,i)=>{
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">{BENCHMARKS.map((b,i)=>{
       const delta=b.better==="lower"?Math.round((1-b.us/b.ind)*100):Math.round((b.us/b.ind-1)*100);
-      const pct=b.better==="lower"?Math.round((1-b.us/b.ind)*100):Math.round(b.us/b.ind*100);
+      const barW=Math.min(100,b.better==="lower"?(1-b.us/b.ind)*100+50:b.us/b.ind*50);
       return<div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold mb-4">{b.lb}</p>
         <div className="flex items-end gap-4 mb-4">
-          <div><p className="text-[32px] font-bold text-[#FF0083]">{b.us}{b.un&&<span className="text-[16px]">{b.un}</span>}</p><p className="text-[12px] text-[#6B7280]">Lemonade</p></div>
+          <div><p className="text-[32px] font-bold text-[#FF0083]"><BenchCounter target={b.us} loaded={loaded} suffix={b.un}/></p><p className="text-[12px] text-[#6B7280]">Lemonade</p></div>
           <div><p className="text-[20px] font-bold text-[#9CA3AF]">{b.ind}{b.un&&<span className="text-[12px]">{b.un}</span>}</p><p className="text-[12px] text-[#9CA3AF]">Industry</p></div>
           <span className="text-[14px] font-bold text-[#10b981] ml-auto">+{delta}% better</span>
         </div>
         <div className="flex gap-1 h-3 rounded-full overflow-hidden bg-[#F3F4F6]">
-          <div className="h-full rounded-full" style={{width:`${Math.min(100,b.better==="lower"?(1-b.us/b.ind)*100+50:b.us/b.ind*50)}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/>
+          <div className="h-full rounded-full bench-bar" style={{width:loaded?`${barW}%`:"0%",background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/>
         </div>
       </div>
     })}</div>
@@ -2118,7 +2151,7 @@ const EmpProgress=({emps})=>{
       <div className="flex items-center gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <Av e={sel} sz={52}/><div className="flex-1"><h2 className="text-[18px] font-bold text-[#1A1A2E]">{sel.nm}</h2><p className="text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><HealthBreakdown emp={sel} sz={56}/>
       </div>
-      <div className="grid grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Health Trend <span className="text-[9px] font-normal normal-case">(click point)</span></h3>
           <ResponsiveContainer width="100%" height={180}><LineChart data={genHealth(sel)} onClick={(e)=>{if(e&&e.activePayload)setDrillEmpH(e.activePayload[0]?.payload)}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="v" stroke="#FF0083" strokeWidth={2.5} dot={{r:4,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="Health" cursor="pointer"/></LineChart></ResponsiveContainer>
           {drillEmpH&&<div className="mt-3 p-3 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="text-[13px] font-semibold text-[#1A1A2E]">{drillEmpH.wk}</span><span className="text-[20px] font-bold" style={{color:drillEmpH.v>=75?"#10b981":drillEmpH.v>=50?"#f59e0b":"#ef4444"}}>{drillEmpH.v}</span><span className="text-[11px] text-[#6B7280]">health score</span></div><button onClick={()=>setDrillEmpH(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div></div>}
@@ -2217,7 +2250,7 @@ const CmdPalette=({open,onClose,query,setQuery,results,idx,setIdx,onSelect})=>{
           {i===idx&&<span className="text-[11px] text-[#9CA3AF]">{"\u21B5"}</span>}
         </button>)}
       </div>:<div className="py-12 text-center">
-        {query?<><p className="text-[14px] text-[#9CA3AF]">No results for "{query}"</p><p className="text-[12px] text-[#D1D5DB] mt-1">Try a different search term</p></>
+        {query?<><EmptyIllustration type="search"/><p className="text-[14px] text-[#9CA3AF] mt-2">No results for "{query}"</p><p className="text-[12px] text-[#D1D5DB] mt-1">Try a different search term</p></>
         :<><p className="text-[14px] text-[#6B7280] font-medium">Quick Search</p><p className="text-[12px] text-[#9CA3AF] mt-1">Search employees, skills, contributions, events...</p></>}
       </div>}
       <div className="px-5 py-2.5 border-t border-[#E5E7EB] flex items-center gap-4 bg-[#FAFAFA]">
@@ -2354,12 +2387,98 @@ const getFollowUps=(text)=>{
   return["What should I focus on today?","Tell me about Lemonade culture"];
 };
 
+// ───────────────── SPRINT 6: SHORTCUTS OVERLAY (#20) ─────────────────
+const ShortcutsOverlay=({open,onClose})=>{
+  if(!open)return null;
+  const shortcuts=[
+    {keys:["1-9"],desc:"Navigate sidebar items"},
+    {keys:["\u2318","K"],desc:"Open command palette"},
+    {keys:["?"],desc:"Toggle shortcuts help"},
+    {keys:["Esc"],desc:"Close panels & modals"},
+  ];
+  return<div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
+    <div className="absolute inset-0 bg-black/40"/>
+    <div className="relative bg-white border border-[#E5E7EB] rounded-[18px] shadow-2xl p-8 w-[420px] fi" onClick={e=>e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-[20px] font-bold text-[#1A1A2E] h-serif">Keyboard Shortcuts</h2>
+        <button onClick={onClose} className="w-7 h-7 rounded-lg bg-[#F7F7F7] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A2E] hover:bg-[#E5E7EB] transition-all text-xs">&#x2715;</button>
+      </div>
+      <div className="space-y-3">{shortcuts.map((s,i)=><div key={i} className="flex items-center justify-between py-2 border-b border-[#F3F4F6] last:border-0">
+        <span className="text-[14px] text-[#6B7280]">{s.desc}</span>
+        <div className="flex gap-1">{s.keys.map((k,j)=><kbd key={j} className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[12px] font-mono text-[#1A1A2E] font-semibold min-w-[28px] text-center">{k}</kbd>)}</div>
+      </div>)}</div>
+      <p className="text-[11px] text-[#9CA3AF] mt-5 text-center">Press <kbd className="bg-[#F3F4F6] border border-[#E5E7EB] rounded px-1.5 py-0.5 text-[10px] font-mono">?</kbd> anywhere to toggle this panel</p>
+    </div>
+  </div>
+};
+
+// ───────────────── SPRINT 6: EMPTY STATE ILLUSTRATIONS (#21) ─────────────────
+const EmptyIllustration=({type})=>{
+  const illus={
+    search:<svg width="56" height="56" viewBox="0 0 80 80" fill="none"><ellipse cx="35" cy="38" rx="18" ry="20" className="line-art"/><path d="M35 28C38 22 45 20 43 28C41 31 37 31 35 28Z" className="line-art"/><path d="M27 36C28 31 33 28 35 31" className="line-art-pink" opacity=".5"/><circle cx="35" cy="38" r="8" className="line-art" strokeDasharray="3 2"/><line x1="41" y1="44" x2="55" y2="58" className="line-art-pink" strokeWidth="2"/></svg>,
+    alerts:<svg width="56" height="56" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="42" rx="18" ry="20" className="line-art"/><path d="M40 32C43 26 50 24 48 32C46 35 42 35 40 32Z" className="line-art"/><path d="M32 40C33 35 38 32 40 35" className="line-art-pink" opacity=".5"/><path d="M34 48c0 0 3 3 6 3s6-3 6-3" className="line-art-pink" strokeWidth="1.5"/><circle cx="36" cy="40" r="1.5" fill="#1A1A2E" opacity=".4"/><circle cx="44" cy="40" r="1.5" fill="#1A1A2E" opacity=".4"/></svg>,
+    contributions:<svg width="56" height="56" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="42" rx="18" ry="20" className="line-art"/><path d="M40 32C43 26 50 24 48 32C46 35 42 35 40 32Z" className="line-art"/><path d="M32 40C33 35 38 32 40 35" className="line-art-pink" opacity=".5"/><rect x="32" y="48" width="16" height="2" rx="1" className="line-art-pink"/><rect x="35" y="52" width="10" height="2" rx="1" className="line-art" opacity=".4"/></svg>,
+    companion:<svg width="56" height="56" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="42" rx="18" ry="20" className="line-art"/><path d="M40 32C43 26 50 24 48 32C46 35 42 35 40 32Z" className="line-art"/><path d="M32 40C33 35 38 32 40 35" className="line-art-pink" opacity=".5"/><path d="M25 55 Q40 65 55 55" className="line-art-pink" strokeDasharray="4 3"/><circle cx="36" cy="41" r="2" className="line-art-pink"/><circle cx="44" cy="41" r="2" className="line-art-pink"/></svg>
+  };
+  return<div className="flex justify-center mt-3 opacity-60 fi">{illus[type]||illus.search}</div>
+};
+
+// ───────────────── SPRINT 6: SPOTLIGHT CARD (#28) ─────────────────
+const spotlightMaker=(emps)=>{
+  if(!emps||emps.length===0)return null;
+  return emps.map(e=>{
+    const contribScore=Math.min(100,e.co.length*15);
+    const healthScore=e.hp;
+    const verifiedCount=e.sk.filter(s=>s.sr==="manager-verified").length;
+    const skillScore=Math.min(100,verifiedCount*33);
+    const total=contribScore*.4+healthScore*.3+skillScore*.3;
+    return{...e,score:Math.round(total),contribScore,healthScore:e.hp,skillScore,verifiedCount};
+  }).sort((a,b)=>b.score-a.score)[0];
+};
+const spotlightWhy=(s)=>{
+  const parts=[];
+  if(s.contribScore>=60)parts.push(`${s.co.length} contributions shipped`);
+  if(s.hp>=80)parts.push(`health score at ${s.hp}`);
+  if(s.verifiedCount>0)parts.push(`${s.verifiedCount} verified skill${s.verifiedCount>1?"s":""}`);
+  return parts.length?parts.join(", ")+".":`Strong overall onboarding performance with a score of ${s.score}.`;
+};
+const SpotlightCard=({emps})=>{
+  const star=spotlightMaker(emps);
+  if(!star)return null;
+  return<div className="spotlight-border mb-6">
+    <div className="spotlight-inner p-5">
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <Av e={star} sz={56}/>
+          <span className="absolute -top-1 -right-1 text-[18px]" role="img" aria-label="star">&#x2B50;</span>
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#d97706]">Maker of the Week</span></div>
+          <h3 className="text-[18px] font-bold text-[#1A1A2E] h-serif">{star.nm}</h3>
+          <p className="text-[12px] text-[#6B7280]">{star.rl} &middot; {star.dp} &middot; Day {star.day}</p>
+        </div>
+        <div className="flex gap-3">
+          {[["Contributions",star.co.length,"#FF0083"],["Health",star.hp,"#10b981"],["Verified",star.verifiedCount,"#3b82f6"]].map(([lb,v,co],i)=>
+            <div key={i} className="text-center px-3"><p className="text-[20px] font-bold" style={{color:co}}>{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
+          )}
+        </div>
+      </div>
+      <div className="mt-3 bg-[#fffbeb] border border-[#fbbf2440] rounded-xl px-4 py-2.5 flex items-center gap-2">
+        <span className="text-[14px]">&#x2728;</span>
+        <p className="text-[13px] text-[#92400e]"><strong>Why they stand out:</strong> {spotlightWhy(star)}</p>
+      </div>
+    </div>
+  </div>
+};
+
 const App=()=>{
   const[appReady,setAppReady]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)},[]);
   const[role,setRole]=usePersistedState("role","maker");const[scr,setScr]=usePersistedState("scr","welcome");const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
   const[toast,setToast]=useState(null);const[notifOpen,setNotifOpen]=useState(false);const[searchQ,setSearchQ]=useState("");const[searchOpen,setSearchOpen]=useState(false);
   const[compOpen,setCompOpen]=useState(false);
+  const[sidebarOpen,setSidebarOpen]=useState(false);
+  const[shortcutsOpen,setShortcutsOpen]=useState(false);
   const[compareIds,setCompareIds]=useState([]);
   const[darkMode,setDarkMode]=usePersistedState("dark",false);
   const[tourStep,setTourStep]=useState(null);
@@ -2369,7 +2488,7 @@ const App=()=>{
   const[highContrast,setHighContrast]=usePersistedState("high-contrast",false);
   const[lemiPersonality,setLemiPersonality]=usePersistedState("lemi-tone","casual");
   const[cmdOpen,setCmdOpen]=useState(false);const[cmdQ,setCmdQ]=useState("");const[cmdIdx,setCmdIdx]=useState(0);
-  useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();setCmdOpen(p=>!p);setCmdQ("");setCmdIdx(0)}if(e.key==='Escape'){setCmdOpen(false)}};document.addEventListener('keydown',h);return()=>document.removeEventListener('keydown',h)},[]);
+  useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();setCmdOpen(p=>!p);setCmdQ("");setCmdIdx(0);return}if(e.key==='Escape'){setCmdOpen(false);setShortcutsOpen(false);setCompOpen(false);setNotifOpen(false);setSidebarOpen(false);return}const tag=e.target.tagName;const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||e.target.isContentEditable;if(!inInput&&e.key==='?'){e.preventDefault();setShortcutsOpen(p=>!p);return}if(!inInput&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const num=parseInt(e.key);if(num>=1&&num<=9){const navItems=NAV[role]||[];if(num<=navItems.length){e.preventDefault();setScr(navItems[num-1].id);setSidebarOpen(false)}}}};document.addEventListener('keydown',h);return()=>document.removeEventListener('keydown',h)},[role]);
   const[loading,setLoading]=useState(false);
   useEffect(()=>{setLoading(true);const t=setTimeout(()=>setLoading(false),350);return()=>clearTimeout(t)},[scr,role]);
   const[confetti,setConfetti]=useState(false);
@@ -2446,7 +2565,7 @@ const App=()=>{
       if(scr==="crisis")return<CrisisSim/>;
       if(scr==="calendar")return<Calendar toast={showToast}/>;
       if(scr==="resources")return<Resources emp={maker}/>;
-      if(scr==="integrations")return<Integrations emp={maker}/>;
+      if(scr==="integrations")return<Integrations emp={maker} toast={showToast}/>;
       if(scr==="faq")return<FAQLinks/>;
       return<MakerDash emp={maker} setScr={setScr}/>;
     }
@@ -2493,19 +2612,24 @@ const App=()=>{
   return<div className="h-screen flex flex-col">
     <a href="#main-content" className="sr-only" style={{position:'absolute',top:'-40px',left:0,zIndex:300}} onFocus={e=>{e.target.style.position='static';e.target.style.background='#FF0083';e.target.style.color='white';e.target.style.padding='8px 16px';e.target.style.borderRadius='8px';e.target.style.fontSize='14px';e.target.style.fontWeight='600'}} onBlur={e=>{e.target.style.position='absolute';e.target.style.top='-40px'}}>Skip to content</a>
     <CmdPalette open={cmdOpen} onClose={()=>setCmdOpen(false)} query={cmdQ} setQuery={setCmdQ} results={cmdResults} idx={cmdIdx} setIdx={setCmdIdx} onSelect={r=>{r.act();setCmdOpen(false);setCmdQ("")}}/>
+    <ShortcutsOverlay open={shortcutsOpen} onClose={()=>setShortcutsOpen(false)}/>
     {toast&&<Toast msg={toast.msg||toast} type={toast.type||'success'} onDone={()=>setToast(null)}/>}
     <Confetti show={confetti}/>
     {/* TOP BAR */}
-    <div className="h-[56px] bg-[#F7F7F7] border-b border-[#E5E7EB] flex items-center justify-between px-5 flex-shrink-0" role="banner">
-      <div className="flex items-center gap-3.5">
+    <div className="h-[56px] bg-[#F7F7F7] border-b border-[#E5E7EB] flex items-center justify-between px-3 lg:px-5 flex-shrink-0" role="banner">
+      <div className="flex items-center gap-2 lg:gap-3.5">
+        {/* HAMBURGER — visible on mobile */}
+        <button onClick={()=>setSidebarOpen(!sidebarOpen)} className="lg:hidden w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" aria-label="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <span style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
-        <span className="text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
+        <span className="hidden sm:inline text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 lg:gap-3">
         {/* SEARCH */}
-        <div className="relative tour-search">
+        <div className="relative tour-search hidden sm:block">
           <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSearchOpen(true)}} onFocus={()=>setSearchOpen(true)} onBlur={()=>setTimeout(()=>setSearchOpen(false),200)}
-            className="w-48 bg-white border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[13px] text-[#1A1A2E] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FF0083] focus:w-64 transition-all shadow-sm" placeholder="Search... ⌘K"/>
+            className="w-36 lg:w-48 bg-white border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[13px] text-[#1A1A2E] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FF0083] focus:w-64 transition-all shadow-sm" placeholder="Search... ⌘K"/>
           {searchOpen&&searchResults.length>0&&<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-[#E5E7EB] rounded-[14px] shadow-lg overflow-hidden z-50">
             {searchResults.map((r,i)=><button key={i} onMouseDown={()=>{r.act();setSearchQ("");setSearchOpen(false)}} className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#F7F7F7] text-left transition-colors">
               <span className="text-[10px] px-2 py-0.5 rounded bg-[#F3F4F6] text-[#9CA3AF] font-medium">{r.ty}</span>
@@ -2514,33 +2638,35 @@ const App=()=>{
           </div>}
         </div>
         {/* DARK MODE TOGGLE */}
-        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm">
+        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="w-8 h-8 rounded-lg flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{background:darkMode?'#334155':'white',border:darkMode?'1px solid #475569':'1px solid #E5E7EB'}}>
           {darkMode?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           :<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>}
         </button>
-        {role==="maker"&&<div className="flex items-center gap-2 bg-[#FF008310] rounded-full pl-1.5 pr-3 py-1"><ProgressRing pct={Math.round(maker.day/30*100)} sz={28}/><span className="text-[12px] text-[#FF0083] font-bold">Day {maker.day}/30</span></div>}
-        {role==="lead"&&<div className="flex items-center gap-2 bg-[#FF008310] rounded-full px-3 py-1"><span className="text-[12px] text-[#FF0083] font-bold">{leadE.length} reports</span></div>}
+        {/* SHORTCUTS BUTTON */}
+        <button onClick={()=>setShortcutsOpen(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" className="hidden sm:flex w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm text-[13px] font-mono text-[#9CA3AF] hover:text-[#FF0083]">?</button>
+        {role==="maker"&&<div className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full pl-1.5 pr-3 py-1"><ProgressRing pct={Math.round(maker.day/30*100)} sz={28}/><span className="text-[12px] text-[#FF0083] font-bold">Day {maker.day}/30</span></div>}
+        {role==="lead"&&<button onClick={()=>setScr("team")} className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full px-3 py-1 hover:bg-[#FF008325] transition-colors cursor-pointer"><span className="text-[12px] text-[#FF0083] font-bold">{leadE.length} reports</span></button>}
         {/* NOTIFICATIONS */}
         <div className="relative tour-notif">
-          <button onClick={()=>setNotifOpen(!notifOpen)} aria-label="Notifications" aria-expanded={notifOpen} className="relative w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <button onClick={()=>setNotifOpen(!notifOpen)} aria-label="Notifications" aria-expanded={notifOpen} className="relative w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{zIndex:notifOpen?51:1,position:'relative'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode?"#94A3B8":"#6B7280"} strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
             {unread>0&&<div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ef4444] text-white text-[9px] font-bold flex items-center justify-center">{unread}</div>}
           </button>
           {notifOpen&&<div className="notif-overlay" onClick={()=>setNotifOpen(false)}/>}
-          {notifOpen&&<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-[#E5E7EB] rounded-[14px] shadow-lg overflow-hidden z-50">
-            <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-[#1A1A2E]">Notifications</span>
+          {notifOpen&&<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-[#E5E7EB] rounded-[14px] shadow-lg overflow-hidden z-50" style={darkMode?{background:'#1e293b',borderColor:'#475569',boxShadow:'0 10px 40px rgba(0,0,0,.5)'}:{}}>
+            <div className="px-4 py-3 border-b flex items-center justify-between" style={darkMode?{borderColor:'#475569'}:{borderColor:'#E5E7EB'}}>
+              <span className="text-[13px] font-semibold" style={{color:darkMode?'#F1F5F9':'#1A1A2E'}}>Notifications</span>
               <button onClick={()=>setNotifs(p=>p.map(n=>({...n,read:true})))} className="text-[11px] text-[#FF0083] font-medium hover:underline">Mark all read</button>
             </div>
-            <div className="max-h-72 overflow-y-auto">{notifs.map(n=><div key={n.id} className={`px-4 py-3 border-b border-[#E5E7EB] flex items-start gap-2.5 ${n.read?"":"bg-[#FF008306]"}`}>
+            <div className="max-h-72 overflow-y-auto">{notifs.map(n=><div key={n.id} className={`px-4 py-3 flex items-start gap-2.5`} style={{borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',background:!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}}>
               <span className="mt-0.5 flex-shrink-0"><CI n={n.ic} sz={16}/></span>
-              <div className="flex-1 min-w-0"><p className={`text-[13px] ${n.read?"text-[#6B7280]":"text-[#1A1A2E] font-medium"}`}>{n.tx}</p><p className="text-[11px] text-[#9CA3AF] mt-0.5">{n.ts}</p></div>
+              <div className="flex-1 min-w-0"><p className="text-[13px]" style={{color:n.read?(darkMode?'#94A3B8':'#6B7280'):(darkMode?'#F1F5F9':'#1A1A2E'),fontWeight:n.read?400:500}}>{n.tx}</p><p className="text-[11px] mt-0.5" style={{color:darkMode?'#64748B':'#9CA3AF'}}>{n.ts}</p></div>
               {!n.read&&<div className="w-2 h-2 rounded-full bg-[#FF0083] mt-1.5 flex-shrink-0"/>}
             </div>)}</div>
           </div>}
         </div>
-        <div className="h-5 w-px bg-[#E5E7EB]"/>
-        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-3.5 py-1.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-8 shadow-sm" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center"}}>
+        <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
+        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role hidden sm:block bg-white border border-[#E5E7EB] rounded-lg px-3.5 py-1.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-8 shadow-sm" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center"}}>
           <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
           <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
@@ -2548,8 +2674,10 @@ const App=()=>{
       </div>
     </div>
     <div className="flex flex-1 overflow-hidden">
+      {/* SIDEBAR OVERLAY (mobile) */}
+      {sidebarOpen&&<div className="sidebar-overlay lg:hidden" onClick={()=>setSidebarOpen(false)}/>}
       {/* SIDEBAR */}
-      <div className="tour-sidebar w-[220px] bg-[#F7F7F7] flex-shrink-0 flex flex-col overflow-y-auto border-r border-[#E5E7EB]">
+      <div className={`tour-sidebar w-[220px] bg-[#F7F7F7] flex-shrink-0 flex flex-col overflow-y-auto border-r border-[#E5E7EB] fixed lg:static inset-y-0 left-0 z-[46] sidebar-drawer ${sidebarOpen?"translate-x-0":"-translate-x-full lg:translate-x-0"}`} style={{top:"56px"}}>
         <div className="px-5 pt-6 mb-3"><p className="text-[9px] font-semibold uppercase tracking-[.2em] text-[#D1D5DB]">{role==="maker"?"Maker View":role==="lead"?"Lead View":"Strategy View"}</p></div>
         {role==="maker"&&<div className="px-3 mb-3"><select value={makerSel} onChange={e=>{setMakerSel(e.target.value);setScr("home")}} className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm">
           {es.map(e=><option key={e.id} value={e.id}>{e.nm} — {e.rl} · Day {e.day}</option>)}
@@ -2558,7 +2686,7 @@ const App=()=>{
           {Object.keys(LEADS).map(k=><option key={k} value={k}>{LEADS[k].nm} — {LEADS[k].rl}</option>)}
         </select></div>}
         <nav role="navigation" aria-label="Main navigation" className="space-y-0.5 px-2 flex-1">{nav.map(it=>{const act=scr===it.id;return(
-          <button key={it.id} onClick={()=>{setScr(it.id);if(it.id==="team")setSelId(null)}}
+          <button key={it.id} onClick={()=>{setScr(it.id);if(it.id==="team")setSelId(null);setSidebarOpen(false)}}
             className={`nav-i w-full flex items-center gap-3 px-3 py-2.5 text-[14px] text-left rounded-lg ${act?"nav-a":"text-[#6B7280]"}`}>
             <span className="flex-shrink-0"><NI n={it.ic} active={act}/></span><span className="font-medium">{it.lb}</span>
           </button>
@@ -2569,7 +2697,7 @@ const App=()=>{
         </div>
       </div>
       {/* MAIN */}
-      <div id="main-content" role="main" aria-label="Page content" className="flex-1 overflow-y-auto p-7 bg-[#FAFAFA] relative" onClick={()=>{setNotifOpen(false);setSearchOpen(false)}}>
+      <div id="main-content" role="main" aria-label="Page content" className="flex-1 overflow-y-auto p-4 lg:p-7 bg-[#FAFAFA] relative" onClick={()=>{setNotifOpen(false);setSearchOpen(false)}}>
         <div key={scr+role} className="page-enter">
           {loading?<PageSkeleton/>:screen()}
         </div>
