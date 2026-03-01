@@ -91,6 +91,8 @@
     .dark .bg-\[\#FF008308\]{background:rgba(255,0,131,.1)!important}
     .dark .bg-\[\#FF008310\]{background:rgba(255,0,131,.12)!important}
     .reduce-motion *{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+    .high-contrast{--hc-text:#000;--hc-border:#333}.high-contrast *{border-color:#555!important}.high-contrast .text-\[\#6B7280\],.high-contrast .text-\[\#9CA3AF\]{color:#444!important}.high-contrast .text-\[\#1A1A2E\]{color:#000!important}.high-contrast .bg-white,.high-contrast .bg-\[\#F7F7F7\]{background:#fff!important}.high-contrast .border-\[\#E5E7EB\]{border-color:#999!important}
+    .dark.high-contrast .text-\[\#94A3B8\],.dark.high-contrast .text-\[\#64748B\]{color:#cbd5e1!important}.dark.high-contrast .bg-\[\#1e293b\]{background:#0f172a!important}
     /* ── SPRINT 6: SHAKE ANIMATION ── */
     @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
     .shake{animation:shake .4s ease-out}
@@ -111,7 +113,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const{useState,useEffect,useRef,useMemo}=React;
+const{useState,useEffect,useRef,useMemo,useCallback}=React;
 const usePersistedState=(key,init)=>{
   const[val,setVal]=useState(()=>{try{const s=localStorage.getItem('amj-'+key);return s!==null?JSON.parse(s):init}catch{return init}});
   useEffect(()=>{try{localStorage.setItem('amj-'+key,JSON.stringify(val))}catch{}},[key,val]);
@@ -228,6 +230,23 @@ const NOTIFS=[
   {id:"n8",tx:"Your contribution streak is 5 days!",ts:"2d ago",read:true,ic:"fire",scr:"contribs"}
 ];
 
+const TASKS=[
+  {id:"tk1",ti:"Fix notification service unit tests",src:"GitHub",srcId:"PR #247",url:"https://github.com/lemonade-inc/core/pull/247",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e1"},
+  {id:"tk2",ti:"Update claims dashboard mobile layout",src:"Figma",srcId:"Design #F-892",url:"https://figma.com/file/lemonade-claims-v2",pri:"medium",st:"todo",as:"Ran",due:"Tomorrow",emp:"e1"},
+  {id:"tk3",ti:"Review pricing API documentation",src:"Monday",srcId:"LEM-445",url:"https://lemonade.monday.com/boards/1234/items/445",pri:"low",st:"todo",as:"Ran",due:"Wed",emp:"e1"},
+  {id:"tk4",ti:"Implement error boundary for policy view",src:"Jira",srcId:"LEM-342",url:"https://lemonade.atlassian.net/browse/LEM-342",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e2"},
+  {id:"tk5",ti:"Design onboarding flow improvements",src:"Figma",srcId:"Design #F-901",url:"https://figma.com/file/lemonade-onboard-v3",pri:"high",st:"todo",as:"Ran",due:"Tomorrow",emp:"e2"},
+  {id:"tk6",ti:"Add A/B test tracking for signup",src:"Jira",srcId:"LEM-356",url:"https://lemonade.atlassian.net/browse/LEM-356",pri:"medium",st:"todo",as:"Ran",due:"Thu",emp:"e3"},
+  {id:"tk7",ti:"Write product brief: AI claim assistant",src:"Monday",srcId:"LEM-501",url:"https://lemonade.monday.com/boards/1234/items/501",pri:"high",st:"in-progress",as:"Yael",due:"Today",emp:"e6"},
+  {id:"tk8",ti:"CX flow user testing analysis",src:"Monday",srcId:"LEM-488",url:"https://lemonade.monday.com/boards/1234/items/488",pri:"medium",st:"todo",as:"Yael",due:"Wed",emp:"e5"},
+  {id:"tk9",ti:"Create micro-interaction specs for claims",src:"Figma",srcId:"Design #F-910",url:"https://figma.com/file/lemonade-micro-int",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e9"},
+  {id:"tk10",ti:"Stakeholder map presentation prep",src:"Monday",srcId:"LEM-512",url:"https://lemonade.monday.com/boards/1234/items/512",pri:"low",st:"todo",as:"Yael",due:"Fri",emp:"e8"},
+  {id:"tk11",ti:"API rate limiter implementation",src:"GitHub",srcId:"PR #251",url:"https://github.com/lemonade-inc/core/pull/251",pri:"medium",st:"todo",as:"Ran",due:"Wed",emp:"e4"},
+  {id:"tk12",ti:"Fresh Eyes audit: mobile checkout",src:"Jira",srcId:"LEM-360",url:"https://lemonade.atlassian.net/browse/LEM-360",pri:"medium",st:"in-progress",as:"Yael",due:"Tomorrow",emp:"e7"},
+  {id:"tk13",ti:"Pipeline v2 performance benchmarks",src:"GitHub",srcId:"PR #253",url:"https://github.com/lemonade-inc/core/pull/253",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e10"},
+  {id:"tk14",ti:"Update claims processing test coverage",src:"Jira",srcId:"LEM-371",url:"https://lemonade.atlassian.net/browse/LEM-371",pri:"medium",st:"todo",as:"Ran",due:"Thu",emp:"e10"}
+];
+
 const SCHEDULE=[
   {id:"s1",nm:"1:1 with Ran",dt:"Today 10:00",ty:"meeting",wi:"Ran",co:"#3b82f6"},
   {id:"s2",nm:"Sprint Planning",dt:"Today 14:00",ty:"ceremony",wi:"Product Core Squad",co:"#FF0083"},
@@ -248,34 +267,160 @@ const GOALS=[
 
 const RESOURCES=[
   // ── Product & Culture (All) ──
-  {id:"r1",ct:"Product",ti:"Insurance Product 101",ds:"Lemonade's insurance products — home, renters, pet, car, life",tm:"20 min",rl:"All"},
-  {id:"r2",ct:"Product",ti:"Claims 101",ds:"How claims flow from filing to resolution in our AI-first system",tm:"15 min",rl:"All"},
-  {id:"r3",ct:"Product",ti:"Product Values",ds:"How we make product decisions — customer-first, AI-native, transparent",tm:"10 min",rl:"All"},
-  {id:"r4",ct:"Product",ti:"CX 101",ds:"Customer experience principles and how we measure satisfaction",tm:"12 min",rl:"All"},
-  {id:"r5",ct:"Product",ti:"Risk Overview",ds:"How insurance risk works and Lemonade's approach to underwriting",tm:"15 min",rl:"All"},
+  {id:"r1",ct:"Product",ti:"Insurance Product 101",ds:"Lemonade's insurance products — home, renters, pet, car, life",tm:"20 min",rl:"All",au:"Product Team",dt:"Jan 2026",
+    body:[
+      {h:"Overview",p:"Lemonade offers six insurance products across three markets: US, EU, and Israel. Each product is built on our AI-first platform, enabling instant quotes, automated underwriting, and fast claims resolution."},
+      {h:"Home & Renters",p:"Our flagship product line. Renters insurance starts at $5/mo with AI Maya handling 95% of signups in under 90 seconds. Homeowners insurance uses advanced property data models to price risk accurately. Key metrics: 1.2M active policies, 40-second average claim filing time."},
+      {h:"Pet Insurance",p:"Launched in 2020, now our fastest-growing vertical. Covers accidents and illness for dogs and cats. Uses veterinary claims data and breed-specific models. Key differentiator: no breed discrimination in pricing, transparent claim handling."},
+      {h:"Car Insurance",p:"Available in select US states. Leverages telematics data and AI-driven risk models. Features: usage-based pricing, instant ID cards, and AI-powered accident reconstruction for claims."},
+      {h:"Life Insurance",p:"Term life policies with instant decisioning. No medical exam required for most applicants under 45. AI underwriting analyzes health data to provide quotes in minutes, not weeks."},
+      {h:"The Giveback",p:"Lemonade takes a flat fee from premiums, uses the rest to pay claims. Unclaimed money goes to nonprofits customers choose during signup. Over $12M donated to date. This isn't charity — it's a structural feature that aligns incentives and reduces fraud."}
+    ]},
+  {id:"r2",ct:"Product",ti:"Claims 101",ds:"How claims flow from filing to resolution in our AI-first system",tm:"15 min",rl:"All",au:"Claims Engineering",dt:"Feb 2026",
+    body:[
+      {h:"The Claims Pipeline",p:"Every claim at Lemonade flows through our AI-first pipeline: Filing → Triage → Investigation → Decision → Payment. Our AI, CX.AI, handles initial triage and can approve simple claims in as little as 3 seconds."},
+      {h:"AI Jim — Automated Claims",p:"AI Jim processes ~30% of claims end-to-end without human intervention. It cross-references policy data, damage photos (via computer vision), and third-party databases to make instant decisions. For flagged cases, it escalates to human adjusters with a full context package."},
+      {h:"Human-in-the-Loop",p:"Complex claims route to our CX team with AI-generated summaries, risk scores, and recommended actions. Adjusters review AI suggestions and make final calls. The system learns from every decision."},
+      {h:"Fraud Detection",p:"Forensic Graph technology maps relationships between claims, policies, and external data to detect fraud patterns. It catches coordinated fraud rings that traditional systems miss. False positive rate: <2%."},
+      {h:"Key Metrics",p:"Average claim filing: 40 seconds. Average resolution (simple): 3 minutes. Average resolution (complex): 48 hours. Customer satisfaction post-claim: 4.7/5. These are the benchmarks you should know."}
+    ]},
+  {id:"r3",ct:"Product",ti:"Product Values",ds:"How we make product decisions — customer-first, AI-native, transparent",tm:"10 min",rl:"All",au:"Product Leadership",dt:"Jan 2026",
+    body:[
+      {h:"Customer-First",p:"Every product decision starts with the customer. We use behavioral data, support tickets, and NPS feedback to identify pain points. If a feature doesn't measurably improve the customer experience, it doesn't ship."},
+      {h:"AI-Native, Not AI-Added",p:"We don't bolt AI onto existing processes. We design workflows where AI is the primary operator and humans provide oversight. This means rethinking insurance from first principles, not digitizing paper forms."},
+      {h:"Radical Transparency",p:"Our Policy 2.0 is written in plain English. Our pricing model explains exactly what drives costs. We publish our loss ratios. Transparency isn't just a value — it's a competitive advantage that builds trust."},
+      {h:"Ship Fast, Learn Faster",p:"We run 200+ A/B tests per quarter. Every feature ships with built-in measurement. We'd rather launch a good feature tomorrow than a perfect one next month."}
+    ]},
+  {id:"r4",ct:"Product",ti:"CX 101",ds:"Customer experience principles and how we measure satisfaction",tm:"12 min",rl:"All",au:"CX Team",dt:"Feb 2026",
+    body:[
+      {h:"CX Philosophy",p:"At Lemonade, CX isn't a department — it's a product feature. Our AI handles 80% of customer interactions, and when humans step in, they have full context from AI analysis. The goal: every interaction should feel effortless."},
+      {h:"Key Metrics",p:"NPS: 72 (industry avg: 35). CSAT: 4.8/5. First response time: <30 seconds. Resolution time (L1): <5 minutes. We track these weekly at the squad level."},
+      {h:"The CX Stack",p:"Intercom for messaging, Zendesk for ticketing, custom AI layer for routing and suggestions. Every CX interaction feeds back into our product improvement pipeline through automated tagging and sentiment analysis."},
+      {h:"How You Impact CX",p:"Every bug you fix, every feature you ship, every design you improve directly affects customer experience. Use the CX dashboard in Mixpanel to see how your work impacts satisfaction scores."}
+    ]},
+  {id:"r5",ct:"Product",ti:"Risk Overview",ds:"How insurance risk works and Lemonade's approach to underwriting",tm:"15 min",rl:"All",au:"Risk Team",dt:"Jan 2026",
+    body:[
+      {h:"Insurance Risk Basics",p:"Insurance is fundamentally about pooling risk. Premiums from many policyholders fund claims from the few. The key challenge: pricing risk accurately so premiums cover claims while remaining competitive."},
+      {h:"Our Underwriting Engine",p:"Lemonade uses 1,000+ data points per policy (vs. ~20 in traditional insurance). Our ML models process property data, demographic data, geographic risk, and behavioral signals to generate real-time pricing."},
+      {h:"Loss Ratio",p:"Our target loss ratio is 75% — meaning $0.75 of every premium dollar goes to claims and Giveback. We monitor this daily by product, geography, and cohort. Understanding loss ratio is critical for every team member."},
+      {h:"Reinsurance",p:"We transfer a portion of risk to reinsurance partners. This protects us from catastrophic events (hurricanes, wildfires) and allows us to grow without proportional capital requirements."}
+    ]},
   // ── Engineering ──
-  {id:"r6",ct:"Engineering",ti:"Lemonade Architecture Overview",ds:"Microservices, event-driven design, and AI integration patterns",tm:"25 min",rl:"Engineer"},
-  {id:"r7",ct:"Engineering",ti:"RnD Intro",ds:"How R&D is structured — squads, tech leads, deployment flow",tm:"15 min",rl:"Engineer"},
-  {id:"r8",ct:"Engineering",ti:"QA @ Lemonade",ds:"Testing standards, CI/CD pipeline, and quality gates",tm:"12 min",rl:"Engineer"},
-  {id:"r9",ct:"Engineering",ti:"Reporting & Handling Bugs",ds:"Bug triage process, severity levels, and Jira workflow",tm:"10 min",rl:"Engineer"},
-  {id:"r10",ct:"Engineering",ti:"Pricing Platform Intro",ds:"How our pricing engine works — models, APIs, and rate management",tm:"20 min",rl:"Engineer"},
+  {id:"r6",ct:"Engineering",ti:"Lemonade Architecture Overview",ds:"Microservices, event-driven design, and AI integration patterns",tm:"25 min",rl:"Engineer",au:"Platform Team",dt:"Feb 2026",
+    body:[
+      {h:"Architecture Philosophy",p:"Lemonade runs on a microservices architecture with ~120 services across 3 clusters (US, EU, IL). We use event-driven communication via Kafka, with REST APIs for synchronous calls. Each squad owns 5-15 services end-to-end."},
+      {h:"Tech Stack",p:"Backend: Node.js (primary), Python (ML/AI), Go (high-throughput). Frontend: React + TypeScript. Infra: AWS, Kubernetes, Terraform. Data: PostgreSQL, Redis, Elasticsearch. ML: SageMaker, custom training pipelines."},
+      {h:"Key Services",p:"Policy Service: manages policy lifecycle. Claims Service: handles claim processing pipeline. Pricing Service: real-time quote generation. AI Gateway: routes requests to ML models. Notification Service: multi-channel messaging."},
+      {h:"Development Flow",p:"Feature branch → PR → Code review → CI (tests, lint, security scan) → Staging deploy → QA sign-off → Production canary → Full rollout. Average time from PR to production: 4 hours."},
+      {h:"Observability",p:"Datadog for metrics and APM. PagerDuty for alerts. Grafana dashboards per squad. Every service emits structured logs. We practice blameless postmortems for all Sev1/Sev2 incidents."}
+    ]},
+  {id:"r7",ct:"Engineering",ti:"RnD Intro",ds:"How R&D is structured — squads, tech leads, deployment flow",tm:"15 min",rl:"Engineer",au:"VP Engineering",dt:"Jan 2026",
+    body:[
+      {h:"Squad Structure",p:"R&D is organized into 8 product squads, each with 4-6 engineers, a designer, and a PM. Squads own their domain end-to-end: code, deployment, monitoring, and on-call rotation."},
+      {h:"Tech Leads",p:"Each squad has a tech lead responsible for architectural decisions, code quality standards, and mentoring. Tech leads meet weekly to align on cross-cutting concerns and platform investments."},
+      {h:"Sprint Rhythm",p:"2-week sprints starting Monday. Sprint planning Monday AM, daily standups, sprint review/retro every other Friday. We use Jira for sprint management and Monday.com for quarterly planning."},
+      {h:"On-Call",p:"Rotating on-call per squad. 1-week shifts. Primary + secondary. PagerDuty integration. Expected response time: 5 minutes for Sev1. New joiners shadow on-call for 2 sprints before going primary."}
+    ]},
+  {id:"r8",ct:"Engineering",ti:"QA @ Lemonade",ds:"Testing standards, CI/CD pipeline, and quality gates",tm:"12 min",rl:"Engineer",au:"QA Team",dt:"Feb 2026",
+    body:[
+      {h:"Testing Philosophy",p:"We believe in a testing pyramid: 70% unit tests, 20% integration tests, 10% E2E tests. Every PR must include tests. Target coverage: 80%+ per service. AI-generated tests are welcome but must be reviewed for edge cases."},
+      {h:"CI/CD Pipeline",p:"GitHub Actions runs on every PR: lint → unit tests → integration tests → security scan (Snyk) → build. Merging to main triggers: staging deploy → smoke tests → canary production deploy. Full rollout is manual."},
+      {h:"Quality Gates",p:"PRs need 2 approvals (1 from squad, 1 from outside). All checks must pass. No force-merges without tech lead approval. Staging must be green for 1 hour before production deploy."}
+    ]},
+  {id:"r9",ct:"Engineering",ti:"Reporting & Handling Bugs",ds:"Bug triage process, severity levels, and Jira workflow",tm:"10 min",rl:"Engineer",au:"Engineering Ops",dt:"Jan 2026",
+    body:[
+      {h:"Severity Levels",p:"Sev1: Service down, customer impact >1000 users. Sev2: Major feature broken, workaround available. Sev3: Minor bug, limited impact. Sev4: Cosmetic issue, no functional impact."},
+      {h:"Triage Process",p:"Bugs reported in Jira with reproduction steps, environment, and severity. QA triages daily. Sev1/2 go to current sprint immediately. Sev3/4 are groomed into the backlog."},
+      {h:"Your First Bug Fix",p:"Pick a Sev3/4 from the 'Good First Bug' label in Jira. Follow the standard PR flow. Tag the reporter for verification. This is a great way to learn the codebase in your first weeks."}
+    ]},
+  {id:"r10",ct:"Engineering",ti:"Pricing Platform Intro",ds:"How our pricing engine works — models, APIs, and rate management",tm:"20 min",rl:"Engineer",au:"Pricing Team",dt:"Feb 2026",
+    body:[
+      {h:"How Pricing Works",p:"Our pricing engine evaluates 1,000+ risk factors in real-time to generate personalized quotes. The pipeline: user input → feature extraction → ML model scoring → regulatory compliance check → final price. Average response time: 200ms."},
+      {h:"ML Models",p:"We use gradient-boosted trees for base pricing and neural networks for complex risk assessment. Models are retrained monthly on new claims data. A/B testing ensures model updates improve both accuracy and competitiveness."},
+      {h:"Rate Management",p:"Insurance rates must be filed with state regulators. Our rate management system tracks approved rates per state and automatically applies the correct rating algorithm. Changes go through actuarial review before filing."}
+    ]},
   // ── Design ──
-  {id:"r11",ct:"Design",ti:"Design at Lemonade",ds:"Design principles, brand guidelines, and the Lemonade visual language",tm:"20 min",rl:"Designer"},
-  {id:"r12",ct:"Design",ti:"Figma Design System v3",ds:"Component library, tokens, and design patterns",tm:"20 min",rl:"Designer"},
-  {id:"r13",ct:"Design",ti:"Product Platform Intro",ds:"Tour of all Lemonade products from a design perspective",tm:"15 min",rl:"Designer"},
+  {id:"r11",ct:"Design",ti:"Design at Lemonade",ds:"Design principles, brand guidelines, and the Lemonade visual language",tm:"20 min",rl:"Designer",au:"Design Lead",dt:"Feb 2026",
+    body:[
+      {h:"Design Principles",p:"1. Clarity over cleverness — insurance is confusing, our UI shouldn't be. 2. Delight in details — micro-interactions matter. 3. Mobile-first — 70% of our traffic is mobile. 4. Accessible by default — WCAG AA minimum."},
+      {h:"Brand Language",p:"Primary pink (#FF0083) conveys warmth and disruption. Clean whites and soft grays create trust. Rounded corners and generous spacing feel approachable. Our illustrations use a playful, flat style that makes insurance feel human."},
+      {h:"Design Process",p:"Discovery → Wireframes → Visual design → Prototype → User testing → Dev handoff → QA review. We use Figma for everything. Each squad designer owns their product area and participates in weekly design crits."},
+      {h:"Accessibility Standards",p:"WCAG AA compliance is mandatory. Color contrast ratios, keyboard navigation, screen reader support, and focus management must be tested before every launch. Use our a11y checklist in Figma."}
+    ]},
+  {id:"r12",ct:"Design",ti:"Figma Design System v3",ds:"Component library, tokens, and design patterns",tm:"20 min",rl:"Designer",au:"Design Systems",dt:"Feb 2026",
+    body:[
+      {h:"Component Library",p:"200+ components organized by atomic design: atoms (buttons, inputs), molecules (cards, list items), organisms (forms, navigation), templates (page layouts). Every component has variants for state, size, and theme."},
+      {h:"Design Tokens",p:"Colors, typography, spacing, shadows, and border radii are defined as tokens. Use tokens exclusively — never hardcode values. Tokens sync to code via Style Dictionary, ensuring design-dev consistency."},
+      {h:"Patterns",p:"Common patterns: onboarding flow, claim filing, policy management, settings, empty states, error states. Check the pattern library before designing — reuse is preferred over reinvention."}
+    ]},
+  {id:"r13",ct:"Design",ti:"Product Platform Intro",ds:"Tour of all Lemonade products from a design perspective",tm:"15 min",rl:"Designer",au:"Product Design",dt:"Jan 2026",
+    body:[
+      {h:"Product Tour",p:"As a designer, you'll work across our consumer app (React Native), web app (React), and internal tools. Each platform shares the same design system but has platform-specific patterns."},
+      {h:"Consumer App",p:"The flagship experience. Maya (our AI) guides users through quoting, purchasing, and claims. Key flows: onboarding (5 screens), claim filing (3 steps), policy management. Focus on conversational UI and progressive disclosure."},
+      {h:"Internal Tools",p:"CX dashboard, claims management, analytics. Used by ~200 internal users daily. Prioritize efficiency and information density over delight. Data tables, filters, and bulk actions are core patterns."}
+    ]},
   // ── PM ──
-  {id:"r14",ct:"PM",ti:"Product Strategy",ds:"How we define and prioritize the product roadmap",tm:"15 min",rl:"PM"},
-  {id:"r15",ct:"PM",ti:"Product Skills",ds:"Core PM competencies at Lemonade — data, stakeholders, specs",tm:"12 min",rl:"PM"},
-  {id:"r16",ct:"PM",ti:"From OKRs to Weekly Planning",ds:"How company OKRs flow into squad goals and sprint work",tm:"10 min",rl:"PM"},
-  {id:"r17",ct:"PM",ti:"How We Do OKRs",ds:"The Lemonade OKR framework — setting, tracking, reviewing",tm:"10 min",rl:"PM"},
-  {id:"r18",ct:"PM",ti:"Monday Intro",ds:"Monday.com workspaces, boards, automations, and sprint management",tm:"15 min",rl:"PM"},
+  {id:"r14",ct:"PM",ti:"Product Strategy",ds:"How we define and prioritize the product roadmap",tm:"15 min",rl:"PM",au:"CPO Office",dt:"Jan 2026",
+    body:[
+      {h:"Strategy Framework",p:"Our product strategy follows: Mission → 3-Year Vision → Annual Themes → Quarterly OKRs → Squad Goals → Sprint Work. Every feature should trace back to a quarterly OKR."},
+      {h:"Prioritization",p:"We use RICE scoring (Reach × Impact × Confidence / Effort) for backlog prioritization. Quarterly planning involves all PMs, with final decisions by the product leadership team."},
+      {h:"Roadmap Management",p:"Living roadmap in Monday.com. Updated weekly. Three horizons: Now (this quarter, committed), Next (next quarter, planned), Later (6+ months, exploratory). Share roadmap updates in #product-all monthly."}
+    ]},
+  {id:"r15",ct:"PM",ti:"Product Skills",ds:"Core PM competencies at Lemonade — data, stakeholders, specs",tm:"12 min",rl:"PM",au:"PM Lead",dt:"Feb 2026",
+    body:[
+      {h:"Data-Informed Decisions",p:"Every PM at Lemonade must be data-literate. You'll use Mixpanel for product analytics, Looker for business metrics, and custom dashboards for squad-specific KPIs. Write SQL. Read graphs. Question assumptions."},
+      {h:"Stakeholder Management",p:"You'll work with engineering, design, actuarial, legal, and CX. Run weekly stakeholder syncs. Document decisions in Confluence. Use RACI for major initiatives."},
+      {h:"Writing Specs",p:"We use a standard spec template: Problem → Hypothesis → Solution → Success Metrics → Edge Cases → Dependencies. Specs live in Confluence and are reviewed by engineering + design before sprint planning."}
+    ]},
+  {id:"r16",ct:"PM",ti:"From OKRs to Weekly Planning",ds:"How company OKRs flow into squad goals and sprint work",tm:"10 min",rl:"PM",au:"Product Ops",dt:"Jan 2026",
+    body:[
+      {h:"The Cascade",p:"Company OKRs (set by leadership) → Department OKRs → Squad OKRs → Sprint goals → Individual tasks. Each level maps up clearly. If you can't trace a task to an OKR, question whether it should be done."},
+      {h:"Weekly Planning",p:"Monday: sprint planning + priority check. Wednesday: mid-week status. Friday: week-in-review + metrics check. Use Monday.com for task management, Slack for async updates, and Confluence for decisions."}
+    ]},
+  {id:"r17",ct:"PM",ti:"How We Do OKRs",ds:"The Lemonade OKR framework — setting, tracking, reviewing",tm:"10 min",rl:"PM",au:"Strategy Team",dt:"Jan 2026",
+    body:[
+      {h:"Setting OKRs",p:"Objectives are ambitious and inspiring. Key Results are measurable and time-bound. Each squad sets 2-3 OKRs per quarter. OKRs are graded 0.0-1.0, with 0.7 being 'on target' (we aim high)."},
+      {h:"Tracking & Review",p:"Weekly check-ins in Monday.com. Monthly all-hands updates. Quarterly grading and retrospective. OKR scores don't affect compensation — they're a tool for alignment and ambition."}
+    ]},
+  {id:"r18",ct:"PM",ti:"Monday Intro",ds:"Monday.com workspaces, boards, automations, and sprint management",tm:"15 min",rl:"PM",au:"PM Ops",dt:"Feb 2026",
+    body:[
+      {h:"Workspace Structure",p:"Top-level: Product workspace with boards per squad. Each board has groups: Backlog, Sprint, In Progress, Review, Done. Items have owner, priority, status, OKR link, and estimated effort fields."},
+      {h:"Automations",p:"Status changes trigger Slack notifications. Due date approaching sends reminders. When all sub-items are done, parent item auto-completes. Sprint velocity is calculated automatically."},
+      {h:"Sprint Management",p:"Use the Sprint View to plan 2-week sprints. Drag items from Backlog to Sprint. Monday calculates sprint capacity based on team size and historical velocity. Review sprint burndown chart daily."}
+    ]},
   // ── Analytics & Tools ──
-  {id:"r19",ct:"Tools",ti:"Mixpanel 101",ds:"Key funnels, event tracking, cohort analysis, and dashboards",tm:"15 min",rl:"PM"},
-  {id:"r20",ct:"Tools",ti:"Analytics 101",ds:"Data literacy — how to read dashboards and make data-informed decisions",tm:"12 min",rl:"All"},
+  {id:"r19",ct:"Tools",ti:"Mixpanel 101",ds:"Key funnels, event tracking, cohort analysis, and dashboards",tm:"15 min",rl:"PM",au:"Data Team",dt:"Feb 2026",
+    body:[
+      {h:"Getting Started",p:"Access Mixpanel at analytics.lemonade.com. Your SSO credentials work. You'll see pre-built dashboards for your squad. Key concepts: events (user actions), properties (event metadata), funnels (conversion paths), cohorts (user groups)."},
+      {h:"Key Funnels",p:"Quote-to-bind: measures conversion from quote generation to policy purchase. Claim filing: tracks drop-off through the claim submission flow. Onboarding: measures new user activation steps. These are the funnels you'll check daily."},
+      {h:"Building Reports",p:"Use Insights for trend analysis, Funnels for conversion, Retention for cohort stickiness, and Flows for user journey mapping. Save reports to your squad's dashboard. Share findings in #data-insights."}
+    ]},
+  {id:"r20",ct:"Tools",ti:"Analytics 101",ds:"Data literacy — how to read dashboards and make data-informed decisions",tm:"12 min",rl:"All",au:"Data Team",dt:"Jan 2026",
+    body:[
+      {h:"Why Data Matters",p:"At Lemonade, every team member should be data-literate. Whether you're an engineer optimizing performance, a designer running a usability test, or a PM measuring feature impact — data drives decisions."},
+      {h:"Key Dashboards",p:"Business metrics (Looker): revenue, policies, claims, loss ratio. Product metrics (Mixpanel): activation, engagement, conversion. Engineering metrics (Datadog): latency, error rates, uptime. Know where to find the metrics that matter to your work."},
+      {h:"Reading Metrics",p:"Always ask: What's the trend? What's the baseline? Is the sample significant? What's the segment? Don't act on single data points. Look for patterns across time and user groups."}
+    ]},
   // ── AI ──
-  {id:"r21",ct:"AI",ti:"AI @ Lemonade",ds:"How AI powers claims, pricing, fraud detection, and customer support",tm:"15 min",rl:"All"},
-  {id:"r22",ct:"AI",ti:"AI Contribution Logging Guide",ds:"How to document AI usage in every submission",tm:"8 min",rl:"All"},
-  {id:"r23",ct:"AI",ti:"AI Output Review Checklist",ds:"5-step process for reviewing and improving AI-generated content",tm:"10 min",rl:"All"}
+  {id:"r21",ct:"AI",ti:"AI @ Lemonade",ds:"How AI powers claims, pricing, fraud detection, and customer support",tm:"15 min",rl:"All",au:"AI Team",dt:"Feb 2026",
+    body:[
+      {h:"AI at Our Core",p:"Lemonade isn't a traditional insurance company using AI. We're an AI company doing insurance. Our AI handles: 95% of signups (Maya), 30% of claims (AI Jim), 100% of initial underwriting, and 80% of customer support routing."},
+      {h:"Key AI Systems",p:"Maya: conversational AI for onboarding and quotes. AI Jim: automated claims processing. CX.AI: customer support routing and suggestions. Forensic Graph: fraud detection network. Pricing Engine: ML-driven risk assessment."},
+      {h:"AI Ethics",p:"We audit models quarterly for bias. We maintain human oversight for all high-impact decisions. We're transparent about AI usage with customers. We comply with EU AI Act requirements across all markets."},
+      {h:"Your Role with AI",p:"As a maker, you'll both use AI tools in your work AND build AI-powered features. Document your AI usage honestly. Understand the models your squad uses. Question AI outputs — you're the quality gate."}
+    ]},
+  {id:"r22",ct:"AI",ti:"AI Contribution Logging Guide",ds:"How to document AI usage in every submission",tm:"8 min",rl:"All",au:"Engineering Practices",dt:"Feb 2026",
+    body:[
+      {h:"Why We Log AI",p:"AI transparency is core to our culture. By logging AI usage in every contribution (PR, design, brief), we track the balance between AI-assisted and human-crafted work. This isn't about limiting AI — it's about understanding how we use it."},
+      {h:"What to Log",p:"For every submission, record: which AI tool(s) used, what was AI-generated vs. human-refined, what percentage of the output is AI-originated, and what human judgment was applied. Be honest — there's no penalty for high AI usage."},
+      {h:"The AI Log Form",p:"Use the AI Log section in AMJ to record each contribution. Fields: contribution type, AI tools used, AI percentage (slider), what you modified, what you learned. Logs feed into your skill development tracking."}
+    ]},
+  {id:"r23",ct:"AI",ti:"AI Output Review Checklist",ds:"5-step process for reviewing and improving AI-generated content",tm:"10 min",rl:"All",au:"AI Practices Lead",dt:"Feb 2026",
+    body:[
+      {h:"The 5-Step Review",p:"1. Verify accuracy — check facts, numbers, and references. 2. Check context — does the output fit our specific use case? 3. Assess quality — is it production-ready or needs refinement? 4. Add domain knowledge — inject what only you know. 5. Document changes — log what you modified and why."},
+      {h:"Common Pitfalls",p:"AI hallucinations (confident but wrong), generic solutions (not Lemonade-specific), over-engineering, missing edge cases, and outdated patterns. Your expertise catches what AI misses."},
+      {h:"Best Practices",p:"Use AI for scaffolding, refine with domain knowledge. Don't copy-paste without review. Run AI code through your mental model before testing. If AI output feels 'off', trust your instinct and investigate."}
+    ]}
 ];
 
 const BENCHMARKS=[
@@ -533,11 +678,12 @@ const Toast=({msg,type,onDone})=>{
   </div>
 };
 
-const ActivityFeed=({items,limit=5})=><div className="space-y-3">{items.slice(0,limit).map((it,i)=><div key={i} className="flex items-center gap-3 py-2">
+const actScr=act=>{if(!act)return null;const a=act.toLowerCase();if(a.includes("pr ")||a.includes("merged")||a.includes("submitted")||a.includes("shipped")||a.includes("contribution"))return"contribs";if(a.includes("skill")||a.includes("verified"))return"skills";if(a.includes("design"))return"contribs";if(a.includes("checklist"))return"checklist";if(a.includes("audit")||a.includes("backlog"))return"contribs";if(a.includes("brief"))return"contribs";return null};
+const ActivityFeed=({items,limit=5,onNav})=><div className="space-y-3">{items.slice(0,limit).map((it,i)=>{const tgt=actScr(it.act);return<div key={i} className={`flex items-center gap-3 py-2 rounded-lg px-2 -mx-2 transition-all ${tgt&&onNav?"cursor-pointer hover:bg-[#FF008306]":""}`} onClick={()=>{if(tgt&&onNav)onNav(tgt)}}>
   <span className="flex-shrink-0"><CI n={it.ic} sz={16}/></span>
   <div className="flex-1 min-w-0"><p className="text-[13px] text-[#1A1A2E] font-medium truncate">{it.nm}</p><p className="text-[12px] text-[#6B7280] truncate">{it.act}</p></div>
-  <span className="text-[11px] text-[#9CA3AF] flex-shrink-0 whitespace-nowrap">{it.ts}</span>
-</div>)}</div>;
+  <div className="flex items-center gap-2 flex-shrink-0"><span className="text-[11px] text-[#9CA3AF] whitespace-nowrap">{it.ts}</span>{tgt&&onNav&&<span className="text-[#FF0083] text-[10px]">→</span>}</div>
+</div>})}</div>;
 
 // ───────────────── LEMONADE LINE-ART ILLUSTRATIONS ─────────────────
 const LemonIll=({w=120,h=120})=><svg width={w} height={h} viewBox="0 0 120 120" fill="none">
@@ -891,7 +1037,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
     )}
   </div>
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{filtered.map(e=>{const ph=pInfo(e.day);const lc=e.co[0];return(
-    <div key={e.id} className={`bg-white border rounded-[14px] p-5 shadow-sm card-h ${e.hp<65?"border-[#ef444450]":"border-[#E5E7EB]"}`}>
+    <div key={e.id} onClick={()=>onSel(e.id)} className={`bg-white border rounded-[14px] p-5 shadow-sm card-h cursor-pointer ${e.hp<65?"border-[#ef444450]":"border-[#E5E7EB]"}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3"><Av e={e} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · {e.dp}</p></div></div>
         <HealthBreakdown emp={e} sz={52}/>
@@ -903,7 +1049,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
         {lc&&<div className="flex justify-between"><span className="text-[11px] text-[#9CA3AF]">Last</span><span className="text-[11px] text-[#6B7280]">{lc.ty} · {lc.da}d ago</span></div>}
       </div>
       <div className="flex gap-2">
-        <button onClick={()=>onSel(e.id)} className="flex-1 text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl py-2 hover:bg-[#FF008310] transition-all font-semibold">View Profile</button>
+        <button onClick={e2=>{e2.stopPropagation();onSel(e.id)}} className="flex-1 text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl py-2 hover:bg-[#FF008310] transition-all font-semibold">View Profile</button>
         {onCompare&&<button onClick={()=>toggleCompare(e.id)} className={`w-10 rounded-xl border transition-all flex items-center justify-center ${compareIds.includes(e.id)?"bg-[#FF0083] border-[#FF0083] text-white":"border-[#E5E7EB] text-[#9CA3AF] hover:border-[#FF0083] hover:text-[#FF0083]"}`} title="Compare">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
         </button>}
@@ -982,7 +1128,7 @@ const ReviewAssist=({emps})=>{
 };
 
 // ───────────────── PHASE 4: STRATEGY ─────────────────
-const StratOver=()=>{
+const StratOver=({setScr})=>{
   const avgH=Math.round(E.reduce((s,e)=>s+e.hp,0)/E.length);const bl=E.filter(e=>e.co.some(c=>c.bl)).length;
   const p20=E.filter(e=>e.day>=20);const vr=p20.length?Math.round(p20.filter(e=>e.sk.some(s=>s.sr==="manager-verified")).length/p20.length*100):0;
   const avgAI=Math.round(E.reduce((s,e)=>s+e.co.reduce((ss,c)=>ss+c.ai,0)/(e.co.length||1),0)/E.length);
@@ -1014,7 +1160,7 @@ const StratOver=()=>{
     </table></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Recent Activity</h3>
-      <ActivityFeed items={TIMELINE} limit={5}/>
+      <ActivityFeed items={TIMELINE} limit={5} onNav={setScr}/>
     </div>
   </div>
 };
@@ -1233,191 +1379,54 @@ const CrisisSim=()=>{
 };
 
 // ───────────────── NEW: INTEGRATIONS ─────────────────
+const SrcLogo=({src,sz=16})=>{const s={GitHub:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>,Jira:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><defs><linearGradient id="jg1" x1="98%" y1="0%" x2="58%" y2="90%"><stop offset="18%" stopColor="#0052CC"/><stop offset="100%" stopColor="#2684FF"/></linearGradient></defs><path d="M11.53 2L2 11.53l3.54 3.54 5.99-5.99 5.99 5.99 3.54-3.54L11.53 2z" fill="url(#jg1)"/><path d="M11.53 8.59L7.47 12.65l4.06 4.06 4.06-4.06-4.06-4.06z" fill="#2684FF"/></svg>,Figma:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4z" fill="#0ACF83"/><path d="M4 12c0-2.2 1.8-4 4-4h4v8H8c-2.2 0-4-1.8-4-4z" fill="#A259FF"/><path d="M4 4c0-2.2 1.8-4 4-4h4v8H8C5.8 8 4 6.2 4 4z" fill="#F24E1E"/><path d="M12 0h4c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4V0z" fill="#FF7262"/><path d="M20 12c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4z" fill="#1ABCFE"/></svg>,Monday:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><circle cx="5" cy="17" r="3.5" fill="#FF3D57"/><circle cx="12" cy="12" r="3.5" fill="#FFCB00"/><circle cx="19" cy="7" r="3.5" fill="#00D647"/></svg>,Slack:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><path d="M5.04 15.16a2.53 2.53 0 01-2.52 2.53A2.53 2.53 0 010 15.16a2.53 2.53 0 012.52-2.52h2.52v2.52zm1.27 0a2.53 2.53 0 012.52-2.52 2.53 2.53 0 012.52 2.52v6.32A2.53 2.53 0 018.83 24a2.53 2.53 0 01-2.52-2.52v-6.32z" fill="#E01E5A"/><path d="M8.83 5.04a2.53 2.53 0 01-2.52-2.52A2.53 2.53 0 018.83 0a2.53 2.53 0 012.52 2.52v2.52H8.83zm0 1.27a2.53 2.53 0 012.52 2.52 2.53 2.53 0 01-2.52 2.52H2.52A2.53 2.53 0 010 8.83a2.53 2.53 0 012.52-2.52h6.31z" fill="#36C5F0"/><path d="M18.96 8.83a2.53 2.53 0 012.52-2.52A2.53 2.53 0 0124 8.83a2.53 2.53 0 01-2.52 2.52h-2.52V8.83zm-1.27 0a2.53 2.53 0 01-2.52 2.52 2.53 2.53 0 01-2.52-2.52V2.52A2.53 2.53 0 0115.17 0a2.53 2.53 0 012.52 2.52v6.31z" fill="#2EB67D"/><path d="M15.17 18.96a2.53 2.53 0 012.52 2.52A2.53 2.53 0 0115.17 24a2.53 2.53 0 01-2.52-2.52v-2.52h2.52zm0-1.27a2.53 2.53 0 01-2.52-2.52 2.53 2.53 0 012.52-2.52h6.31A2.53 2.53 0 0124 15.17a2.53 2.53 0 01-2.52 2.52h-6.31z" fill="#ECB22E"/></svg>};return<span className="flex-shrink-0" style={{color:"#6B7280"}}>{s[src]||<CI n="bolt" sz={sz}/>}</span>};
+
 const Integrations=({emp,toast})=>{
-  const copyId=(id)=>{navigator.clipboard.writeText(id).then(()=>{toast&&toast("Copied "+id+" to clipboard")}).catch(()=>{})};
-  const allTabs=[["slack","Slack","bubble",["Engineer","Designer","PM"],"Connected ↔"],["github","GitHub","octopus",["Engineer"],"Connected ↔"],["jira","Jira","ticket",["Engineer","Designer","PM"],"Connected ↔"],["figma","Figma","paint",["Designer","Engineer"],"Connected ↔"],["confluence","Confluence","book",["PM"],"Connected ↔"],["monday","Monday","clipboard",["Engineer","Designer","PM"],"Connected ↔"],["mixpanel","Mixpanel","bar-chart",["Designer","PM"],"Connected ↔"]];
-  const tabs=allTabs.filter(([,,,r])=>r.includes(emp.rl));
-  const[tab,setTab]=useState("slack");
-  // ── GitHub mock data ──
-  const ghPRs=[
-    {id:"#247",ti:"Refactor claim validation pipeline",br:"feat/validation-refactor",st:"merged",rev:"Tamar Golan",age:"2d",ci:"pass",add:"+142",del:"-38"},
-    {id:"#251",ti:"Unit tests for notification service",br:"test/notif-service",st:"review",rev:"Lior Menashe",age:"4h",ci:"pass",add:"+89",del:"-12"},
-    {id:"#254",ti:"Fix edge case in policy renewal",br:"fix/renewal-edge",st:"open",rev:"—",age:"1h",ci:"running",add:"+23",del:"-5"},
-    {id:"#239",ti:"Add caching layer for user preferences",br:"feat/user-prefs-cache",st:"merged",rev:"Ran",age:"5d",ci:"pass",add:"+67",del:"-21"}
-  ];
-  const ghCommits=[{h:"a3f2c1d",msg:"fix: handle null policy in validation chain",ts:"2h ago"},{h:"8b1e4f2",msg:"test: add coverage for notification retry logic",ts:"5h ago"},{h:"c7d9a0b",msg:"refactor: extract validation utils to shared module",ts:"1d ago"}];
-  // ── Jira mock data ──
-  const jiraSprint={nm:"Sprint 24 — Product Core",days:8,total:14,pts:{done:21,prog:13,todo:8,total:42}};
-  const jiraTickets=[
-    {id:"LEM-342",ti:"Implement claim validation v2",st:"In Progress",pt:5,as:"MC",ep:"Claims Modernization",ty:"Story"},
-    {id:"LEM-351",ti:"Add unit tests for notification service",st:"In Progress",pt:3,as:"MC",ep:"Quality & Testing",ty:"Task"},
-    {id:"LEM-289",ti:"Design system token migration",st:"Done",pt:8,as:"TL",ep:"Design System",ty:"Story"},
-    {id:"LEM-356",ti:"Q2 OKR alignment review",st:"Done",pt:2,as:"NS",ep:"Strategy",ty:"Task"},
-    {id:"LEM-360",ti:"API endpoint for policy recommendations",st:"To Do",pt:5,as:"YB",ep:"Insurance AI",ty:"Story"},
-    {id:"LEM-348",ti:"Mobile nav responsive patterns",st:"In Review",pt:3,as:"TL",ep:"Design System",ty:"Story"}
-  ];
-  // ── Figma mock data ──
-  const figmaFiles=[
-    {nm:"Lemonade DS v3",pg:24,cmp:186,up:"2h ago",by:"Shira Katz",ic:"paint",st:"Published"},
-    {nm:"Claims Status Redesign",pg:8,cmp:32,up:"1d ago",by:"Tom Levi",ic:"phone",st:"In Review"},
-    {nm:"Mobile Nav Patterns",pg:5,cmp:14,up:"3h ago",by:"Tom Levi",ic:"phone",st:"Draft"},
-    {nm:"Onboarding Flow Illustrations",pg:12,cmp:48,up:"2d ago",by:"Shira Katz",ic:"frame",st:"Shipped"},
-    {nm:"Error State Patterns",pg:6,cmp:22,up:"5h ago",by:"Ori Navon",ic:"warn",st:"In Review"}
-  ];
-  const figmaTokens=[{nm:"Pink / Primary",vl:"#FF0083",ty:"Color"},{nm:"Navy / Text",vl:"#1A1A2E",ty:"Color"},{nm:"Spacing / md",vl:"16px",ty:"Spacing"},{nm:"Radius / card",vl:"14px",ty:"Radius"},{nm:"Font / body",vl:"Lato 400",ty:"Typography"}];
-  // ── Confluence mock data ──
-  const confPages=[
-    {ti:"Lemonade Architecture Overview",sp:"Engineering",up:"3d ago",by:"Tamar Golan",ic:"building",views:142},
-    {ti:"Claims Service API Reference",sp:"Engineering",up:"1w ago",by:"Lior Menashe",ic:"signal",views:89},
-    {ti:"Q2 OKR Framework",sp:"Product",up:"2d ago",by:"Noa Shapiro",ic:"target-sm",views:67},
-    {ti:"Design System Guidelines v3",sp:"Design",up:"4d ago",by:"Shira Katz",ic:"paint",views:53},
-    {ti:"Onboarding: First 30 Days",sp:"People",up:"1w ago",by:"Dana",ic:"books",views:201},
-    {ti:"AI Usage Policy & Best Practices",sp:"Engineering",up:"5d ago",by:"Ran",ic:"robot",views:178}
-  ];
-  // ── Slack mock data ──
-  const slackMsgs=[
-    {u:"Maya Cohen",av:"MC",t:"Hey team, just submitted my first PR! Refactored the claim validation pipeline.",ts:"10:32 AM"},
-    {u:"lemon-ask",av:"AI",t:"@Maya Nice work! Your PR has been assigned to Ran for review. While you wait, consider: What edge cases might affect validation with international policies?",ts:"10:33 AM",bot:true},
-    {u:"Tom Levi",av:"TL",t:"Anyone know where the design system tokens live? Need them for the status page redesign.",ts:"11:15 AM"},
-    {u:"lemon-ask",av:"AI",t:"@Tom Design tokens are in /packages/design-system/tokens. Also check the Figma library \"Lemonade DS v3\" for the latest updates. Want me to explain the token naming convention?",ts:"11:15 AM",bot:true},
-    {u:"Shira Katz",av:"SK",t:"/lemon-ask What's the accessibility standard we follow?",ts:"2:45 PM"},
-    {u:"lemon-ask",av:"AI",t:"@Shira We follow WCAG 2.1 AA. Key requirements: 4.5:1 contrast ratio for text, keyboard navigable, screen reader compatible. Our pink #FF0083 on white needs careful handling — check the a11y guide in Notion.",ts:"2:45 PM",bot:true}
-  ];
-  const fiberyTasks=[
-    {col:"To Do",tasks:[{t:"Write user stories for claims v2",p:"Medium",a:"NS"},{t:"Research competitor onboarding",p:"Low",a:"AD"}]},
-    {col:"In Progress",tasks:[{t:"Refactor validation pipeline",p:"High",a:"MC"},{t:"Dashboard accessibility audit",p:"High",a:"SK"}]},
-    {col:"Done",tasks:[{t:"Claims status redesign",p:"High",a:"TL"},{t:"Q2 OKR alignment",p:"Medium",a:"NS"},{t:"GTM plan: Pet v2",p:"High",a:"AD"}]}
-  ];
-  const mixMetrics=[{lb:"DAU",v:"12.4K",ch:"+8.2%",up:true},{lb:"Claim Resolution",v:"4.2 min",ch:"-12%",up:true},{lb:"NPS Score",v:"72",ch:"+3",up:true},{lb:"Churn Rate",v:"2.1%",ch:"+0.3%",up:false}];
-  const funnel=[{s:"Quote Started",v:100,w:"100%"},{s:"Quote Completed",v:68,w:"68%"},{s:"Policy Purchased",v:42,w:"42%"},{s:"Claim Filed",v:15,w:"15%"},{s:"Claim Resolved",v:12,w:"12%"}];
+  const myTasks=TASKS.filter(t=>t.emp===emp.id);
+  const[tasks,setTasks]=useState(myTasks);
+  const[srcFilter,setSrcFilter]=useState("all");
+  const[adding,setAdding]=useState(false);
+  const[newTask,setNewTask]=useState({ti:"",src:"Jira",pri:"medium",due:""});
+  const srcs=["all",...new Set(tasks.map(t=>t.src))];
+  const filtered=srcFilter==="all"?tasks:tasks.filter(t=>t.src===srcFilter);
+  const cols=[{k:"todo",lb:"To Do",co:"#9CA3AF"},{k:"in-progress",lb:"In Progress",co:"#3b82f6"},{k:"done",lb:"Done",co:"#10b981"}];
+  const cycleSt=(id)=>{setTasks(p=>p.map(t=>{if(t.id!==id)return t;const nx=t.st==="todo"?"in-progress":t.st==="in-progress"?"done":"todo";return{...t,st:nx}}));toast&&toast("Task status updated")};
+  const addTask=()=>{if(!newTask.ti.trim())return;setTasks(p=>[{id:"tk-"+Date.now(),ti:newTask.ti,src:newTask.src,srcId:newTask.src.slice(0,3).toUpperCase()+"-"+Math.floor(Math.random()*900+100),url:"#",pri:newTask.pri,st:"todo",as:emp.ld,due:newTask.due||"This week",emp:emp.id},...p]);setNewTask({ti:"",src:"Jira",pri:"medium",due:""});setAdding(false);toast&&toast("Task added")};
+  const priCo={high:{bg:"#fef2f2",tx:"#dc2626"},medium:{bg:"#fffbeb",tx:"#d97706"},low:{bg:"#F3F4F6",tx:"#9CA3AF"}};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Tools Hub</h1><p className="text-[14px] text-[#6B7280] mt-1">Quick links to your daily tools — all connected via API</p></div>
-    <div className="flex gap-2 mb-6 flex-wrap">{tabs.map(([id,lb,ic,,sync])=>
-      <button key={id} onClick={()=>setTab(id)} className={`px-5 py-2.5 rounded-[14px] text-[14px] font-medium transition-all flex items-center gap-2 ${tab===id?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}><CI n={ic} sz={16} co={tab===id?"#fff":"#6B7280"}/> {lb}</button>
-    )}</div>
-    <div className="flex items-center gap-3 mb-5 px-1"><span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#10b981]"/><span className="text-[11px] text-[#6B7280]">All integrations connected via 2-way API sync</span></span><span className="text-[10px] text-[#9CA3AF]">Last synced: 2 min ago</span></div>
-
-    {tab==="slack"&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
-      <div className="bg-[#F7F7F7] border-b border-[#E5E7EB] px-5 py-3 flex items-center gap-2"><span className="text-[14px] font-semibold text-[#1A1A2E]"># onboarding-2026</span><span className="text-[12px] text-[#9CA3AF]">6 members</span></div>
-      <div className="p-5 space-y-4">{slackMsgs.map((m,i)=><div key={i} className="flex gap-3">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${m.bot?"bg-[#FF008315] text-[#FF0083]":"bg-[#F3F4F6] text-[#6B7280]"}`}>{m.av}</div>
-        <div><div className="flex items-center gap-2"><span className={`text-[13px] font-semibold ${m.bot?"text-[#FF0083]":"text-[#1A1A2E]"}`}>{m.u}</span>{m.bot&&<span className="text-[9px] bg-[#FF008315] text-[#FF0083] px-1.5 py-0.5 rounded font-semibold">BOT</span>}<span className="text-[11px] text-[#9CA3AF]">{m.ts}</span></div>
-          <p className="text-[13px] text-[#6B7280] mt-0.5 leading-relaxed">{m.t}</p></div>
+    <div className="flex items-center justify-between mb-6">
+      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">My Tasks This Week</h1><p className="text-[14px] text-[#6B7280] mt-1">Synced from your connected tools — assigned by {emp.ld}</p></div>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[11px] text-[#6B7280] shadow-sm"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>2-way sync active</div>
+        <button onClick={()=>setAdding(!adding)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p flex items-center gap-1.5">+ Add Task</button>
+      </div>
+    </div>
+    {adding&&<div className="bg-white border border-[#FF008330] rounded-[14px] p-5 shadow-sm mb-5 fi">
+      <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">New Task</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+        <input value={newTask.ti} onChange={e=>setNewTask(p=>({...p,ti:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Task title *"/>
+        <select value={newTask.src} onChange={e=>setNewTask(p=>({...p,src:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]"><option>Jira</option><option>GitHub</option><option>Figma</option><option>Monday</option></select>
+        <select value={newTask.pri} onChange={e=>setNewTask(p=>({...p,pri:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+        <input value={newTask.due} onChange={e=>setNewTask(p=>({...p,due:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Due: Today, Tomorrow..."/>
+      </div>
+      <div className="flex gap-2"><button onClick={addTask} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p">Add</button><button onClick={()=>setAdding(false)} className="text-[13px] text-[#6B7280] px-4 py-2 hover:text-[#1A1A2E]">Cancel</button></div>
+    </div>}
+    <div className="flex gap-2 mb-5 flex-wrap">{srcs.map(s=><button key={s} onClick={()=>setSrcFilter(s)} className={`px-4 py-2 rounded-[14px] text-[13px] font-medium transition-all flex items-center gap-2 ${srcFilter===s?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{s!=="all"&&<SrcLogo src={s} sz={14}/>}{s==="all"?"All Sources":s}</button>)}</div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">{cols.map(col=>{const ct=filtered.filter(t=>t.st===col.k);return<div key={col.k} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between" style={{borderLeft:`3px solid ${col.co}`}}><span className="text-[13px] font-semibold text-[#1A1A2E]">{col.lb}</span><span className="text-[11px] text-[#9CA3AF] bg-[#F3F4F6] rounded-full px-2.5 py-0.5">{ct.length}</span></div>
+      <div className="p-3 space-y-2 min-h-[100px]">{ct.length===0?<p className="text-[12px] text-[#D1D5DB] text-center py-6">No tasks</p>:ct.map(t=><div key={t.id} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3.5 hover:border-[#FF008340] transition-all group">
+        <div className="flex items-start justify-between mb-2"><p className="text-[13px] font-medium text-[#1A1A2E] flex-1">{t.ti}</p></div>
+        <div className="flex items-center gap-2 mb-2.5"><SrcLogo src={t.src} sz={14}/><span className="text-[10px] font-mono text-[#6B7280]">{t.srcId}</span><span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium`} style={{background:priCo[t.pri].bg,color:priCo[t.pri].tx}}>{t.pri}</span></div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2"><span className="text-[10px] text-[#9CA3AF]">Due: {t.due}</span><span className="text-[10px] text-[#9CA3AF]">· {t.as}</span></div>
+          <div className="flex items-center gap-1.5">
+            <button onClick={()=>cycleSt(t.id)} className="text-[9px] px-2 py-0.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] hover:text-[#FF0083] transition-all" title="Cycle status">Move →</button>
+            <a href={t.url} target="_blank" rel="noopener" className="text-[9px] px-2 py-0.5 rounded-full border border-[#E5E7EB] text-[#FF0083] hover:bg-[#FF008310] transition-all font-medium" onClick={e=>e.stopPropagation()}>Open ↗</a>
+          </div>
+        </div>
       </div>)}</div>
-    </div>}
-
-    {tab==="monday"&&<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{fiberyTasks.map((col,i)=>
-      <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between"><span className="text-[13px] font-semibold text-[#1A1A2E]">{col.col}</span><span className="text-[11px] text-[#9CA3AF] bg-[#F3F4F6] rounded-full px-2 py-0.5">{col.tasks.length}</span></div>
-        <div className="p-3 space-y-2">{col.tasks.map((t,j)=><div key={j} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3">
-          <p className="text-[13px] font-medium text-[#1A1A2E] mb-2">{t.t}</p>
-          <div className="flex items-center justify-between"><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${t.p==="High"?"bg-[#fef2f2] text-[#dc2626]":t.p==="Medium"?"bg-[#fffbeb] text-[#d97706]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>{t.p}</span><span className="text-[11px] text-[#9CA3AF]">{t.a}</span></div>
-        </div>)}</div>
-      </div>
-    )}</div>}
-
-    {tab==="mixpanel"&&<div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">{mixMetrics.map((m,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm">
-        <p className="text-[11px] text-[#9CA3AF] uppercase tracking-wider font-semibold mb-1">{m.lb}</p>
-        <p className="text-[28px] font-bold text-[#1A1A2E]">{m.v}</p>
-        <span className={`text-[12px] font-medium ${m.up?"text-[#10b981]":"text-[#ef4444]"}`}>{m.ch}</span>
-      </div>)}</div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Conversion Funnel</h3>
-        <div className="space-y-3">{funnel.map((f,i)=><div key={i} className="flex items-center gap-4">
-          <span className="text-[13px] text-[#6B7280] w-32 text-right">{f.s}</span>
-          <div className="flex-1 h-8 bg-[#F3F4F6] rounded-lg overflow-hidden"><div className="h-full rounded-lg flex items-center px-3" style={{width:f.w,background:`linear-gradient(90deg,#FF0083${i===0?"":"cc"},#ff4da6${i===0?"":"88"})`}}><span className="text-[12px] font-bold text-white">{f.v}%</span></div></div>
-        </div>)}</div>
-      </div>
-    </div>}
-
-    {tab==="github"&&<div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden mb-4">
-        <div className="bg-[#F7F7F7] border-b border-[#E5E7EB] px-5 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2"><span className="text-[14px] font-semibold text-[#1A1A2E]">lemonade-inc / core</span><span className="text-[11px] px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[#10b981] font-medium">● CI Passing</span></div>
-          <span className="text-[12px] text-[#9CA3AF]">4 open PRs</span>
-        </div>
-        <div className="divide-y divide-[#E5E7EB]">{ghPRs.map((p,i)=><div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-[#F7F7F7] transition-colors">
-          <button onClick={()=>copyId(p.id)} title="Copy ID" className="text-[13px] font-mono text-[#FF0083] font-bold w-12 hover:underline cursor-pointer">{p.id}</button>
-          <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{p.ti}</p><p className="text-[11px] text-[#9CA3AF] font-mono">{p.br}</p></div>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${p.st==="merged"?"bg-[#f0fdf4] text-[#10b981]":p.st==="review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#eff6ff] text-[#3b82f6]"}`}>{p.st==="review"?"In Review":p.st[0].toUpperCase()+p.st.slice(1)}</span>
-          <span className="text-[11px] text-[#9CA3AF] w-24 text-right truncate">{p.rev}</span>
-          <div className="flex items-center gap-1.5 text-[11px]"><span className="text-[#10b981]">{p.add}</span><span className="text-[#ef4444]">{p.del}</span></div>
-          <a href={`https://github.com/lemonade-inc/core/pull/${p.id.replace("#","")}`} target="_blank" rel="noopener" className="text-[10px] text-[#FF0083] font-medium hover:underline flex-shrink-0">View on GitHub &#x2197;</a>
-        </div>)}</div>
-      </div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Recent Commits</h3>
-        <div className="space-y-2.5">{ghCommits.map((c,i)=><div key={i} className="flex items-center gap-3">
-          <span className="text-[12px] font-mono text-[#FF0083] bg-[#FF008310] px-2 py-0.5 rounded">{c.h}</span>
-          <span className="text-[13px] text-[#6B7280] flex-1 truncate">{c.msg}</span>
-          <span className="text-[11px] text-[#9CA3AF]">{c.ts}</span>
-        </div>)}</div>
-      </div>
-    </div>}
-
-    {tab==="jira"&&<div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{jiraSprint.nm}</h3><p className="text-[12px] text-[#6B7280]">{jiraSprint.days} days remaining</p></div>
-          <div className="text-right"><span className="text-[14px] font-bold text-[#FF0083]">{jiraSprint.pts.done}/{jiraSprint.pts.total}</span><span className="text-[12px] text-[#9CA3AF] ml-1">pts</span></div>
-        </div>
-        <div className="h-2.5 bg-[#F3F4F6] rounded-full overflow-hidden flex">
-          <div className="h-full rounded-l-full" style={{width:`${(jiraSprint.pts.done/jiraSprint.pts.total)*100}%`,background:"#10b981"}}/>
-          <div className="h-full" style={{width:`${(jiraSprint.pts.prog/jiraSprint.pts.total)*100}%`,background:"#3b82f6"}}/>
-        </div>
-        <div className="flex gap-4 mt-2 text-[11px] text-[#6B7280]">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>Done ({jiraSprint.pts.done})</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#3b82f6]"/>In Progress ({jiraSprint.pts.prog})</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#E5E7EB]"/>To Do ({jiraSprint.pts.todo})</span>
-        </div>
-      </div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
-        <div className="divide-y divide-[#E5E7EB]">{jiraTickets.map((t,i)=><div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-[#F7F7F7] transition-colors">
-          <button onClick={()=>copyId(t.id)} title="Copy ID" className="text-[12px] font-mono text-[#FF0083] font-semibold w-20 hover:underline cursor-pointer text-left">{t.id}</button>
-          <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{t.ti}</p><span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{t.ep}</span></div>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${t.st==="Done"?"bg-[#f0fdf4] text-[#10b981]":t.st==="In Progress"?"bg-[#eff6ff] text-[#3b82f6]":t.st==="In Review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>{t.st}</span>
-          <span className="text-[11px] text-[#9CA3AF] bg-[#F3F4F6] rounded px-1.5 py-0.5 font-mono">{t.pt}pt</span>
-          <span className="text-[11px] text-[#9CA3AF] w-8 text-center">{t.as}</span>
-          <a href={`https://lemonade.atlassian.net/browse/${t.id}`} target="_blank" rel="noopener" className="text-[10px] text-[#FF0083] font-medium hover:underline flex-shrink-0">Open in Jira &#x2197;</a>
-        </div>)}</div>
-      </div>
-    </div>}
-
-    {tab==="figma"&&<div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">{figmaFiles.map((f,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2"><CI n={f.ic} sz={18}/><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${f.st==="Published"?"bg-[#f0fdf4] text-[#10b981]":f.st==="Shipped"?"bg-[#FF008315] text-[#FF0083]":f.st==="In Review"?"bg-[#fffbeb] text-[#d97706]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>{f.st}</span></div>
-          <span className="text-[11px] text-[#9CA3AF]">{f.up}</span>
-        </div>
-        <h4 className="text-[14px] font-semibold text-[#1A1A2E] mb-1">{f.nm}</h4>
-        <p className="text-[12px] text-[#6B7280] mb-3">{f.pg} pages · {f.cmp} components · {f.by}</p>
-        <a href={`https://figma.com/file/lemonade-ds/${f.nm.replace(/\s+/g,'-').toLowerCase()}`} target="_blank" rel="noopener" className="text-[12px] text-[#FF0083] font-medium hover:underline">Open in Figma &#x2192;</a>
-      </div>)}</div>
-      {emp.rl==="Engineer"&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Dev Mode — Design Tokens</h3>
-        <div className="grid grid-cols-5 gap-3">{figmaTokens.map((t,i)=><div key={i} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3 text-center">
-          {t.ty==="Color"?<div className="w-8 h-8 rounded-lg mx-auto mb-2 border border-[#E5E7EB]" style={{background:t.vl}}/>:<div className="w-8 h-8 rounded-lg mx-auto mb-2 bg-[#F3F4F6] flex items-center justify-center text-[10px] font-mono text-[#6B7280]">{t.vl}</div>}
-          <p className="text-[11px] font-medium text-[#1A1A2E] truncate">{t.nm}</p>
-          <p className="text-[10px] text-[#9CA3AF] font-mono">{t.vl}</p>
-        </div>)}</div>
-      </div>}
-    </div>}
-
-    {tab==="confluence"&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
-      <div className="bg-[#F7F7F7] border-b border-[#E5E7EB] px-5 py-3 flex items-center justify-between">
-        <span className="text-[14px] font-semibold text-[#1A1A2E] flex items-center gap-1.5"><CI n="books" sz={16}/> Lemonade Wiki</span>
-        <span className="text-[12px] text-[#9CA3AF]">{confPages.length} pages</span>
-      </div>
-      <div className="divide-y divide-[#E5E7EB]">{confPages.map((p,i)=><div key={i} className="px-5 py-3.5 flex items-center gap-3 hover:bg-[#F7F7F7] transition-colors">
-        <span className="flex-shrink-0"><CI n={p.ic} sz={18}/></span>
-        <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-medium text-[#1A1A2E]">{p.ti}</p>
-          <div className="flex items-center gap-2 mt-0.5"><span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{p.sp}</span><span className="text-[11px] text-[#9CA3AF]">by {p.by} · {p.up}</span></div>
-        </div>
-        <div className="flex items-center gap-1 text-[11px] text-[#9CA3AF]"><CI n="eye" sz={12} co="#9CA3AF"/> {p.views}</div>
-      </div>)}</div>
-    </div>}
+    </div>})}</div>
+    <div className="mt-5 flex items-center gap-4 px-1 flex-wrap">{["GitHub","Jira","Figma","Monday","Slack"].map(s=><div key={s} className="flex items-center gap-1.5 text-[11px] text-[#9CA3AF]"><SrcLogo src={s} sz={12}/>{s}<span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"/></div>)}</div>
   </div>
 };
 
@@ -1498,10 +1507,10 @@ const MakerDash=({emp,setScr})=>{
   const[showHealthBD,setShowHealthBD]=useState(false);const healthBDRef=useRef(null);
   useEffect(()=>{if(!showHealthBD)return;const h=e=>{if(healthBDRef.current&&!healthBDRef.current.contains(e.target))setShowHealthBD(false)};document.addEventListener("mousedown",h);return()=>document.removeEventListener("mousedown",h)},[showHealthBD]);
   const stats=[
-    {lb:"Day",v:emp.day+"/30",ic:"calendar-sm",co:"#FF0083",sub:`Phase ${pDay(emp.day)}: ${pInfo(emp.day).nm}`},
+    {lb:"Day",v:emp.day+"/30",ic:"calendar-sm",co:"#FF0083",sub:`Phase ${pDay(emp.day)}: ${pInfo(emp.day).nm}`,scr:"journey"},
     {lb:"Health",v:emp.hp,ic:"muscle",co:emp.hp>=75?"#10b981":"#f59e0b",sub:emp.hp>=80?"On track":"Needs attention",isHealth:true},
-    {lb:"Contributions",v:emp.co.length,ic:"pencil",co:"#3b82f6",sub:`${emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length} shipped`},
-    {lb:"Avg AI %",v:avgAI+"%",ic:"robot",co:avgAI<=50?"#10b981":"#f59e0b",sub:avgAI<=50?"Good balance":"Consider reducing"}
+    {lb:"Contributions",v:emp.co.length,ic:"pencil",co:"#3b82f6",sub:`${emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length} shipped`,scr:"contributions"},
+    {lb:"Avg AI %",v:avgAI+"%",ic:"robot",co:avgAI<=50?"#10b981":"#f59e0b",sub:avgAI<=50?"Good balance":"Consider reducing",scr:"ai-usage"}
   ];
   const staticNudge=NUDGES.filter(n=>n.day<=emp.day).pop();
   const smartNudges=computeNudges(emp);
@@ -1510,7 +1519,10 @@ const MakerDash=({emp,setScr})=>{
   return<div className="fi">
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-4"><LemonIll w={48} h={48}/><div><div className="flex items-center gap-3 mb-1"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Good morning, {emp.nm.split(" ")[0]}</h1><RoleBadge rl={emp.rl}/></div><p className="text-[14px] text-[#6B7280]">Here's your onboarding snapshot</p></div></div>
-      {streak>=3&&<div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-4 py-2"><CI n="fire" sz={18} co="#FF0083"/><span className="text-[14px] font-bold text-[#FF0083]">{streak}-day streak</span></div>}
+      <div className="flex items-center gap-3">
+        {streak>=3&&<div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-4 py-2"><CI n="fire" sz={18} co="#FF0083"/><span className="text-[14px] font-bold text-[#FF0083]">{streak}-day streak</span></div>}
+        {LEADS[emp.ld]&&<div className="flex items-center gap-2.5 bg-white border border-[#E5E7EB] rounded-full px-3 py-1.5 shadow-sm"><img src={LEADS[emp.ld].ph} alt="" className="w-7 h-7 rounded-full object-cover"/><div><p className="text-[11px] font-semibold text-[#1A1A2E]">{LEADS[emp.ld].nm}</p><p className="text-[9px] text-[#9CA3AF]">Your Lead</p></div></div>}
+      </div>
     </div>
     {firstShip&&emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length===1&&<div className="bg-gradient-to-r from-[#FF008315] to-[#FF008305] border border-[#FF008330] rounded-[14px] p-4 mb-5 flex items-center gap-3 fi">
       <CI n="party" sz={24} co="#FF0083"/><div><p className="text-[14px] font-bold text-[#1A1A2E]">You shipped your first contribution!</p><p className="text-[12px] text-[#6B7280]">Here's what your lead said: "{emp.co.find(c=>c.st==="merged"||c.st==="shipped")?.rv||'Great work — keep it up!'}"</p></div>
@@ -1521,7 +1533,7 @@ const MakerDash=({emp,setScr})=>{
     :staticNudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-center gap-3">
       <CI n={staticNudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706]"><strong>Nudge:</strong> {staticNudge.tx}</p>
     </div>}
-    <div className="grid grid-cols-4 gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm relative ${s.isHealth?"cursor-pointer hover:border-[#FF008340]":""}`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):undefined}>
+    <div className="grid grid-cols-4 gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm relative cursor-pointer hover:border-[#FF008340] transition-all`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):s.scr?()=>setScr(s.scr):undefined}>
       <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}{s.isHealth&&<span className="text-[9px] font-normal ml-1 normal-case">(click)</span>}</p></div>
       <p className="text-[28px] font-bold tracking-tight" style={{color:s.co}}>{s.v}</p>
       <p className="text-[12px] text-[#6B7280] mt-1">{s.sub}</p>
@@ -1556,7 +1568,7 @@ const MakerDash=({emp,setScr})=>{
           </div>
           <button onClick={()=>setScr("integrations")} className="mt-3 text-[11px] text-[#FF0083] font-medium hover:underline">View all in Tools Hub →</button>
         </div>
-        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm cursor-pointer hover:border-[#FF008340] transition-all" onClick={()=>setScr("skills")}>
           <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Achievements</h3>
           <div className="flex flex-wrap gap-2">{BADGES.map(b=>{const got=b.un(emp);return<div key={b.id} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-medium border ${got?"bg-[#FF008310] border-[#FF008330] text-[#FF0083]":"bg-[#F3F4F6] border-[#E5E7EB] text-[#D1D5DB]"}`} title={b.ds}>
             <span className={got?"":"grayscale opacity-40"}><CI n={b.ic} sz={14} co={got?"#FF0083":"#D1D5DB"}/></span>{b.nm}
@@ -1566,7 +1578,7 @@ const MakerDash=({emp,setScr})=>{
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Recent Activity</h3>
-        <ActivityFeed items={TIMELINE.filter(t=>t.emp===emp.id)} limit={5}/>
+        <ActivityFeed items={TIMELINE.filter(t=>t.emp===emp.id)} limit={5} onNav={setScr}/>
       </div>
     </div>
   </div>
@@ -1644,25 +1656,52 @@ const Calendar=({toast})=>{
 const Resources=({emp})=>{
   const myRes=RESOURCES.filter(r=>r.rl==="All"||r.rl===emp.rl);
   const cats=[...new Set(myRes.map(r=>r.ct))];
-  const[tab,setTab]=useState(cats[0]||"Product");const[done,setDone]=useState({});
+  const[tab,setTab]=useState(cats[0]||"Product");const[openId,setOpenId]=useState(null);const[search,setSearch]=useState("");
   const items=myRes.filter(r=>r.ct===tab);
-  const total=myRes.length;const completed=Object.values(done).filter(Boolean).length;
+  const openArt=openId?RESOURCES.find(r=>r.id===openId):null;
+  const filtered=search?myRes.filter(r=>r.ti.toLowerCase().includes(search.toLowerCase())||r.ds.toLowerCase().includes(search.toLowerCase())||(r.body||[]).some(s=>s.h.toLowerCase().includes(search.toLowerCase())||s.p.toLowerCase().includes(search.toLowerCase()))):items;
   return<div className="fi">
-    <div className="flex items-center justify-between mb-8">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Resources</h1><p className="text-[14px] text-[#6B7280] mt-1">Curated knowledge base for your onboarding</p></div>
-      <div className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-[14px] px-5 py-3 shadow-sm">
-        <span className="text-[14px] font-bold text-[#FF0083]">{completed}/{total}</span>
-        <div className="w-24 h-2 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${(completed/total)*100}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
+    {openArt?<div className="fi">
+      <button onClick={()=>setOpenId(null)} className="flex items-center gap-2 text-[14px] text-[#6B7280] hover:text-[#1A1A2E] transition-colors mb-5">← Back to Knowledge Base</button>
+      <div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
+        <div className="bg-gradient-to-r from-[#FF008310] to-[#FF008305] px-8 py-6 border-b border-[#E5E7EB]">
+          <div className="flex items-center gap-2 mb-2"><span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FF008315] text-[#FF0083] font-semibold uppercase tracking-wider">{openArt.ct}</span><span className="text-[11px] text-[#9CA3AF]">·</span><span className="text-[11px] text-[#9CA3AF]">{openArt.tm} read</span>{openArt.rl!=="All"&&<><span className="text-[11px] text-[#9CA3AF]">·</span><span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{openArt.rl}</span></>}</div>
+          <h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">{openArt.ti}</h1>
+          <p className="text-[14px] text-[#6B7280] mt-1">{openArt.ds}</p>
+          {openArt.au&&<div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#E5E7EB30]"><div className="w-8 h-8 rounded-full bg-[#FF008320] flex items-center justify-center text-[12px] font-bold text-[#FF0083]">{openArt.au[0]}</div><div><p className="text-[12px] font-medium text-[#1A1A2E]">{openArt.au}</p><p className="text-[10px] text-[#9CA3AF]">Updated {openArt.dt||"Jan 2026"}</p></div></div>}
+        </div>
+        <div className="px-8 py-6 space-y-6">{(openArt.body||[]).map((s,i)=><div key={i}>
+          <h2 className="text-[18px] font-bold text-[#1A1A2E] mb-2 flex items-center gap-2"><span className="w-1.5 h-6 rounded-full bg-[#FF0083]"/>{s.h}</h2>
+          <p className="text-[14px] text-[#6B7280] leading-relaxed pl-4">{s.p}</p>
+        </div>)}</div>
+        <div className="px-8 py-5 border-t border-[#E5E7EB] bg-[#F7F7F7] flex items-center justify-between">
+          <p className="text-[11px] text-[#9CA3AF]">Was this article helpful?</p>
+          <div className="flex gap-2"><button className="px-3 py-1 rounded-lg border border-[#E5E7EB] text-[12px] text-[#6B7280] hover:border-[#10b981] hover:text-[#10b981] transition-all">👍 Yes</button><button className="px-3 py-1 rounded-lg border border-[#E5E7EB] text-[12px] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">👎 No</button></div>
+        </div>
       </div>
     </div>
-    <div className="flex gap-2 mb-6">{cats.map(c=><button key={c} onClick={()=>setTab(c)} className={`px-4 py-2 rounded-[14px] text-[14px] font-medium transition-all ${tab===c?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{c}</button>)}</div>
-    <div className="space-y-3">{items.map(r=><div key={r.id} className={`bg-white border rounded-[14px] p-4 shadow-sm flex items-center gap-4 transition-all ${done[r.id]?"border-[#10b981] bg-[#f0fdf4]":"border-[#E5E7EB] card-h"}`}>
-      <div onClick={()=>setDone(p=>({...p,[r.id]:!p[r.id]}))} className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 cursor-pointer ${done[r.id]?"bg-[#10b981] border-[#10b981] text-white":"border-[#D1D5DB]"}`}>{done[r.id]&&<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}</div>
-      <div className="flex-1"><p className={`text-[14px] font-medium ${done[r.id]?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{r.ti}</p><p className="text-[12px] text-[#6B7280] mt-0.5">{r.ds}</p></div>
-      <div className="flex items-center gap-2 flex-shrink-0"><span className="text-[11px] text-[#9CA3AF]">{r.tm}</span>
-        {r.rl!=="All"&&<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{r.rl}</span>}
+    :<>
+    <div className="flex items-center justify-between mb-6">
+      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Knowledge Base</h1><p className="text-[14px] text-[#6B7280] mt-1">Everything you need to know — curated for {emp.rl}s</p></div>
+      <div className="flex items-center gap-3">
+        <span className="text-[11px] text-[#9CA3AF]">{myRes.length} articles</span>
+        <input value={search} onChange={e=>setSearch(e.target.value)} className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] w-48 shadow-sm" placeholder="Search articles..."/>
+      </div>
+    </div>
+    {!search&&<div className="flex gap-2 mb-6">{cats.map(c=><button key={c} onClick={()=>setTab(c)} className={`px-4 py-2 rounded-[14px] text-[14px] font-medium transition-all ${tab===c?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{c}</button>)}</div>}
+    {search&&<p className="text-[13px] text-[#6B7280] mb-4">{filtered.length} result{filtered.length!==1?"s":""} for "{search}"</p>}
+    <div className="space-y-3">{filtered.map(r=><div key={r.id} onClick={()=>{setOpenId(r.id);setSearch("")}} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm cursor-pointer card-h transition-all hover:border-[#FF008340] group">
+      <div className="flex items-start gap-4">
+        <div className="w-10 h-10 rounded-xl bg-[#FF008310] flex items-center justify-center flex-shrink-0"><CI n={r.ct==="Engineering"?"octopus":r.ct==="Design"?"paint":r.ct==="AI"?"robot":r.ct==="Tools"?"bolt":"books"} sz={20} co="#FF0083"/></div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1"><h3 className="text-[15px] font-semibold text-[#1A1A2E] group-hover:text-[#FF0083] transition-colors">{r.ti}</h3><span className="text-[#FF0083] opacity-0 group-hover:opacity-100 transition-opacity text-[13px]">→</span></div>
+          <p className="text-[13px] text-[#6B7280]">{r.ds}</p>
+          <div className="flex items-center gap-3 mt-2"><span className="text-[10px] text-[#9CA3AF]">{r.tm} read</span>{r.au&&<span className="text-[10px] text-[#9CA3AF]">by {r.au}</span>}{r.body&&<span className="text-[10px] text-[#9CA3AF]">{r.body.length} sections</span>}</div>
+        </div>
+        {r.rl!=="All"&&<span className="text-[10px] px-2.5 py-1 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium flex-shrink-0">{r.rl}</span>}
       </div>
     </div>)}</div>
+    </>}
   </div>
 };
 
@@ -1700,7 +1739,7 @@ const FAQLinks=()=>{
     </div>)}</div>}
     {tab==="links"&&<div className="space-y-5">{IMP_LINKS.map((cat,i)=><div key={i}>
       <h3 className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#9CA3AF] mb-3">{cat.cat}</h3>
-      <div className="grid grid-cols-2 gap-3">{cat.links.map((l,j)=><a key={j} href={l.ur} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-3 card-h no-underline">
+      <div className="grid grid-cols-2 gap-3">{cat.links.map((l,j)=><a key={j} href={l.ur} target="_blank" rel="noopener noreferrer" className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-3 card-h no-underline">
         <div className="w-8 h-8 rounded-lg bg-[#FF008310] flex items-center justify-center text-[#FF0083] text-sm font-bold flex-shrink-0">{l.nm[0]=="#"?"#":l.nm[0]}</div>
         <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{l.nm}</p><p className="text-[11px] text-[#6B7280]">{l.ds}</p></div>
         <span className="text-[11px] text-[#FF0083]">→</span>
@@ -2304,10 +2343,12 @@ const TourOverlay=({step,onNext,onSkip})=>{
   const pad=8;
   const tipW=280;
   let tipStyle={};
-  if(s.pos==="right")tipStyle={top:pos.top,left:pos.left+pos.width+pad+12};
+  const maxTop=window.innerHeight-220;
+  if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:pos.left+pos.width+pad+12};
   else if(s.pos==="bottom")tipStyle={top:pos.top+pos.height+pad+12,left:Math.max(8,pos.left+pos.width/2-tipW/2)};
-  else if(s.pos==="left")tipStyle={top:pos.top,left:pos.left-tipW-pad-12};
+  else if(s.pos==="left")tipStyle={top:Math.min(pos.top,maxTop),left:Math.max(8,pos.left-tipW-pad-12)};
   else tipStyle={top:pos.top-160,left:pos.left+pos.width/2-tipW/2};
+  if(tipStyle.top>maxTop)tipStyle.top=maxTop;
   return<div style={{position:"fixed",inset:0,zIndex:200}}>
     <div style={{position:"absolute",inset:0,background:"transparent",boxShadow:`0 0 0 ${pos.top-pad}px rgba(0,0,0,0.5) inset`,clipPath:`polygon(0 0,100% 0,100% 100%,0 100%,0 ${pos.top-pad}px,${pos.left-pad}px ${pos.top-pad}px,${pos.left-pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top-pad}px,0 ${pos.top-pad}px)`}} onClick={onSkip}/>
     <div style={{position:"absolute",top:pos.top-pad,left:pos.left-pad,width:pos.width+pad*2,height:pos.height+pad*2,border:"2px solid #FF0083",borderRadius:12,pointerEvents:"none",boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}/>
@@ -2474,7 +2515,9 @@ const SpotlightCard=({emps})=>{
 const App=()=>{
   const[appReady,setAppReady]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)},[]);
-  const[role,setRole]=usePersistedState("role","maker");const[scr,setScr]=usePersistedState("scr","welcome");const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
+  const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=usePersistedState("scr","welcome");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
+  const setScr=useCallback((s)=>{_setScr(prev=>{setScrHist(h=>[...h.slice(-19),prev]);return s})},[_setScr]);
+  const goBack=useCallback(()=>{if(scrHist.length>0){const prev=scrHist[scrHist.length-1];setScrHist(h=>h.slice(0,-1));_setScr(prev)}},[scrHist,_setScr]);
   const[toast,setToast]=useState(null);const[notifOpen,setNotifOpen]=useState(false);const[searchQ,setSearchQ]=useState("");const[searchOpen,setSearchOpen]=useState(false);
   const[compOpen,setCompOpen]=useState(false);
   const[sidebarOpen,setSidebarOpen]=useState(false);
@@ -2502,6 +2545,7 @@ const App=()=>{
   // Dark mode & reduce motion class management
   useEffect(()=>{const root=document.getElementById('root');if(root){if(darkMode)root.classList.add('dark');else root.classList.remove('dark')}},[darkMode]);
   useEffect(()=>{if(reduceMotion)document.body.classList.add('reduce-motion');else document.body.classList.remove('reduce-motion')},[reduceMotion]);
+  useEffect(()=>{if(highContrast)document.body.classList.add('high-contrast');else document.body.classList.remove('high-contrast')},[highContrast]);
   // Real-time notifications
   useEffect(()=>{
     if(!liveNotifs)return;
@@ -2586,7 +2630,7 @@ const App=()=>{
     if(scr==="benchmarks")return<BenchmarkView/>;
     if(scr==="attrition")return<AttritionRisk/>;
     if(scr==="content")return<ContentIntel/>;
-    return<StratOver/>;
+    return<StratOver setScr={setScr}/>;
   };
 
   if(!appReady) return <div className="h-screen bg-white flex flex-col items-center justify-center gap-6">
@@ -2625,6 +2669,8 @@ const App=()=>{
         <span className="hidden sm:inline text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
       <div className="flex items-center gap-2 lg:gap-3">
+        {/* BACK BUTTON */}
+        {scrHist.length>0&&<button onClick={goBack} className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" title="Go back" aria-label="Go back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>}
         {/* SEARCH */}
         <div className="relative tour-search hidden sm:block">
           <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSearchOpen(true)}} onFocus={()=>setSearchOpen(true)} onBlur={()=>setTimeout(()=>setSearchOpen(false),200)}
