@@ -393,22 +393,58 @@ const NAV={
 };
 
 // ───────────────── CHAT LOGIC ─────────────────
-const compR=m=>{const l=m.toLowerCase();
-  if(l.includes("week"))return"Week 2 is **The Sandbox** — your safe space for first contributions.\n\n• Submit 2–3 small PRs/briefs with AI Contribution Logs\n• Pair with a squad member on at least one task\n• Attend your first sprint ceremony\n\nThe goal isn't perfection — it's building the muscle of contributing and iterating.";
+const compR=(m,history,emp)=>{const l=m.toLowerCase();
+  // Build context from history (last 5 topics)
+  const prevTopics=[];
+  if(history&&history.length>0){
+    history.slice(-10).forEach(h=>{
+      if(h.r==="u"){const hl=h.t.toLowerCase();
+        if(hl.includes("skill"))prevTopics.push("skills");
+        if(hl.includes("ai")||hl.includes("contribution"))prevTopics.push("ai");
+        if(hl.includes("health")||hl.includes("score"))prevTopics.push("health");
+        if(hl.includes("team")||hl.includes("squad"))prevTopics.push("team");
+        if(hl.includes("career")||hl.includes("growth"))prevTopics.push("career");
+        if(hl.includes("week")||hl.includes("phase"))prevTopics.push("phase");
+      }
+    });
+  }
+  // Personalization based on emp data
+  const empCtx=emp?{nm:emp.nm.split(" ")[0],day:emp.day,hp:emp.hp,phase:pDay(emp.day),skCount:emp.sk?emp.sk.length:0,coCount:emp.co?emp.co.length:0,avgAI:emp.co&&emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0,skills:emp.sk?emp.sk.map(s=>s.nm):[],verifiedSkills:emp.sk?emp.sk.filter(s=>s.sr==="manager-verified").map(s=>s.nm):[],learningSkills:emp.sk?emp.sk.filter(s=>s.lv==="learning").map(s=>s.nm):[]}:null;
+  // Context-aware responses for follow-up questions
+  if(prevTopics.length>0&&(l.includes("improve")||l.includes("better")||l.includes("how do i")||l.includes("what should"))){
+    const lastTopic=prevTopics[prevTopics.length-1];
+    if(lastTopic==="skills"&&empCtx)return`Based on your skills, ${empCtx.nm}, here's how to improve:\n\n• You have **${empCtx.skCount} skills** tracked${empCtx.verifiedSkills.length>0?` (${empCtx.verifiedSkills.length} verified)`:""}${empCtx.learningSkills.length>0?`\n• **Focus on**: ${empCtx.learningSkills.slice(0,3).join(", ")} — these are at 'learning' level`:""}\n• Ask your lead for a **skill verification** session\n• Pair with a proficient teammate on your weaker areas\n\nConsistent practice beats cramming.`;
+    if(lastTopic==="ai"&&empCtx)return`Your AI usage is at **${empCtx.avgAI}%** average${empCtx.avgAI>60?", which is on the higher side":""}.\n\n• ${empCtx.avgAI>60?"Try reducing AI reliance by 10% on your next contribution":"Great balance — keep logging your AI usage"}\n• Focus on the **human-crafted** sections\n• The sweet spot is 30-50% AI usage\n\nAI is a tool, not a crutch.`;
+    if(lastTopic==="health"&&empCtx)return`Your health score is **${empCtx.hp}**${empCtx.hp>=80?" — you're doing great!":", let's work on that"}.\n\n• **Contribution frequency**: Submit regularly, even small ones\n• **Skill progress**: Get skills verified by your lead\n• **AI balance**: Aim for 30-50% AI usage\n• **Engagement**: Ship work and participate in reviews\n\nSmall, consistent actions build health over time.`;
+    if(lastTopic==="career"&&empCtx)return`At Day ${empCtx.day}, ${empCtx.nm}, focus on:\n\n• **Right now**: Master Phase ${empCtx.phase} outcomes\n• **Skills**: ${empCtx.skCount} tracked — get more verified\n• **Contributions**: ${empCtx.coCount} so far — aim for consistent output\n• **60-day goals**: Set these after your 30-day onboarding\n\nCareer growth at Lemonade is skills-based, not tenure-based.`;
+  }
+  // Standard responses with personalization
+  if(l.includes("week"))return`Week 2 is **The Sandbox** — your safe space for first contributions.${empCtx?`\n\n${empCtx.nm}, you're on Day ${empCtx.day} (Phase ${empCtx.phase}).`:""}\n\n• Submit 2–3 small PRs/briefs with AI Contribution Logs\n• Pair with a squad member on at least one task\n• Attend your first sprint ceremony\n\nThe goal isn't perfection — it's building the muscle of contributing and iterating.`;
   if(l.includes("okr")||l.includes("sprint"))return"OKRs at Lemonade flow **company → squad → individual**.\n\n• **Company OKR**: North star (e.g. 'Increase claims satisfaction 20%')\n• **Squad OKR**: Your team's slice\n• **Sprint work**: Each task traces back to a squad OKR\n\nLink your work to OKRs — it shows product thinking.";
   if(l.includes("pr")||l.includes("review"))return"A great review goes beyond 'LGTM':\n\n• **Craft questions**: 'Why this approach?' not just 'Does it work?'\n• **AI awareness**: What was AI-generated vs. human-crafted?\n• **Learning lens**: What can the maker learn?\n• **Actionable feedback**: Specific suggestions, not vague concerns\n\nReviews are teaching moments, not gatekeeping.";
   if(l.includes("audit")||l.includes("fresh"))return"The **Fresh Eyes Audit** is uniquely Lemonade:\n\n• In Week 3, audit a real product flow as a new user\n• Your fresh perspective catches things veterans miss\n• Strong findings get **added to the product backlog**\n\nYour inexperience is your superpower right now.";
   if(l.includes("arch")||l.includes("system"))return"Lemonade's architecture:\n\n• **Microservices**: Each domain is a separate service\n• **Event-driven**: Services communicate via events\n• **AI-first**: AI models integrated at the core\n• **Mobile-first**: APIs designed for mobile first";
-  if(l.includes("ai")||l.includes("contribution"))return"AI at Lemonade is a **craft philosophy**:\n\n• **AI Contribution Logging**: Document what AI generated vs. what you crafted\n• **Intentional use**: Decrease AI reliance over time\n• **AI Output Review**: Never ship raw AI content\n• **Intentional AI User badge**: Earned by consistent logging";
+  if(l.includes("ai")||l.includes("contribution")){let r="AI at Lemonade is a **craft philosophy**:\n\n• **AI Contribution Logging**: Document what AI generated vs. what you crafted\n• **Intentional use**: Decrease AI reliance over time\n• **AI Output Review**: Never ship raw AI content\n• **Intentional AI User badge**: Earned by consistent logging";if(empCtx&&empCtx.avgAI)r+=`\n\nYour current avg AI usage: **${empCtx.avgAI}%**${empCtx.avgAI>60?" — consider bringing it down a bit":empCtx.avgAI<40?" — healthy range!":""}.`;return r;}
   if(l.includes("culture")||l.includes("value")||l.includes("mission"))return"Lemonade is a **B-Corp** with a unique model:\n\n• **Giveback**: Unclaimed premiums go to charities customers choose\n• **Transparency**: Open about our numbers and practices\n• **AI-first**: Founded on the belief that AI can make insurance fair\n• **Customer-centric**: Every decision starts with 'What would a customer want?'\n\nUnderstanding the mission helps you make better product decisions.";
   if(l.includes("tool")||l.includes("stack")||l.includes("tech"))return"Our core stack:\n\n• **Frontend**: React, TypeScript, React Native (mobile)\n• **Backend**: Node.js, Python, Go microservices\n• **Data**: PostgreSQL, Redis, Kafka for events\n• **AI/ML**: Python, TensorFlow, custom models\n• **Tools**: Figma, Monday, Mixpanel, Slack, GitHub\n\nYou don't need to know everything — focus on your squad's slice.";
   if(l.includes("team")||l.includes("squad"))return"Squads at Lemonade are **cross-functional**:\n\n• Each squad has Engineers, Designers, and PMs\n• Squads own a product area end-to-end\n• **Ceremonies**: Daily standup, weekly planning, bi-weekly retro\n• **Decision-making**: Squad leads decide, escalate when needed\n\nYour squad is your home — build relationships there first.";
   if(l.includes("career")||l.includes("growth")||l.includes("level"))return"Growth at Lemonade:\n\n• **IC Track**: Junior → Mid → Senior → Staff → Principal\n• **Management Track**: Lead → Director → VP\n• **Skills-based**: Promotion is based on demonstrated skills, not tenure\n• **60-day goals**: Set after onboarding, reviewed quarterly\n\nFocus on craft mastery first — career growth follows.";
   if(l.includes("stuck")||l.includes("help")||l.includes("block"))return"When you're stuck:\n\n• **First**: Check the Resources tab — most answers are documented\n• **Second**: Ask in your squad's Slack channel\n• **Third**: Ping your lead for a quick sync\n• **Emergency**: #help-engineering or #help-design channels\n\nAsking for help is a sign of strength, not weakness.";
-  return"I can help with your onboarding! Try asking about:\n\n• What to focus on each week\n• How OKRs connect to your work\n• What makes a good review\n• The Fresh Eyes Audit\n• Lemonade's architecture & tech stack\n• How AI is used here\n• Culture & mission\n• Squad structure\n• Career growth\n• What to do when stuck";
+  let fallback="I can help with your onboarding! Try asking about:\n\n• What to focus on each week\n• How OKRs connect to your work\n• What makes a good review\n• The Fresh Eyes Audit\n• Lemonade's architecture & tech stack\n• How AI is used here\n• Culture & mission\n• Squad structure\n• Career growth\n• What to do when stuck";
+  if(empCtx)fallback+=`\n\nBy the way ${empCtx.nm}, you're on **Day ${empCtx.day}** with **${empCtx.coCount} contributions**. Keep going!`;
+  return fallback;
 };
 
-const stratR=m=>{const l=m.toLowerCase();
+const stratR=(m,history)=>{const l=m.toLowerCase();
+  const prevTopics=[];
+  if(history&&history.length>0){history.slice(-10).forEach(h=>{if(h.r==="u"){const hl=h.t.toLowerCase();if(hl.includes("slow")||hl.includes("ramp"))prevTopics.push("ramp");if(hl.includes("health"))prevTopics.push("health");if(hl.includes("skill"))prevTopics.push("skill");if(hl.includes("cohort"))prevTopics.push("cohort")}});}
+  if(prevTopics.length>0&&(l.includes("more")||l.includes("detail")||l.includes("what else")||l.includes("tell me more"))){
+    const lt=prevTopics[prevTopics.length-1];
+    if(lt==="ramp")return"**Deeper dive on slow ramps:**\n\n• **Yoni**: Avg AI at 78%, hasn't had a PR merged yet. Consider a pairing session with Tamar (strongest eng).\n• **Ori**: Motion design skills are strong but Lemonade style is unclear. Schedule a design review with Shira.\n\n**Action**: Both need 1:1 attention this week.";
+    if(lt==="health")return"**Health score factors:**\n\n• Contribution frequency (25%)\n• Skill progress (20%)\n• AI balance (20%)\n• Phase progress (20%)\n• Engagement (15%)\n\nYoni's main drag: low contribution frequency + high AI reliance.";
+    if(lt==="skill")return"**Skill gap deep-dive:**\n\n• **AI-Native** is the weakest category across the board\n• Engineers struggle most with 'AI Integration'\n• PMs need 'AI Output Review' training\n• Designers lag on 'AI Contribution Logging'\n\n**Rec**: Role-specific AI workshops.";
+    if(lt==="cohort")return"**Cohort retention risk:**\n\n• **Cohort A**: Low risk — strong performers, high engagement\n• **Cohort B**: Medium risk — Yoni's struggles may affect morale\n• **Cohort C**: Medium risk — early days, need structured support\n\n**Rec**: Weekly cohort check-ins for B and C.";
+  }
   if(l.includes("slow")||l.includes("ramp"))return"**Slowest ramps:**\n\n• **Yoni Bar** (Eng, Day 22, health 58) — PR stuck 7 days, high AI reliance\n• **Ori Navon** (Design, Day 20, health 67) — 3 skills at 'learning', design in review 8 days\n\n**Rec**: Pair programming for Yoni, design mentorship for Ori.";
   if(l.includes("health")||l.includes("lowest"))return"**Health distribution (10 employees):**\n\n• **[Green]** Above 80: Amit (95), Tamar (91), Noa (90), Shira (88), Eden (85), Maya (82)\n• **[Yellow]** 60\u201380: Lior (76), Tom (71), Ori (67)\n• **[Red]** Below 60: Yoni (58)\n\n**Avg health: 78.** Two employees need immediate attention.";
   if(l.includes("skill")||l.includes("gap"))return"**Biggest gap: AI-Native skills**\n\nAcross 10 employees:\n• 4 at 'learning' level\n• 3 at 'practicing'\n• 3 at 'proficient' (2 verified)\n\n**Rec**: Focused AI-Native workshop this week.";
@@ -685,22 +721,55 @@ const AIU=({emp})=>{
   </div>
 };
 
-const CompanionPanel=({open,onClose,scr,role,emp,personality})=>{
+const CompanionPanel=({open,onClose,scr,setScr,role,emp,personality})=>{
   const greeting=personality==="formal"?"Hello. I'm Lemi, your onboarding companion. I'm here to assist with any questions about your Lemonade journey.":"Hey! I'm Lemi, your onboarding companion. Ask me anything about your Lemonade journey — I'm here to guide, not to give answers.";
   const[msgs,setMsgs]=useState([{r:"a",t:greeting,typing:false}]);
   const[inp,setInp]=useState("");const[typ,setTyp]=useState(false);const ref=useRef(null);const typingRef=useRef(null);
+  const[recording,setRecording]=useState(false);const recognRef=useRef(null);
+  const hasSpeech=typeof window!=="undefined"&&(window.SpeechRecognition||window.webkitSpeechRecognition);
   useEffect(()=>{ref.current?.scrollIntoView({behavior:"smooth"})},[msgs,typ]);
   const insight=getInsight(scr,role,emp);
-  const send=t=>{if(!t.trim())return;if(typingRef.current)clearInterval(typingRef.current);setMsgs(p=>{const cleaned=p.map(m=>m.typing?{...m,typing:false}:m);return[...cleaned,{r:"u",t:t.trim()}]});setInp("");
-    const resp=role==="strategy"?stratR(t):compR(t);
-    const words=resp.split(' ');
-    let idx=0;
-    setMsgs(p=>[...p,{r:"a",t:"",typing:true}]);
-    typingRef.current=setInterval(()=>{
-      idx++;
-      setMsgs(p=>{const next=[...p];const last=next[next.length-1];if(last&&last.r==="a"){next[next.length-1]={...last,t:words.slice(0,idx).join(' '),typing:idx<words.length}}return next});
-      if(idx>=words.length){clearInterval(typingRef.current);typingRef.current=null}
-    },40);
+  // Derive action buttons from response text
+  const getActionBtns=(text)=>{
+    if(!text||!setScr)return[];const t=text.toLowerCase();const btns=[];
+    if(t.includes("skill"))btns.push({lb:"Go to Skills",sc:"skills"});
+    if(t.includes("contribution")||t.includes("pr")||t.includes("submission"))btns.push({lb:"Go to Contributions",sc:"contributions"});
+    if(t.includes("journey")||t.includes("phase")||t.includes("week"))btns.push({lb:"Go to Journey",sc:"journey"});
+    if(t.includes("ai")||t.includes("ai contribution")||t.includes("ai log"))btns.push({lb:"Go to AI Log",sc:"ai-log"});
+    if(t.includes("calendar")||t.includes("ceremony")||t.includes("standup"))btns.push({lb:"Go to Calendar",sc:"calendar"});
+    if(t.includes("resource")||t.includes("course")||t.includes("architecture"))btns.push({lb:"Go to Resources",sc:"resources"});
+    if(t.includes("checklist"))btns.push({lb:"Go to Checklist",sc:"checklist"});
+    if(t.includes("health")||t.includes("score"))btns.push({lb:"Go to Dashboard",sc:role==="maker"?"home":"team"});
+    return btns.slice(0,2);
+  };
+  const send=t=>{if(!t.trim())return;if(typingRef.current)clearInterval(typingRef.current);
+    setMsgs(p=>{const cleaned=p.map(m=>m.typing?{...m,typing:false}:m);return[...cleaned,{r:"u",t:t.trim()}]});setInp("");
+    // Pass conversation history and emp for context (#26)
+    setTimeout(()=>{
+      setMsgs(prev=>{
+        const history=prev.filter(m=>!m.typing);
+        const resp=role==="strategy"?stratR(t,history):compR(t,history,emp);
+        const words=resp.split(' ');
+        let idx=0;
+        typingRef.current=setInterval(()=>{
+          idx++;
+          setMsgs(p2=>{const next=[...p2];const last=next[next.length-1];if(last&&last.r==="a"){next[next.length-1]={...last,t:words.slice(0,idx).join(' '),typing:idx<words.length}}return next});
+          if(idx>=words.length){clearInterval(typingRef.current);typingRef.current=null}
+        },40);
+        return[...prev,{r:"a",t:"",typing:true}];
+      });
+    },10);
+  };
+  // Voice input (#15)
+  const toggleVoice=()=>{
+    if(recording&&recognRef.current){recognRef.current.stop();setRecording(false);return}
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR)return;
+    const recog=new SR();recog.continuous=false;recog.interimResults=false;recog.lang="en-US";
+    recog.onresult=ev=>{const txt=ev.results[0][0].transcript;setInp(prev=>prev?prev+" "+txt:txt);setRecording(false)};
+    recog.onerror=()=>setRecording(false);
+    recog.onend=()=>setRecording(false);
+    recognRef.current=recog;recog.start();setRecording(true);
   };
   const getChips=()=>{
     if(role==="lead"){
@@ -723,6 +792,7 @@ const CompanionPanel=({open,onClose,scr,role,emp,personality})=>{
     if(scr==="welcome")return["Tell me about Lemonade's culture","What's the Giveback program?"];
     return["What should I focus on this week?","How do OKRs connect to my sprint?","What's the Fresh Eyes Audit?"];
   };
+  const topicCount=msgs.filter(m=>m.r==="u").length;
   const chips=getChips();
   if(!open)return null;
   return<div className="fixed top-0 right-0 h-full w-[380px] bg-white border-l border-[#E5E7EB] shadow-2xl z-50 flex flex-col fi" style={{boxShadow:"-8px 0 30px rgba(0,0,0,.08)"}}>
@@ -731,7 +801,7 @@ const CompanionPanel=({open,onClose,scr,role,emp,personality})=>{
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-sm">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 2 5 5 5 9c0 2.5 1 4 3 6l-1 5 4-2 4 2-1-5c2-2 3-3.5 3-6 0-4-3-7-5-7z" fill="white" opacity=".9"/><circle cx="10" cy="9" r="1.2" fill="#FF0083"/><circle cx="14" cy="9" r="1.2" fill="#FF0083"/><path d="M9.5 12.5c0 0 1.5 1.5 5 0" stroke="#FF0083" strokeWidth="1.2" strokeLinecap="round"/></svg>
         </div>
-        <div><p className="text-[14px] font-bold text-[#1A1A2E]">Lemi</p><p className="text-[10px] text-[#9CA3AF]">Your onboarding companion</p></div>
+        <div><p className="text-[14px] font-bold text-[#1A1A2E]">Lemi</p>{topicCount>0?<p className="text-[10px] text-[#FF0083] flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FF0083" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2a7 7 0 017 7c0 3-2 5-4 7l1 6-4-2-4 2 1-6c-2-2-4-4-4-7a7 7 0 017-7z"/></svg> Lemi remembers your context</p>:<p className="text-[10px] text-[#9CA3AF]">Your onboarding companion</p>}</div>
       </div>
       <button onClick={onClose} className="w-7 h-7 rounded-lg bg-[#F7F7F7] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A2E] hover:bg-[#E5E7EB] transition-all text-xs">✕</button>
     </div>
@@ -745,8 +815,11 @@ const CompanionPanel=({open,onClose,scr,role,emp,personality})=>{
         <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${m.r==="u"?"text-white shadow-sm":"bg-[#F7F7F7] border border-[#E5E7EB] text-[#6B7280]"}`} style={m.r==="u"?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>
           <Md t={m.t}/>{m.r==="a"&&!m.typing&&i>0&&<p className="mt-2 text-[10px] italic text-[#D1D5DB]">What do you think? Form your own view first.</p>}
         </div>
-        {m.r==="a"&&!m.typing&&i===msgs.length-1&&i>0&&<div className="flex gap-2 mt-2 flex-wrap">
-          {getFollowUps(m.t).map((f,j)=><button key={j} onClick={()=>{setInp(f)}} className="text-[11px] px-3 py-1.5 rounded-full border border-[#FF008325] text-[#FF0083] hover:bg-[#FF008310] transition-colors">{f}</button>)}
+        {m.r==="a"&&!m.typing&&i===msgs.length-1&&i>0&&<div className="flex flex-col gap-1.5 mt-2">
+          <div className="flex gap-2 flex-wrap">
+            {getFollowUps(m.t).map((f,j)=><button key={j} onClick={()=>{setInp(f)}} className="text-[11px] px-3 py-1.5 rounded-full border border-[#FF008325] text-[#FF0083] hover:bg-[#FF008310] transition-colors">{f}</button>)}
+          </div>
+          {setScr&&getActionBtns(m.t).length>0&&<div className="flex gap-2 flex-wrap">{getActionBtns(m.t).map((a,j)=><button key={j} onClick={()=>{setScr(a.sc);onClose()}} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FF0083] text-white hover:bg-[#e6007a] transition-colors flex items-center gap-1">{a.lb} <span className="text-[10px]">&rarr;</span></button>)}</div>}
         </div>}
         </div>
       </div>)}
@@ -756,20 +829,29 @@ const CompanionPanel=({open,onClose,scr,role,emp,personality})=>{
     {!typ&&chips.length>0&&<div className="px-4 pb-2 flex flex-wrap gap-1.5">{chips.map((c,i)=><button key={i} onClick={()=>send(c)} className="text-[11px] bg-[#F7F7F7] border border-[#E5E7EB] rounded-full px-3 py-1.5 text-[#6B7280] hover:border-[#FF0083] hover:text-[#FF0083] transition-all">{c}</button>)}</div>}
     <div className="px-4 py-3 border-t border-[#E5E7EB] flex gap-2 flex-shrink-0">
       <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send(inp)} className="flex-1 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] transition-colors" placeholder="Ask Lemi..."/>
+      {hasSpeech&&<button onClick={toggleVoice} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 ${recording?"bg-[#ef4444] shadow-lg":"bg-[#F7F7F7] border border-[#E5E7EB] hover:border-[#FF0083]"}`} title={recording?"Stop recording":"Voice input"} style={recording?{animation:"pr 1.5s ease-out infinite"}:{}}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={recording?"white":"#6B7280"} strokeWidth="2" strokeLinecap="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>}
       <button onClick={()=>send(inp)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2.5 text-[13px] font-semibold btn-p">Send</button>
     </div>
   </div>
 };
 
 // ───────────────── PHASE 3: LEAD ─────────────────
-const TeamDash=({emps,onSel,leadNm})=>{
+const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
   const[filter,setFilter]=useState("all");
   const onTrack=emps.filter(e=>e.hp>=75).length;const attn=emps.filter(e=>e.hp>=60&&e.hp<75).length;const atRisk=emps.filter(e=>e.hp<60).length;
   const filtered=filter==="all"?emps:filter==="on-track"?emps.filter(e=>e.hp>=75):filter==="attention"?emps.filter(e=>e.hp<75&&e.hp>=60):emps.filter(e=>e.hp<60);
   const lead=LEADS[leadNm]||LEADS.Ran;
   const byDept={};emps.forEach(e=>{if(!byDept[e.dp])byDept[e.dp]=[];byDept[e.dp].push(e)});
+  const toggleCompare=(id)=>{if(!onCompare)return;if(compareIds.includes(id)){onCompare(compareIds.filter(x=>x!==id))}else if(compareIds.length<2){onCompare([...compareIds,id])}};
   return<div className="fi">
-  <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding — {emps.length} reports</p></div>
+  <div className="mb-6 flex items-center justify-between"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding — {emps.length} reports</p></div>
+    <div className="flex items-center gap-2">
+      {compareIds&&compareIds.length>0&&<button onClick={()=>onCompare([])} className="text-[12px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear ({compareIds.length})</button>}
+      {compareIds&&compareIds.length===2&&<button onClick={onShowCompare} className="text-[12px] px-4 py-1.5 rounded-full bg-[#FF0083] text-white font-semibold btn-p flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Compare</button>}
+    </div>
+  </div>
   {/* TEAM HIERARCHY */}
   <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-6">
     <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-5">Team Hierarchy</h3>
@@ -803,7 +885,12 @@ const TeamDash=({emps,onSel,leadNm})=>{
         <div className="flex justify-between"><span className="text-[11px] text-[#9CA3AF]">Contributions</span><span className="text-[11px] text-[#1A1A2E] font-medium">{e.co.length}</span></div>
         {lc&&<div className="flex justify-between"><span className="text-[11px] text-[#9CA3AF]">Last</span><span className="text-[11px] text-[#6B7280]">{lc.ty} · {lc.da}d ago</span></div>}
       </div>
-      <button onClick={()=>onSel(e.id)} className="w-full text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl py-2 hover:bg-[#FF008310] transition-all font-semibold">View Profile</button>
+      <div className="flex gap-2">
+        <button onClick={()=>onSel(e.id)} className="flex-1 text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl py-2 hover:bg-[#FF008310] transition-all font-semibold">View Profile</button>
+        {onCompare&&<button onClick={()=>toggleCompare(e.id)} className={`w-10 rounded-xl border transition-all flex items-center justify-center ${compareIds.includes(e.id)?"bg-[#FF0083] border-[#FF0083] text-white":"border-[#E5E7EB] text-[#9CA3AF] hover:border-[#FF0083] hover:text-[#FF0083]"}`} title="Compare">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </button>}
+      </div>
     </div>
   )})}</div>
 </div>};
@@ -977,7 +1064,7 @@ const SkillGap=()=>{
 const ContentIntel=()=>{
   const data=[{topic:"Lemonade Architecture",queries:34,ins:"Most queried",roles:"Engineers 60%, PMs 25%, Designers 15%",trend:"+12% vs last month"},{topic:"Monday + OKRs",queries:28,ins:"High early interest",roles:"PMs 55%, Engineers 30%, Designers 15%",trend:"+8% vs last month"},{topic:"AI @ Lemonade",queries:22,ins:"Growing trend",roles:"All roles evenly",trend:"+22% vs last month"},{topic:"Pricing Platform",queries:19,ins:"Mostly engineers",roles:"Engineers 80%, PMs 20%",trend:"Stable"},{topic:"QA @ Lemonade",queries:11,ins:"Steady, low-volume",roles:"Engineers 90%, Others 10%",trend:"-5% vs last month"}];
   const[inp,setInp]=useState("");const[msgs,setMsgs]=useState([]);const[typ,setTyp]=useState(false);const[drillQuery,setDrillQuery]=useState(null);
-  const send=t=>{if(!t.trim())return;setMsgs(p=>[...p,{r:"u",t:t.trim()}]);setInp("");setTyp(true);setTimeout(()=>{setTyp(false);setMsgs(p=>[...p,{r:"a",t:stratR(t)}])},800)};
+  const send=t=>{if(!t.trim())return;setMsgs(p=>[...p,{r:"u",t:t.trim()}]);setInp("");setTyp(true);setTimeout(()=>{setTyp(false);setMsgs(p=>{const history=p.filter(m=>m.r);return[...p,{r:"a",t:stratR(t,history)}]})},800)};
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Content Intelligence</h1><p className="text-[14px] text-[#6B7280] mt-1">What onboarding content resonates</p></div>
@@ -1684,6 +1771,85 @@ const AlertCenter=({emps,toast})=>{
   </div>
 };
 
+// ───────────────── NEW: COMPARE VIEW ─────────────────
+const CompareView=({emp1,emp2,onClear})=>{
+  const avg1=emp1.co.length?Math.round(emp1.co.reduce((s,c)=>s+c.ai,0)/emp1.co.length):0;
+  const avg2=emp2.co.length?Math.round(emp2.co.reduce((s,c)=>s+c.ai,0)/emp2.co.length):0;
+  const rows=[
+    {lb:"Health Score",v1:emp1.hp,v2:emp2.hp,better:"high"},
+    {lb:"Contributions",v1:emp1.co.length,v2:emp2.co.length,better:"high"},
+    {lb:"Avg AI %",v1:avg1,v2:avg2,better:"low"},
+    {lb:"Skills Count",v1:emp1.sk.length,v2:emp2.sk.length,better:"high"},
+    {lb:"Phase",v1:pDay(emp1.day),v2:pDay(emp2.day),better:"high"},
+    {lb:"Day",v1:emp1.day,v2:emp2.day,better:"high"},
+    {lb:"Verified Skills",v1:emp1.sk.filter(s=>s.sr==="manager-verified").length,v2:emp2.sk.filter(s=>s.sr==="manager-verified").length,better:"high"},
+    {lb:"Shipped",v1:emp1.co.filter(c=>c.st==="merged"||c.st==="shipped").length,v2:emp2.co.filter(c=>c.st==="merged"||c.st==="shipped").length,better:"high"}
+  ];
+  const co1=(v1,v2,better)=>{if(v1===v2)return"#6B7280";return(better==="high"?v1>v2:v1<v2)?"#10b981":"#ef4444"};
+  const barData=rows.slice(0,5).map(r=>({name:r.lb,[emp1.nm.split(" ")[0]]:r.v1,[emp2.nm.split(" ")[0]]:r.v2}));
+  return<div className="fi">
+    <div className="mb-6 flex items-center justify-between">
+      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
+      <button onClick={onClear} className="text-[12px] px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear Comparison</button>
+    </div>
+    <div className="grid grid-cols-2 gap-5 mb-5">
+      {[emp1,emp2].map((e,i)=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-4"><Av e={e} sz={48}/><div><h3 className="text-[16px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[12px] text-[#6B7280]">{e.rl} · {e.dp} · Day {e.day}</p></div><div className="ml-auto"><HR s={e.hp} sz={56}/></div></div>
+        <div className="flex flex-wrap gap-1.5">{e.sk.slice(0,5).map((s,j)=><span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#6B7280] border border-[#E5E7EB]">{s.nm}</span>)}{e.sk.length>5&&<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF]">+{e.sk.length-5}</span>}</div>
+      </div>)}
+    </div>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
+      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Side-by-Side Metrics</h3>
+      <div className="space-y-3">{rows.map((r,i)=><div key={i} className="flex items-center gap-3">
+        <span className="w-32 text-[12px] text-[#9CA3AF] text-right flex-shrink-0">{r.lb}</span>
+        <div className="flex-1 flex items-center gap-2">
+          <span className="text-[14px] font-bold w-12 text-right" style={{color:co1(r.v1,r.v2,r.better)}}>{r.v1}{r.lb==="Avg AI %"?"%":""}</span>
+          <div className="flex-1 h-2 bg-[#F3F4F6] rounded-full overflow-hidden relative">
+            <div className="absolute left-0 top-0 h-full rounded-full" style={{width:`${Math.min(100,r.v1/(Math.max(r.v1,r.v2)||1)*100)}%`,background:"#FF0083",opacity:.7}}/>
+            <div className="absolute left-0 top-0 h-full rounded-full" style={{width:`${Math.min(100,r.v2/(Math.max(r.v1,r.v2)||1)*100)}%`,background:"#3b82f6",opacity:.4}}/>
+          </div>
+          <span className="text-[14px] font-bold w-12" style={{color:co1(r.v2,r.v1,r.better)}}>{r.v2}{r.lb==="Avg AI %"?"%":""}</span>
+        </div>
+      </div>)}</div>
+    </div>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Visual Comparison</h3>
+      <div className="flex items-center gap-3 mb-3"><span className="flex items-center gap-1.5 text-[11px] text-[#6B7280]"><span className="w-3 h-3 rounded" style={{background:"#FF0083"}}/>{emp1.nm.split(" ")[0]}</span><span className="flex items-center gap-1.5 text-[11px] text-[#6B7280]"><span className="w-3 h-3 rounded" style={{background:"#3b82f6"}}/>{emp2.nm.split(" ")[0]}</span></div>
+      <ResponsiveContainer width="100%" height={220}><BarChart data={barData}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="name" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={{background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px"}}/><Bar dataKey={emp1.nm.split(" ")[0]} fill="#FF0083" radius={[6,6,0,0]} opacity={.85}/><Bar dataKey={emp2.nm.split(" ")[0]} fill="#3b82f6" radius={[6,6,0,0]} opacity={.85}/></BarChart></ResponsiveContainer>
+    </div>
+  </div>
+};
+
+// ───────────────── NEW: TEAM HEATMAP CALENDAR ─────────────────
+const HeatmapCalendar=({emps})=>{
+  const[hovCell,setHovCell]=useState(null);
+  const days=Array.from({length:30},(_,i)=>i+1);
+  // Build activity map: for each emp, count contributions per day
+  const actMap={};emps.forEach(e=>{actMap[e.id]={};e.co.forEach(c=>{const d=c.da;if(!actMap[e.id][d])actMap[e.id][d]=0;actMap[e.id][d]++})});
+  // Find max for color scale
+  let maxAct=1;emps.forEach(e=>{days.forEach(d=>{const v=actMap[e.id][d]||0;if(v>maxAct)maxAct=v})});
+  const heatColor=(count)=>{if(!count)return"#F7F7F7";const ratio=count/maxAct;if(ratio<=0.25)return"#FFE0EF";if(ratio<=0.5)return"#FFB3D4";if(ratio<=0.75)return"#FF66AA";return"#FF0083"};
+  return<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+    <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Activity Heatmap (30 Days)</h3>
+    <div className="overflow-x-auto">
+      <div style={{display:"grid",gridTemplateColumns:`80px repeat(30, 1fr)`,gap:"2px",minWidth:"700px"}}>
+        {/* Header row — day numbers */}
+        <div/>
+        {days.map(d=><div key={d} className="text-[8px] text-[#9CA3AF] text-center font-medium" style={{lineHeight:"14px"}}>{d}</div>)}
+        {/* Employee rows */}
+        {emps.map(e=><React.Fragment key={e.id}>
+          <div className="text-[11px] text-[#6B7280] font-medium truncate flex items-center pr-2" style={{height:18}}>{e.nm.split(" ")[0]}</div>
+          {days.map(d=>{const count=actMap[e.id][d]||0;const isHov=hovCell&&hovCell.eid===e.id&&hovCell.d===d;
+            return<div key={d} onMouseEnter={()=>setHovCell({eid:e.id,enm:e.nm,d,count})} onMouseLeave={()=>setHovCell(null)} className="rounded-sm cursor-pointer transition-all relative" style={{width:"100%",height:18,background:heatColor(count),border:isHov?"2px solid #1A1A2E":"2px solid transparent",opacity:count?1:.5}}>
+              {isHov&&<div className="absolute z-30 bg-[#1A1A2E] text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg" style={{bottom:"calc(100% + 4px)",left:"50%",transform:"translateX(-50%)"}}>{hovCell.enm} - Day {d}: {count} contribution{count!==1?"s":""}</div>}
+            </div>})}
+        </React.Fragment>)}
+      </div>
+    </div>
+    <div className="flex items-center gap-2 mt-3 justify-end"><span className="text-[10px] text-[#9CA3AF]">Less</span>{[0,1,2,3,4].map(i=><div key={i} className="w-3 h-3 rounded-sm" style={{background:i===0?"#F7F7F7":i===1?"#FFE0EF":i===2?"#FFB3D4":i===3?"#FF66AA":"#FF0083"}}/>)}<span className="text-[10px] text-[#9CA3AF]">More</span></div>
+  </div>
+};
+
 // ───────────────── NEW: TEAM ANALYTICS ─────────────────
 const empColors=["#FF0083","#3b82f6","#10b981","#f59e0b","#8b5cf6","#06b6d4","#ec4899","#84cc16","#f97316","#6366f1"];
 const TeamAnalytics=({emps,onSel})=>{
@@ -1737,6 +1903,7 @@ const TeamAnalytics=({emps,onSel})=>{
           <td className="p-4"><span className="text-[13px] font-medium" style={{color:avgAI>60?"#ef4444":avgAI>40?"#f59e0b":"#10b981"}}>{avgAI}%</span></td>
         </tr>)})}</tbody>
     </table></div>
+    <div className="mb-5"><HeatmapCalendar emps={emps}/></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Recent Team Activity</h3>
       <ActivityFeed items={TIMELINE} limit={5}/>
@@ -2193,6 +2360,7 @@ const App=()=>{
   const[role,setRole]=usePersistedState("role","maker");const[scr,setScr]=usePersistedState("scr","welcome");const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
   const[toast,setToast]=useState(null);const[notifOpen,setNotifOpen]=useState(false);const[searchQ,setSearchQ]=useState("");const[searchOpen,setSearchOpen]=useState(false);
   const[compOpen,setCompOpen]=useState(false);
+  const[compareIds,setCompareIds]=useState([]);
   const[darkMode,setDarkMode]=usePersistedState("dark",false);
   const[tourStep,setTourStep]=useState(null);
   const[tourDone,setTourDone]=usePersistedState("tour-done",false);
@@ -2283,6 +2451,7 @@ const App=()=>{
       return<MakerDash emp={maker} setScr={setScr}/>;
     }
     if(role==="lead"){
+      if(scr==="compare"&&compareIds.length===2){const c1=es.find(e=>e.id===compareIds[0]);const c2=es.find(e=>e.id===compareIds[1]);if(c1&&c2)return<CompareView emp1={c1} emp2={c2} onClear={()=>{setCompareIds([]);setScr("team")}}/>;};
       if(scr==="employee"&&selE)return<EmpDetail emp={selE} onBack={()=>setScr("team")} onUpd={u=>setEs(p=>p.map(e=>e.id===u.id?u:e))}/>;
       if(scr==="progress")return<EmpProgress emps={leadE}/>;
       if(scr==="pulse")return<TeamPulse emps={leadE} toast={showToast}/>;
@@ -2292,7 +2461,7 @@ const App=()=>{
       if(scr==="analytics")return<TeamAnalytics emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="review")return<ReviewAssist emps={leadE}/>;
       if(scr==="reflections")return<Reflections emps={leadE}/>;
-      return<TeamDash emps={leadE} leadNm={leadSel} onSel={id=>{setSelId(id);setScr("employee")}}/>;
+      return<TeamDash emps={leadE} leadNm={leadSel} onSel={id=>{setSelId(id);setScr("employee")}} compareIds={compareIds} onCompare={setCompareIds} onShowCompare={()=>setScr("compare")}/>;
     }
     if(scr==="cohorts")return<Cohorts/>;
     if(scr==="skill-gaps")return<SkillGap/>;
@@ -2408,7 +2577,7 @@ const App=()=>{
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 2 5 5 5 9c0 2.5 1 4 3 6l-1 5 4-2 4 2-1-5c2-2 3-3.5 3-6 0-4-3-7-5-7z" fill="white" opacity=".9"/><circle cx="10" cy="9" r="1.2" fill="#FF0083"/><circle cx="14" cy="9" r="1.2" fill="#FF0083"/><path d="M9.5 12.5c0 0 1.5 1.5 5 0" stroke="#FF0083" strokeWidth="1.2" strokeLinecap="round"/></svg>
         </button>}
       </div>
-      <CompanionPanel open={compOpen} onClose={()=>setCompOpen(false)} scr={scr} role={role} emp={maker} personality={lemiPersonality}/>
+      <CompanionPanel open={compOpen} onClose={()=>setCompOpen(false)} scr={scr} setScr={setScr} role={role} emp={maker} personality={lemiPersonality}/>
     </div>
     {tourStep!==null&&<TourOverlay step={tourStep} onNext={()=>{if(tourStep>=TOUR_STEPS.length-1){setTourStep(null);setTourDone(true)}else setTourStep(tourStep+1)}} onSkip={()=>{setTourStep(null);setTourDone(true)}}/>}
   </div>
