@@ -2483,7 +2483,7 @@ const App=()=>{
   const[darkMode,setDarkMode]=usePersistedState("dark",false);
   const[tourStep,setTourStep]=useState(null);
   const[tourDone,setTourDone]=usePersistedState("tour-done",false);
-  const[liveNotifs,setLiveNotifs]=usePersistedState("live-notifs",true);
+  const[liveNotifs,setLiveNotifs]=usePersistedState("live-notifs",false);
   const[reduceMotion,setReduceMotion]=usePersistedState("reduce-motion",false);
   const[highContrast,setHighContrast]=usePersistedState("high-contrast",false);
   const[lemiPersonality,setLemiPersonality]=usePersistedState("lemi-tone","casual");
@@ -2511,7 +2511,6 @@ const App=()=>{
       const txt=tpl.tx.replace("{nm}",emp.nm).replace("{hp}",String(Math.min(100,emp.hp+Math.floor(Math.random()*8)+1))).replace("{day}",String(emp.day));
       const n={id:"rn-"+Date.now(),tx:txt,ts:"Just now",read:false,ic:tpl.ic};
       setNotifs(p=>[n,...p]);
-      showToast({msg:txt,type:"info"});
     };
     const schedule=()=>{const delay=30000+Math.random()*15000;return setTimeout(()=>{fire();tid=schedule()},delay)};
     let tid=schedule();
