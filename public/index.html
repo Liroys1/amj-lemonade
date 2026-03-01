@@ -78,7 +78,7 @@ const usePersistedState=(key,init)=>{
   useEffect(()=>{try{localStorage.setItem('amj-'+key,JSON.stringify(val))}catch{}},[key,val]);
   return[val,setVal];
 };
-const{BarChart,Bar,LineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend}=Recharts;
+const{BarChart,Bar,LineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend,RadarChart,Radar,PolarGrid,PolarAngleAxis,PolarRadiusAxis}=Recharts;
 
 // ───────────────── DATA ─────────────────
 const PHASES=[
@@ -416,6 +416,32 @@ const HR=({s,sz=72})=>{const r=(sz-8)/2,ci=2*Math.PI*r,of=ci-(s/100)*ci,co=s>=75
   return<svg width={sz} height={sz} style={{transform:"rotate(-90deg)"}}><circle cx={sz/2} cy={sz/2} r={r} fill="none" stroke="#E5E7EB" strokeWidth="3.5"/><circle cx={sz/2} cy={sz/2} r={r} fill="none" stroke={co} strokeWidth="3.5" strokeLinecap="round" strokeDasharray={ci} strokeDashoffset={of} className="hr-a"/><text x={sz/2} y={sz/2} textAnchor="middle" dominantBaseline="central" fill={co} fontSize={sz*.22} fontWeight="700" style={{transform:"rotate(90deg)",transformOrigin:"center"}}>{s}</text></svg>
 };
 
+const computeHealthBreakdown=(emp)=>{
+  const contribFreq=Math.min(100,Math.round((emp.co.length/4)*100));
+  const totalSk=emp.sk.length||1;const verifiedSk=emp.sk.filter(s=>s.sr==="manager-verified").length;const practicingSk=emp.sk.filter(s=>s.lv==="proficient"||s.lv==="practicing").length;
+  const skillProgress=Math.min(100,Math.round(((verifiedSk*2+practicingSk)/totalSk)*50));
+  const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):50;
+  const aiBalance=Math.min(100,Math.max(0,Math.round(100-Math.abs(avgAI-45)*1.5)));
+  const curPhase=pDay(emp.day);const phaseProgress=Math.min(100,Math.round((curPhase/4)*100));
+  const shipped=emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length;const hasAudit=emp.co.some(c=>c.ty==="Audit")?15:0;const recentActivity=emp.co.filter(c=>c.da<=5).length;
+  const engagement=Math.min(100,Math.round((shipped*15+hasAudit+recentActivity*10)));
+  return[{lb:"Contribution Frequency",v:contribFreq,co:"#3b82f6"},{lb:"Skill Progress",v:skillProgress,co:"#8b5cf6"},{lb:"AI Balance",v:aiBalance,co:"#FF0083"},{lb:"Phase Progress",v:phaseProgress,co:"#10b981"},{lb:"Engagement",v:engagement,co:"#f59e0b"}];
+};
+
+const HealthBreakdown=({emp,sz=72})=>{
+  const[open,setOpen]=useState(false);const ref=useRef(null);
+  useEffect(()=>{if(!open)return;const h=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false)};document.addEventListener("mousedown",h);return()=>document.removeEventListener("mousedown",h)},[open]);
+  const factors=computeHealthBreakdown(emp);
+  return<div className="relative inline-block" ref={ref}>
+    <button onClick={()=>setOpen(!open)} className="cursor-pointer hover:opacity-80 transition-opacity" title="Click for health breakdown"><HR s={emp.hp} sz={sz}/></button>
+    {open&&<div className="absolute z-50 right-0 top-full mt-2 bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-lg w-64 fi" style={{minWidth:240}}>
+      <div className="flex items-center justify-between mb-3"><h4 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Breakdown</h4><button onClick={()=>setOpen(false)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div>
+      <div className="space-y-2.5">{factors.map((f,i)=><div key={i}><div className="flex items-center justify-between mb-1"><span className="text-[12px] text-[#6B7280]">{f.lb}</span><span className="text-[12px] font-bold" style={{color:f.co}}>{f.v}%</span></div><div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${f.v}%`,background:f.co}}/></div></div>)}</div>
+      <div className="mt-3 pt-3 border-t border-[#E5E7EB]"><div className="flex items-center justify-between"><span className="text-[12px] font-semibold text-[#1A1A2E]">Overall Score</span><span className="text-[16px] font-bold" style={{color:emp.hp>=75?"#10b981":emp.hp>=50?"#f59e0b":"#ef4444"}}>{emp.hp}</span></div></div>
+    </div>}
+  </div>
+};
+
 const TI=()=><div className="flex gap-1.5 items-center px-4 py-3"><div className="td1 w-2 h-2 rounded-full" style={{background:"#FF0083"}}/><div className="td2 w-2 h-2 rounded-full" style={{background:"#FF0083"}}/><div className="td3 w-2 h-2 rounded-full" style={{background:"#FF0083"}}/></div>;
 
 const Md=({t})=><div dangerouslySetInnerHTML={{__html:t.replace(/\*\*(.*?)\*\*/g,'<strong class="text-[#1A1A2E] font-semibold">$1</strong>').replace(/\n/g,"<br/>").replace(/•/g,'<span class="text-[#FF0083] mr-1">•</span>')}}/>;
@@ -538,11 +564,25 @@ const Journey=({emp})=>{
 
 const Skills=({emp,ro=false,onV=null})=>{
   const vf=emp.sk.filter(s=>s.sr==="manager-verified");
+  const[view,setView]=useState("grid");
+  const lvVal={learning:1,practicing:2,proficient:3,expert:4};
+  const radarData=useMemo(()=>{
+    const cats=Object.keys(CC);
+    return cats.map(cat=>{const skills=emp.sk.filter(s=>s.ct===cat);const avg=skills.length?skills.reduce((s,sk)=>s+(lvVal[sk.lv]||0),0)/skills.length:0;return{cat,value:Math.round(avg*25),fullMark:100,count:skills.length}});
+  },[emp.sk]);
   return<div className="fi">
     {!ro&&vf.length>0&&<div className="bg-gradient-to-r from-[#FF008312] to-[#FF008306] border border-[#FF008330] rounded-[14px] p-4 mb-6 flex items-center gap-3">
       <CI n="party" sz={20} co="#FF0083"/><div><p className="text-[14px] font-semibold text-[#1A1A2E]">{vf.map(s=>s.nm).join(", ")} verified by {emp.ld}</p><p className="text-[11px] text-[#6B7280]">Skill verification milestone!</p></div>
     </div>}
-    <div className="grid grid-cols-3 gap-4">
+    <div className="flex gap-1 mb-5 bg-[#F3F4F6] rounded-xl p-1 w-fit">{[["grid","Grid View"],["radar","Radar View"]].map(([k,lb])=><button key={k} onClick={()=>setView(k)} className={`px-4 py-1.5 rounded-lg text-[13px] font-medium transition-all ${view===k?"text-white shadow-sm":"text-[#6B7280] hover:text-[#1A1A2E]"}`} style={view===k?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>{lb}</button>)}</div>
+    {view==="radar"?<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm fi">
+      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-2">Competency Profile</h3>
+      <div className="flex justify-center">
+        <ResponsiveContainer width="100%" height={320}><RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}><PolarGrid stroke="#E5E7EB"/><PolarAngleAxis dataKey="cat" tick={{fill:"#6B7280",fontSize:12,fontWeight:600}}/><PolarRadiusAxis angle={90} domain={[0,100]} tick={{fill:"#9CA3AF",fontSize:10}}/><Radar name="Skills" dataKey="value" stroke="#FF0083" fill="#FF0083" fillOpacity={0.2} strokeWidth={2}/></RadarChart></ResponsiveContainer>
+      </div>
+      <div className="grid grid-cols-4 gap-3 mt-4">{radarData.map((d,i)=>{const cc=CC[d.cat]||CC.Technical;return<div key={i} className="text-center p-3 rounded-xl border" style={{background:cc.bg,borderColor:cc.bd}}><p className="text-[20px] font-bold" style={{color:cc.tx}}>{d.value}%</p><p className="text-[11px] font-medium" style={{color:cc.tx}}>{d.cat}</p><p className="text-[10px] text-[#9CA3AF]">{d.count} skills</p></div>})}</div>
+    </div>
+    :<div className="grid grid-cols-3 gap-4">
       {emp.sk.map((s,i)=>{
         const ev=emp.co.filter(c=>{if(s.ct==="Technical"&&(c.ty==="PR"||c.ty==="Audit"))return true;if(s.ct==="Design"&&(c.ty==="Design"||c.ty==="Audit"))return true;if(s.ct==="Product"&&c.ty==="Brief")return true;if(s.ct==="AI-Native")return true;return false}).slice(0,2);
         const canV=onV&&(s.lv==="practicing"||s.lv==="proficient")&&s.sr!=="manager-verified"&&s.sr!=="resume";
@@ -554,7 +594,7 @@ const Skills=({emp,ro=false,onV=null})=>{
           {canV&&<button onClick={()=>onV(s.nm)} className="mt-3 w-full text-[11px] text-[#FF0083] border border-[#FF008330] rounded-xl py-2 hover:bg-[#FF008310] transition-all font-medium">Verify Skill</button>}
         </div>
       })}
-    </div>
+    </div>}
   </div>
 };
 
@@ -592,17 +632,20 @@ const Contribs=({emp,showRev=false})=>{
 
 const AIU=({emp})=>{
   const[refl,setRefl]=useState("");const cs=emp.co.slice().reverse();
-  const bd=cs.map(c=>({nm:c.ti.split(" ").slice(0,3).join(" "),ai:c.ai,human:100-c.ai}));
-  const ld=cs.map((c,i)=>({nm:`#${i+1}`,ai:c.ai}));
+  const bd=cs.map(c=>({nm:c.ti.split(" ").slice(0,3).join(" "),ai:c.ai,human:100-c.ai,_src:c}));
+  const ld=cs.map((c,i)=>({nm:`#${i+1}`,ai:c.ai,_src:c}));
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
+  const[drillBar,setDrillBar]=useState(null);const[drillLine,setDrillLine]=useState(null);
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">AI Usage</h1><p className="text-[14px] text-[#6B7280] mt-1">Track how you use AI in your work</p></div>
     <div className="grid grid-cols-2 gap-5 mb-5">
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI vs Human Contribution</h3>
-        <ResponsiveContainer width="100%" height={200}><BarChart data={bd} barGap={2}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI" fill="#FF0083" radius={[6,6,0,0]} opacity={.9}/><Bar dataKey="human" name="Human" fill="#10b981" radius={[6,6,0,0]} opacity={.9}/></BarChart></ResponsiveContainer>
+      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI vs Human Contribution <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
+        <ResponsiveContainer width="100%" height={200}><BarChart data={bd} barGap={2}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI" fill="#FF0083" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/><Bar dataKey="human" name="Human" fill="#10b981" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/></BarChart></ResponsiveContainer>
+        {drillBar&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillBar._src.ti}</h4><button onClick={()=>setDrillBar(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-3 text-center"><div><p className="text-[20px] font-bold text-[#FF0083]">{drillBar.ai}%</p><p className="text-[10px] text-[#9CA3AF]">AI Generated</p></div><div><p className="text-[20px] font-bold text-[#10b981]">{drillBar.human}%</p><p className="text-[10px] text-[#9CA3AF]">Human Written</p></div><div><StP s={drillBar._src.st}/><p className="text-[10px] text-[#9CA3AF] mt-1">{drillBar._src.ty}</p></div></div></div>}
       </div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI Contribution Trend</h3>
-        <ResponsiveContainer width="100%" height={200}><LineChart data={ld}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="ai" stroke="#FF0083" strokeWidth={2.5} dot={{r:5,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="AI %"/></LineChart></ResponsiveContainer>
+      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI Contribution Trend <span className="text-[9px] font-normal normal-case">(click point for details)</span></h3>
+        <ResponsiveContainer width="100%" height={200}><LineChart data={ld}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="ai" stroke="#FF0083" strokeWidth={2.5} dot={{r:5,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="AI %" activeDot={{r:7,cursor:"pointer",onClick:(_,p)=>setDrillLine(ld[p.index])}}/></LineChart></ResponsiveContainer>
+        {drillLine&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillLine._src.ti}</h4><button onClick={()=>setDrillLine(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="flex items-center gap-4"><span className="text-[20px] font-bold text-[#FF0083]">{drillLine.ai}%</span><span className="text-[12px] text-[#6B7280]">AI usage</span><StP s={drillLine._src.st}/><span className="text-[11px] text-[#9CA3AF]">{drillLine._src.da}d ago</span></div></div>}
       </div>
     </div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
@@ -726,7 +769,7 @@ const TeamDash=({emps,onSel,leadNm})=>{
     <div key={e.id} className={`bg-white border rounded-[14px] p-5 shadow-sm card-h ${e.hp<65?"border-[#ef444450]":"border-[#E5E7EB]"}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3"><Av e={e} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · {e.dp}</p></div></div>
-        <HR s={e.hp} sz={52}/>
+        <HealthBreakdown emp={e} sz={52}/>
       </div>
       <div className="space-y-2 mb-4">
         <div className="flex justify-between"><span className="text-[11px] text-[#9CA3AF]">Phase</span><span className="text-[11px] text-[#6B7280]">{ph.wk} — {ph.nm}</span></div>
@@ -757,7 +800,7 @@ const EmpDetail=({emp,onBack,onUpd})=>{
     <div className="flex items-center gap-4 mb-6">
       <Av e={emp} sz={56}/>
       <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">{emp.nm}</h1><p className="text-[14px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div>
-      <div className="ml-auto"><HR s={emp.hp} sz={60}/></div>
+      <div className="ml-auto"><HealthBreakdown emp={emp} sz={60}/></div>
     </div>
     <div className="flex gap-1 mb-6 bg-[#F3F4F6] rounded-xl p-1">{tabs.map(t=><button key={t.id} onClick={()=>setTab(t.id)} className={`px-5 py-2 rounded-lg text-[14px] font-medium transition-all ${tab===t.id?"text-white shadow-lg":"text-[#6B7280] hover:text-[#1A1A2E]"}`} style={tab===t.id?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>{t.lb}</button>)}</div>
     {tab==="journey"&&<Journey emp={emp}/>}
@@ -846,21 +889,22 @@ const StratOver=()=>{
 
 const Cohorts=()=>{
   const cA={nm:"Cohort A",es:[E[0],E[1],E[2],E[9]],co:"#FF0083"};const cB={nm:"Cohort B",es:[E[3],E[4],E[5]],co:"#38bdf8"};const cC={nm:"Cohort C",es:[E[6],E[7],E[8]],co:"#10b981"};
-  const cohorts=[cA,cB,cC];const[show,setShow]=useState({0:true,1:true,2:true});
+  const cohorts=[cA,cB,cC];const[show,setShow]=useState({0:true,1:true,2:true});const[drillCohort,setDrillCohort]=useState(null);
   const traj=Array.from({length:30},(_,i)=>{const d=i+1;return{day:d,"Cohort A":Math.min(100,Math.round(30+d*2.2+Math.sin(d/3)*5)),"Cohort B":Math.min(100,Math.round(25+d*2.5+Math.cos(d/4)*4)),"Cohort C":Math.min(100,Math.round(20+d*2.8+Math.sin(d/5)*3))}});
   const avg=c=>Math.round(c.es.reduce((s,e)=>s+e.hp,0)/c.es.length);
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Cohort Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Compare cohort performance</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
-      <div className="flex items-center justify-between mb-4"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trajectory</h3>
+      <div className="flex items-center justify-between mb-4"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trajectory <span className="text-[9px] font-normal normal-case">(click chart for day details)</span></h3>
         <div className="flex gap-2">{cohorts.map((c,i)=><button key={i} onClick={()=>setShow(p=>({...p,[i]:!p[i]}))} className={`text-[11px] px-3 py-1 rounded-full border transition-all`} style={show[i]?{borderColor:c.co,color:c.co,background:c.co+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{c.nm}</button>)}</div>
       </div>
-      <ResponsiveContainer width="100%" height={260}><LineChart data={traj}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="day" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
-        {show[0]&&<Line type="monotone" dataKey="Cohort A" stroke="#FF0083" strokeWidth={2.5} dot={false}/>}
-        {show[1]&&<Line type="monotone" dataKey="Cohort B" stroke="#38bdf8" strokeWidth={2.5} dot={false}/>}
-        {show[2]&&<Line type="monotone" dataKey="Cohort C" stroke="#10b981" strokeWidth={2.5} dot={false}/>}
+      <ResponsiveContainer width="100%" height={260}><LineChart data={traj} onClick={(e)=>{if(e&&e.activeLabel)setDrillCohort(traj.find(d=>d.day===e.activeLabel))}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="day" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
+        {show[0]&&<Line type="monotone" dataKey="Cohort A" stroke="#FF0083" strokeWidth={2.5} dot={false} cursor="pointer"/>}
+        {show[1]&&<Line type="monotone" dataKey="Cohort B" stroke="#38bdf8" strokeWidth={2.5} dot={false} cursor="pointer"/>}
+        {show[2]&&<Line type="monotone" dataKey="Cohort C" stroke="#10b981" strokeWidth={2.5} dot={false} cursor="pointer"/>}
       </LineChart></ResponsiveContainer>
+      {drillCohort&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Day {drillCohort.day} Health Scores</h4><button onClick={()=>setDrillCohort(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="flex gap-4">{cohorts.map((c,i)=>show[i]&&<div key={i} className="flex-1 text-center p-3 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[20px] font-bold" style={{color:c.co}}>{drillCohort[c.nm]}</p><p className="text-[10px] text-[#9CA3AF]">{c.nm}</p><p className="text-[9px] text-[#6B7280]">{c.es.length} members</p></div>)}</div></div>}
     </div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm"><table className="w-full">
       <thead><tr className="border-b border-[#E5E7EB]"><th className="text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-4">Metric</th>{cohorts.map((c,i)=><th key={i} className="text-center text-[10px] font-semibold uppercase tracking-[.1em] p-4" style={{color:c.co}}>{c.nm}</th>)}</tr></thead>
@@ -905,15 +949,16 @@ const SkillGap=()=>{
 };
 
 const ContentIntel=()=>{
-  const data=[{topic:"Lemonade Architecture",queries:34,ins:"Most queried"},{topic:"Monday + OKRs",queries:28,ins:"High early interest"},{topic:"AI @ Lemonade",queries:22,ins:"Growing trend"},{topic:"Pricing Platform",queries:19,ins:"Mostly engineers"},{topic:"QA @ Lemonade",queries:11,ins:"Steady, low-volume"}];
-  const[inp,setInp]=useState("");const[msgs,setMsgs]=useState([]);const[typ,setTyp]=useState(false);
+  const data=[{topic:"Lemonade Architecture",queries:34,ins:"Most queried",roles:"Engineers 60%, PMs 25%, Designers 15%",trend:"+12% vs last month"},{topic:"Monday + OKRs",queries:28,ins:"High early interest",roles:"PMs 55%, Engineers 30%, Designers 15%",trend:"+8% vs last month"},{topic:"AI @ Lemonade",queries:22,ins:"Growing trend",roles:"All roles evenly",trend:"+22% vs last month"},{topic:"Pricing Platform",queries:19,ins:"Mostly engineers",roles:"Engineers 80%, PMs 20%",trend:"Stable"},{topic:"QA @ Lemonade",queries:11,ins:"Steady, low-volume",roles:"Engineers 90%, Others 10%",trend:"-5% vs last month"}];
+  const[inp,setInp]=useState("");const[msgs,setMsgs]=useState([]);const[typ,setTyp]=useState(false);const[drillQuery,setDrillQuery]=useState(null);
   const send=t=>{if(!t.trim())return;setMsgs(p=>[...p,{r:"u",t:t.trim()}]);setInp("");setTyp(true);setTimeout(()=>{setTyp(false);setMsgs(p=>[...p,{r:"a",t:stratR(t)}])},800)};
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Content Intelligence</h1><p className="text-[14px] text-[#6B7280] mt-1">What onboarding content resonates</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
-      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Top Companion Queries</h3>
-      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:10}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:11}} width={130}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9}/></BarChart></ResponsiveContainer>
+      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Top Companion Queries <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
+      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:10}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:11}} width={130}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillQuery(data[idx])}/></BarChart></ResponsiveContainer>
+      {drillQuery&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillQuery.topic}</h4><button onClick={()=>setDrillQuery(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-3"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB] text-center"><p className="text-[20px] font-bold text-[#FF0083]">{drillQuery.queries}</p><p className="text-[10px] text-[#9CA3AF]">Total Queries</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.roles}</p><p className="text-[10px] text-[#9CA3AF]">Role Split</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.trend}</p><p className="text-[10px] text-[#9CA3AF]">Trend</p></div></div></div>}
       <div className="mt-4 space-y-1">{data.map((t,i)=><div key={i} className="flex items-center gap-3 text-[11px]"><span className="text-[#6B7280] font-medium w-36">{t.topic}</span><span className="text-[#D1D5DB]">— {t.ins}</span></div>)}</div>
     </div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1280,6 +1325,31 @@ const NUDGES=[
   {day:25,tx:"Almost there — begin your 60-day growth goals document.",ic:"chart-up"},
   {day:28,tx:"Final stretch! Prepare your 'What I Learned' reflection.",ic:"sparkle"}
 ];
+const computeNudges=(emp)=>{
+  const nudges=[];
+  // PR stuck in review > 3 days
+  emp.co.filter(c=>c.st==="in-review"&&c.da>3).forEach(c=>{nudges.push({tx:`"${c.ti}" has been in review for ${c.da} days — follow up with your reviewer`,ic:"clock",priority:1,type:"stuck"})});
+  // Skills stuck in "learning" status
+  const learningSkills=emp.sk.filter(s=>s.sr==="onboarding"&&s.lv==="learning");
+  if(learningSkills.length>=2){nudges.push({tx:`${learningSkills.length} skills still at "learning" level (${learningSkills.slice(0,2).map(s=>s.nm).join(", ")}) — try applying them in your next contribution`,ic:"target-sm",priority:2,type:"skill-gap"})}
+  // Low contribution count for the day
+  const expectedContribs=Math.floor(emp.day/5);
+  if(emp.co.length<expectedContribs){nudges.push({tx:`You've made ${emp.co.length} contributions by Day ${emp.day} — aim for at least ${expectedContribs} to stay on track`,ic:"pencil",priority:2,type:"low-contrib"})}
+  // High AI usage average
+  const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0;
+  if(avgAI>60&&emp.co.length>=2){nudges.push({tx:`Your avg AI usage is ${avgAI}% — try reducing AI reliance on your next submission to build craft skills`,ic:"robot",priority:2,type:"high-ai"})}
+  // Upcoming phase transition
+  const nextPhase=emp.day<=5?6:emp.day<=10?11:emp.day<=18?19:31;
+  const daysToNext=nextPhase-emp.day;
+  if(daysToNext>0&&daysToNext<=3){const nextPh=pInfo(nextPhase<=30?nextPhase:30);nudges.push({tx:`Phase transition in ${daysToNext} day${daysToNext>1?"s":""}! Prepare for "${nextPh.nm}" — check the journey map`,ic:"rocket",priority:1,type:"phase-transition"})}
+  // No audit yet and past day 10
+  if(emp.day>10&&!emp.co.some(c=>c.ty==="Audit")){nudges.push({tx:"You haven't submitted a Fresh Eyes Audit yet — this is a key milestone for Week 3",ic:"eye",priority:3,type:"missing-audit"})}
+  // Draft items sitting too long
+  emp.co.filter(c=>c.st==="draft"&&c.da>5).forEach(c=>{nudges.push({tx:`"${c.ti}" is still a draft after ${c.da} days — consider finalizing it`,ic:"pencil",priority:3,type:"stale-draft"})});
+  // Sort by priority
+  nudges.sort((a,b)=>a.priority-b.priority);
+  return nudges;
+};
 const BADGES=[
   {id:"b1",nm:"First PR Shipped",ic:"rocket",ds:"Shipped your first contribution",un:e=>e.co.some(c=>c.st==="merged"||c.st==="shipped")},
   {id:"b2",nm:"5 Skills Tracked",ic:"target-sm",ds:"Added 5+ skills to your grid",un:e=>e.sk.length>=5},
@@ -1292,13 +1362,16 @@ const BADGES=[
 const MakerDash=({emp,setScr})=>{
   const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0;
   const streak=emp.co.filter(c=>c.da<=5).length;
+  const[showHealthBD,setShowHealthBD]=useState(false);const healthBDRef=useRef(null);
+  useEffect(()=>{if(!showHealthBD)return;const h=e=>{if(healthBDRef.current&&!healthBDRef.current.contains(e.target))setShowHealthBD(false)};document.addEventListener("mousedown",h);return()=>document.removeEventListener("mousedown",h)},[showHealthBD]);
   const stats=[
     {lb:"Day",v:emp.day+"/30",ic:"calendar-sm",co:"#FF0083",sub:`Phase ${pDay(emp.day)}: ${pInfo(emp.day).nm}`},
-    {lb:"Health",v:emp.hp,ic:"muscle",co:emp.hp>=75?"#10b981":"#f59e0b",sub:emp.hp>=80?"On track":"Needs attention"},
+    {lb:"Health",v:emp.hp,ic:"muscle",co:emp.hp>=75?"#10b981":"#f59e0b",sub:emp.hp>=80?"On track":"Needs attention",isHealth:true},
     {lb:"Contributions",v:emp.co.length,ic:"pencil",co:"#3b82f6",sub:`${emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length} shipped`},
     {lb:"Avg AI %",v:avgAI+"%",ic:"robot",co:avgAI<=50?"#10b981":"#f59e0b",sub:avgAI<=50?"Good balance":"Consider reducing"}
   ];
-  const nudge=NUDGES.filter(n=>n.day<=emp.day).pop();
+  const staticNudge=NUDGES.filter(n=>n.day<=emp.day).pop();
+  const smartNudges=computeNudges(emp);
   const earned=BADGES.filter(b=>b.un(emp));
   const firstShip=emp.co.some(c=>c.st==="merged"||c.st==="shipped");
   return<div className="fi">
@@ -1309,13 +1382,17 @@ const MakerDash=({emp,setScr})=>{
     {firstShip&&emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length===1&&<div className="bg-gradient-to-r from-[#FF008315] to-[#FF008305] border border-[#FF008330] rounded-[14px] p-4 mb-5 flex items-center gap-3 fi">
       <CI n="party" sz={24} co="#FF0083"/><div><p className="text-[14px] font-bold text-[#1A1A2E]">You shipped your first contribution!</p><p className="text-[12px] text-[#6B7280]">Here's what your lead said: "{emp.co.find(c=>c.st==="merged"||c.st==="shipped")?.rv||'Great work — keep it up!'}"</p></div>
     </div>}
-    {nudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-center gap-3">
-      <CI n={nudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706]"><strong>Nudge:</strong> {nudge.tx}</p>
+    {smartNudges.length>0?<div className="space-y-2 mb-5">{smartNudges.slice(0,3).map((n,i)=>{const cols={stuck:{bg:"#fef2f2",bd:"#ef444430",co:"#dc2626"},"skill-gap":{bg:"#fff7ed",bd:"#f59e0b30",co:"#d97706"},"low-contrib":{bg:"#eff6ff",bd:"#3b82f630",co:"#2563eb"},"high-ai":{bg:"#fdf4ff",bd:"#a855f730",co:"#9333ea"},"phase-transition":{bg:"#f0fdf4",bd:"#10b98130",co:"#059669"},"missing-audit":{bg:"#fffbeb",bd:"#f59e0b30",co:"#d97706"},"stale-draft":{bg:"#f8fafc",bd:"#64748b30",co:"#475569"}};const c=cols[n.type]||cols["skill-gap"];return<div key={i} className="rounded-[14px] px-4 py-3 flex items-center gap-3 fi" style={{background:c.bg,border:`1px solid ${c.bd}`}}>
+      <CI n={n.ic} sz={18} co={c.co}/><p className="text-[13px]" style={{color:c.co}}><strong>Smart Nudge:</strong> {n.tx}</p>
+    </div>})}</div>
+    :staticNudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-center gap-3">
+      <CI n={staticNudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706]"><strong>Nudge:</strong> {staticNudge.tx}</p>
     </div>}
-    <div className="grid grid-cols-4 gap-4 mb-5">{stats.map((s,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-      <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}</p></div>
+    <div className="grid grid-cols-4 gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm relative ${s.isHealth?"cursor-pointer hover:border-[#FF008340]":""}`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):undefined}>
+      <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}{s.isHealth&&<span className="text-[9px] font-normal ml-1 normal-case">(click)</span>}</p></div>
       <p className="text-[28px] font-bold tracking-tight" style={{color:s.co}}>{s.v}</p>
       <p className="text-[12px] text-[#6B7280] mt-1">{s.sub}</p>
+      {s.isHealth&&showHealthBD&&<div className="absolute z-50 left-0 top-full mt-2 bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-lg w-64 fi"><div className="flex items-center justify-between mb-3"><h4 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Breakdown</h4></div><div className="space-y-2.5">{computeHealthBreakdown(emp).map((f,j)=><div key={j}><div className="flex items-center justify-between mb-1"><span className="text-[12px] text-[#6B7280]">{f.lb}</span><span className="text-[12px] font-bold" style={{color:f.co}}>{f.v}%</span></div><div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${f.v}%`,background:f.co}}/></div></div>)}</div></div>}
     </div>)}</div>
     <div className="grid grid-cols-3 gap-5 mb-5">
       <div>
@@ -1515,7 +1592,7 @@ const OneOnOne=({emps})=>{
     {emp&&<div className="grid grid-cols-2 gap-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
-          <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{emp.nm}</h3><p className="text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="ml-auto"><HR s={emp.hp} sz={48}/></div></div>
+          <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{emp.nm}</h3><p className="text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="ml-auto"><HealthBreakdown emp={emp} sz={48}/></div></div>
           <div className="grid grid-cols-3 gap-3 text-center">{[["Contributions",emp.co.length],["Verified",emp.sk.filter(s=>s.sr==="manager-verified").length],["Avg AI %",Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/(emp.co.length||1))+"%"]].map(([lb,v],i)=>
             <div key={i} className="bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
           )}</div>
@@ -1596,6 +1673,7 @@ const TeamAnalytics=({emps,onSel})=>{
   const sortedE=[...emps].sort((a,b)=>{const dir=sortDir==="asc"?1:-1;if(sortCol==="nm")return a.nm.localeCompare(b.nm)*dir;if(sortCol==="hp")return(a.hp-b.hp)*dir;if(sortCol==="co")return(a.co.length-b.co.length)*dir;if(sortCol==="ai"){const aa=a.co.length?a.co.reduce((s,c)=>s+c.ai,0)/a.co.length:0;const bb=b.co.length?b.co.reduce((s,c)=>s+c.ai,0)/b.co.length:0;return(aa-bb)*dir}return 0});
   const doSort=col=>{if(sortCol===col)setSortDir(d=>d==="asc"?"desc":"asc");else{setSortCol(col);setSortDir("asc")}};
   const sortIc=col=>sortCol===col?(sortDir==="asc"?"↑":"↓"):"";
+  const[drillHealth,setDrillHealth]=useState(null);const[drillContrib,setDrillContrib]=useState(null);
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Performance insights for your {emps.length} reports</p></div>
     <div className="grid grid-cols-2 gap-5 mb-5">
@@ -1603,12 +1681,14 @@ const TeamAnalytics=({emps,onSel})=>{
         <div className="flex items-center justify-between mb-3"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trend (per employee)</h3>
           <div className="flex flex-wrap gap-1">{emps.map((e,i)=><button key={e.id} onClick={()=>setShowLines(p=>({...p,[e.id]:!p[e.id]}))} className="text-[10px] px-2 py-0.5 rounded-full border transition-all" style={showLines[e.id]?{borderColor:empColors[i%empColors.length],color:empColors[i%empColors.length],background:empColors[i%empColors.length]+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{e.nm.split(" ")[0]}</button>)}</div>
         </div>
-        <ResponsiveContainer width="100%" height={200}><LineChart data={empHealth}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
-          {emps.map((e,i)=>showLines[e.id]&&<Line key={e.id} type="monotone" dataKey={e.nm.split(" ")[0]} stroke={empColors[i%empColors.length]} strokeWidth={2} dot={{r:3}}/>)}
+        <ResponsiveContainer width="100%" height={200}><LineChart data={empHealth} onClick={(e)=>{if(e&&e.activeLabel)setDrillHealth(empHealth.find(d=>d.wk===e.activeLabel))}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
+          {emps.map((e,i)=>showLines[e.id]&&<Line key={e.id} type="monotone" dataKey={e.nm.split(" ")[0]} stroke={empColors[i%empColors.length]} strokeWidth={2} dot={{r:3}} cursor="pointer"/>)}
         </LineChart></ResponsiveContainer>
+        {drillHealth&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Health Scores — {drillHealth.wk}</h4><button onClick={()=>setDrillHealth(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-2">{emps.filter(e=>showLines[e.id]).map((e,i)=>{const val=drillHealth[e.nm.split(" ")[0]];return val!=null&&<div key={e.id} className="text-center p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:val>=75?"#10b981":val>=50?"#f59e0b":"#ef4444"}}>{val}</p><p className="text-[10px] text-[#9CA3AF]">{e.nm.split(" ")[0]}</p></div>})}</div></div>}
       </div>
-      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Contributions per Employee</h3>
-        <ResponsiveContainer width="100%" height={200}><BarChart data={cData}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="co" name="Contributions" fill="#FF0083" radius={[6,6,0,0]} opacity={.9}/></BarChart></ResponsiveContainer>
+      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Contributions per Employee <span className="text-[9px] font-normal normal-case">(click bar)</span></h3>
+        <ResponsiveContainer width="100%" height={200}><BarChart data={cData}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="co" name="Contributions" fill="#FF0083" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>{const d=cData[idx];const emp=emps.find(e=>e.nm.split(" ")[0]===d.nm);setDrillContrib(emp?{...d,emp}:d)}}/></BarChart></ResponsiveContainer>
+        {drillContrib&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillContrib.nm}'s Contributions</h4><button onClick={()=>setDrillContrib(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div>{drillContrib.emp&&<div className="grid grid-cols-4 gap-2 text-center"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#FF0083]">{drillContrib.co}</p><p className="text-[10px] text-[#9CA3AF]">Total</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#10b981]">{drillContrib.emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length}</p><p className="text-[10px] text-[#9CA3AF]">Shipped</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#f59e0b]">{drillContrib.emp.co.filter(c=>c.st==="in-review").length}</p><p className="text-[10px] text-[#9CA3AF]">In Review</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:drillContrib.ai>60?"#ef4444":"#10b981"}}>{drillContrib.ai}%</p><p className="text-[10px] text-[#9CA3AF]">Avg AI</p></div></div>}</div>}
       </div>
     </div>
     <div className="grid grid-cols-3 gap-4 mb-5">
@@ -1833,22 +1913,25 @@ const EmpProgress=({emps})=>{
   const[sid,setSid]=useState("all");
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   const genHealth=e=>[{wk:"W1",v:Math.max(40,e.hp-25+Math.floor(Math.random()*8))},{wk:"W2",v:Math.max(50,e.hp-15+Math.floor(Math.random()*6))},{wk:"W3",v:Math.max(55,e.hp-5+Math.floor(Math.random()*5))},{wk:"W4",v:e.hp}];
-  const genContrib=e=>e.co.map((c,i)=>({day:c.da,nm:c.ti.split(" ").slice(0,3).join(" "),ai:c.ai}));
+  const genContrib=e=>e.co.map((c,i)=>({day:c.da,nm:c.ti.split(" ").slice(0,3).join(" "),ai:c.ai,_src:c}));
   const sel=sid==="all"?null:emps.find(e=>e.id===sid);
+  const[drillEmpH,setDrillEmpH]=useState(null);const[drillEmpC,setDrillEmpC]=useState(null);
   return<div className="fi">
     <div className="flex items-center justify-between mb-6"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Employee Progress</h1><p className="text-[14px] text-[#6B7280] mt-1">Individual growth trajectories</p></div>
-      <select value={sid} onChange={e=>setSid(e.target.value)} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm"><option value="all">All Employees</option>{emps.map(e=><option key={e.id} value={e.id}>{e.nm}</option>)}</select>
+      <select value={sid} onChange={e=>{setSid(e.target.value);setDrillEmpH(null);setDrillEmpC(null)}} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm"><option value="all">All Employees</option>{emps.map(e=><option key={e.id} value={e.id}>{e.nm}</option>)}</select>
     </div>
     {sel?<div className="fi">
       <div className="flex items-center gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <Av e={sel} sz={52}/><div className="flex-1"><h2 className="text-[18px] font-bold text-[#1A1A2E]">{sel.nm}</h2><p className="text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><HR s={sel.hp} sz={56}/>
+        <Av e={sel} sz={52}/><div className="flex-1"><h2 className="text-[18px] font-bold text-[#1A1A2E]">{sel.nm}</h2><p className="text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><HealthBreakdown emp={sel} sz={56}/>
       </div>
       <div className="grid grid-cols-2 gap-5 mb-5">
-        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Health Trend</h3>
-          <ResponsiveContainer width="100%" height={180}><LineChart data={genHealth(sel)}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="v" stroke="#FF0083" strokeWidth={2.5} dot={{r:4,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="Health"/></LineChart></ResponsiveContainer>
+        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Health Trend <span className="text-[9px] font-normal normal-case">(click point)</span></h3>
+          <ResponsiveContainer width="100%" height={180}><LineChart data={genHealth(sel)} onClick={(e)=>{if(e&&e.activePayload)setDrillEmpH(e.activePayload[0]?.payload)}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="v" stroke="#FF0083" strokeWidth={2.5} dot={{r:4,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="Health" cursor="pointer"/></LineChart></ResponsiveContainer>
+          {drillEmpH&&<div className="mt-3 p-3 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="text-[13px] font-semibold text-[#1A1A2E]">{drillEmpH.wk}</span><span className="text-[20px] font-bold" style={{color:drillEmpH.v>=75?"#10b981":drillEmpH.v>=50?"#f59e0b":"#ef4444"}}>{drillEmpH.v}</span><span className="text-[11px] text-[#6B7280]">health score</span></div><button onClick={()=>setDrillEmpH(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div></div>}
         </div>
-        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI Reliance per Contribution</h3>
-          <ResponsiveContainer width="100%" height={180}><BarChart data={genContrib(sel)}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:9}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI %" fill="#FF0083" radius={[6,6,0,0]} opacity={.85}/></BarChart></ResponsiveContainer>
+        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI Reliance per Contribution <span className="text-[9px] font-normal normal-case">(click bar)</span></h3>
+          <ResponsiveContainer width="100%" height={180}><BarChart data={genContrib(sel)}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:9}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI %" fill="#FF0083" radius={[6,6,0,0]} opacity={.85} cursor="pointer" onClick={(_,idx)=>setDrillEmpC(genContrib(sel)[idx])}/></BarChart></ResponsiveContainer>
+          {drillEmpC&&<div className="mt-3 p-3 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillEmpC._src?drillEmpC._src.ti:drillEmpC.nm}</h4><button onClick={()=>setDrillEmpC(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="flex items-center gap-4"><span className="text-[20px] font-bold text-[#FF0083]">{drillEmpC.ai}%</span><span className="text-[12px] text-[#6B7280]">AI usage</span>{drillEmpC._src&&<StP s={drillEmpC._src.st}/>}<span className="text-[11px] text-[#9CA3AF]">{drillEmpC.day}d ago</span></div></div>}
         </div>
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1861,7 +1944,7 @@ const EmpProgress=({emps})=>{
       </div>
     </div>
     :<div className="grid grid-cols-2 gap-4">{emps.map(e=>{const avgAI=e.co.length?Math.round(e.co.reduce((s,c)=>s+c.ai,0)/e.co.length):0;const trend=e.hp>=80?"\u2197":e.hp>=65?"\u2192":"\u2198";return<div key={e.id} onClick={()=>setSid(e.id)} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm card-h cursor-pointer">
-      <div className="flex items-center gap-3 mb-4"><Av e={e} sz={40}/><div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div><HR s={e.hp} sz={44}/></div>
+      <div className="flex items-center gap-3 mb-4"><Av e={e} sz={40}/><div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div><HealthBreakdown emp={e} sz={44}/></div>
       <div className="grid grid-cols-4 gap-2 text-center">{[[`${e.co.length}`,`Contrib.`],[`${e.sk.filter(s=>s.sr==="manager-verified").length}`,`Verified`],[`${avgAI}%`,`AI`],[trend,`Trend`]].map(([v,lb],i)=><div key={i} className="bg-[#F7F7F7] rounded-lg p-2 border border-[#E5E7EB]"><p className="text-[14px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] text-[#9CA3AF] uppercase">{lb}</p></div>)}</div>
     </div>})}</div>}
   </div>
@@ -1883,7 +1966,7 @@ const TeamPulse=({emps,toast})=>{
       <div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div>
       <span className="text-2xl">{m.em}</span>
       <span className="text-[12px] px-3 py-1 rounded-full font-medium" style={{background:m.co+"18",color:m.co}}>{m.lb}</span>
-      <HR s={e.hp} sz={40}/>
+      <HealthBreakdown emp={e} sz={40}/>
       {checkedIn[e.id]?<span className="text-[11px] text-[#10b981] font-medium px-3 py-1.5 bg-[#f0fdf4] rounded-xl">✓ Checked in</span>
       :<button onClick={()=>{setCheckedIn(p=>({...p,[e.id]:true}));toast(`Checked in with ${e.nm.split(" ")[0]}`)}} className="text-[11px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium">Check in</button>}
     </div>})}</div>
