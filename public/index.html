@@ -547,7 +547,7 @@ const CI=({n,sz=16,co="#6B7280"})=>{const p={
 };return p[n]||<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={co} strokeWidth="1.5"/></svg>};
 
 const NAV={
-  maker:[{id:"welcome",lb:"Onboarding",ic:"lemon"},{id:"home",lb:"Dashboard",ic:"home"},{id:"journey",lb:"My Journey",ic:"map"},{id:"checklist",lb:"Day 1 Checklist",ic:"check"},{id:"goals",lb:"Weekly Goals",ic:"target"},{id:"skills",lb:"My Skills",ic:"skill"},{id:"contributions",lb:"Contributions",ic:"doc"},{id:"ai-log",lb:"AI Log",ic:"clip"},{id:"ai-usage",lb:"AI Usage",ic:"ai"},{id:"crisis",lb:"Crisis Sim",ic:"bolt"},{id:"calendar",lb:"Calendar",ic:"cal"},{id:"resources",lb:"Courses & Resources",ic:"book"},{id:"faq",lb:"FAQs & Links",ic:"faq"},{id:"integrations",lb:"Tools Hub",ic:"link"},{id:"settings",lb:"Settings",ic:"gear"}],
+  maker:[{id:"welcome",lb:"Onboarding",ic:"lemon"},{id:"home",lb:"Dashboard",ic:"home"},{id:"journey",lb:"My Journey",ic:"map"},{id:"checklist",lb:"Day 1 Checklist",ic:"check"},{id:"goals",lb:"Weekly Goals",ic:"target"},{id:"skills",lb:"My Skills",ic:"skill"},{id:"contributions",lb:"Contributions",ic:"doc"},{id:"ai-log",lb:"AI Log",ic:"clip"},{id:"ai-usage",lb:"AI Usage",ic:"ai"},{id:"crisis",lb:"Crisis Sim",ic:"bolt"},{id:"calendar",lb:"Calendar",ic:"cal"},{id:"resources",lb:"Courses & Resources",ic:"book"},{id:"faq",lb:"FAQs & Links",ic:"faq"},{id:"integrations",lb:"My Tasks",ic:"link"},{id:"settings",lb:"Settings",ic:"gear"}],
   lead:[{id:"onboard-setup",lb:"Onboarding Setup",ic:"home"},{id:"team",lb:"Team Dashboard",ic:"team"},{id:"progress",lb:"Employee Progress",ic:"trend"},{id:"pulse",lb:"Team Pulse",ic:"heart"},{id:"one-on-one",lb:"1:1 Prep",ic:"hand"},{id:"alerts",lb:"Alert Center",ic:"alert"},{id:"analytics",lb:"Team Analytics",ic:"chart"},{id:"review",lb:"Review Assistant",ic:"clip"},{id:"reflections",lb:"Reflections",ic:"think"},{id:"settings",lb:"Settings",ic:"gear"}],
   strategy:[{id:"overview",lb:"Overview",ic:"chart"},{id:"cohorts",lb:"Cohort Analytics",ic:"trend"},{id:"skill-gaps",lb:"Skill Gap Map",ic:"puzzle"},{id:"benchmarks",lb:"Benchmarks",ic:"trophy"},{id:"attrition",lb:"Attrition Risk",ic:"alert"},{id:"content",lb:"Content Intelligence",ic:"search"},{id:"settings",lb:"Settings",ic:"gear"}]
 };
@@ -1168,7 +1168,7 @@ const StratOver=({setScr})=>{
 const Cohorts=()=>{
   const cA={nm:"Cohort A",es:[E[0],E[1],E[2],E[9]],co:"#FF0083"};const cB={nm:"Cohort B",es:[E[3],E[4],E[5]],co:"#38bdf8"};const cC={nm:"Cohort C",es:[E[6],E[7],E[8]],co:"#10b981"};
   const cohorts=[cA,cB,cC];const[show,setShow]=useState({0:true,1:true,2:true});const[drillCohort,setDrillCohort]=useState(null);
-  const traj=Array.from({length:30},(_,i)=>{const d=i+1;return{day:d,"Cohort A":Math.min(100,Math.round(30+d*2.2+Math.sin(d/3)*5)),"Cohort B":Math.min(100,Math.round(25+d*2.5+Math.cos(d/4)*4)),"Cohort C":Math.min(100,Math.round(20+d*2.8+Math.sin(d/5)*3))}});
+  const traj=Array.from({length:30},(_,i)=>{const d=i+1;const row={day:d};cohorts.forEach(c=>{const avgHp=Math.round(c.es.reduce((s,e)=>s+e.hp,0)/c.es.length);const avgDay=Math.round(c.es.reduce((s,e)=>s+e.day,0)/c.es.length);const startHp=Math.max(30,avgHp-avgDay*2);const progress=Math.min(d/avgDay,1);row[c.nm]=Math.min(100,Math.round(startHp+(avgHp-startHp)*progress+Math.sin(d/4)*3))});return row});
   const avg=c=>Math.round(c.es.reduce((s,e)=>s+e.hp,0)/c.es.length);
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
@@ -1566,7 +1566,7 @@ const MakerDash=({emp,setScr})=>{
               <CI n={c.ty==="PR"?"octopus":c.ty==="Design"?"paint":"clipboard"} sz={14}/><div className="flex-1 min-w-0"><p className="text-[12px] font-medium text-[#1A1A2E] truncate">{c.ti}</p><p className="text-[10px] text-[#9CA3AF]">{c.ty} · {c.st} · Day {c.da}</p></div>
             </div>):<p className="text-[12px] text-[#9CA3AF]">No open work items</p>})()}
           </div>
-          <button onClick={()=>setScr("integrations")} className="mt-3 text-[11px] text-[#FF0083] font-medium hover:underline">View all in Tools Hub →</button>
+          <button onClick={()=>setScr("integrations")} className="mt-3 text-[11px] text-[#FF0083] font-medium hover:underline">View all in My Tasks →</button>
         </div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm cursor-pointer hover:border-[#FF008340] transition-all" onClick={()=>setScr("skills")}>
           <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Achievements</h3>
@@ -1890,7 +1890,7 @@ const HeatmapCalendar=({emps})=>{
   const[hovCell,setHovCell]=useState(null);
   const days=Array.from({length:30},(_,i)=>i+1);
   // Build activity map: for each emp, count contributions per day
-  const actMap={};emps.forEach(e=>{actMap[e.id]={};e.co.forEach(c=>{const d=c.da;if(!actMap[e.id][d])actMap[e.id][d]=0;actMap[e.id][d]++})});
+  const actMap={};emps.forEach(e=>{actMap[e.id]={};e.co.forEach(c=>{const d=Math.max(1,Math.min(30,e.day-c.da+1));if(!actMap[e.id][d])actMap[e.id][d]=0;actMap[e.id][d]++})});
   // Find max for color scale
   let maxAct=1;emps.forEach(e=>{days.forEach(d=>{const v=actMap[e.id][d]||0;if(v>maxAct)maxAct=v})});
   const heatColor=(count)=>{if(!count)return"#F7F7F7";const ratio=count/maxAct;if(ratio<=0.25)return"#FFE0EF";if(ratio<=0.5)return"#FFB3D4";if(ratio<=0.75)return"#FF66AA";return"#FF0083"};
@@ -1904,14 +1904,14 @@ const HeatmapCalendar=({emps})=>{
         {/* Employee rows */}
         {emps.map(e=><React.Fragment key={e.id}>
           <div className="text-[11px] text-[#6B7280] font-medium truncate flex items-center pr-2" style={{height:18}}>{e.nm.split(" ")[0]}</div>
-          {days.map(d=>{const count=actMap[e.id][d]||0;const isHov=hovCell&&hovCell.eid===e.id&&hovCell.d===d;
-            return<div key={d} onMouseEnter={()=>setHovCell({eid:e.id,enm:e.nm,d,count})} onMouseLeave={()=>setHovCell(null)} className="rounded-sm cursor-pointer transition-all relative" style={{width:"100%",height:18,background:heatColor(count),border:isHov?"2px solid #1A1A2E":"2px solid transparent",opacity:count?1:.5}}>
-              {isHov&&<div className="absolute z-30 bg-[#1A1A2E] text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg" style={{bottom:"calc(100% + 4px)",left:"50%",transform:"translateX(-50%)"}}>{hovCell.enm} - Day {d}: {count} contribution{count!==1?"s":""}</div>}
+          {days.map(d=>{const count=actMap[e.id][d]||0;const isHov=hovCell&&hovCell.eid===e.id&&hovCell.d===d;const isToday=d===e.day;
+            return<div key={d} onMouseEnter={()=>setHovCell({eid:e.id,enm:e.nm,d,count})} onMouseLeave={()=>setHovCell(null)} className="rounded-sm cursor-pointer transition-all relative" style={{width:"100%",height:18,background:heatColor(count),border:isHov?"2px solid #1A1A2E":isToday?"2px solid #FF008380":"2px solid transparent",opacity:count||isToday?1:.5}}>
+              {isHov&&<div className="absolute z-30 bg-[#1A1A2E] text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap shadow-lg" style={{bottom:"calc(100% + 4px)",left:"50%",transform:"translateX(-50%)"}}>{hovCell.enm} - Day {d}{isToday?" (today)":""}: {count} contribution{count!==1?"s":""}</div>}
             </div>})}
         </React.Fragment>)}
       </div>
     </div>
-    <div className="flex items-center gap-2 mt-3 justify-end"><span className="text-[10px] text-[#9CA3AF]">Less</span>{[0,1,2,3,4].map(i=><div key={i} className="w-3 h-3 rounded-sm" style={{background:i===0?"#F7F7F7":i===1?"#FFE0EF":i===2?"#FFB3D4":i===3?"#FF66AA":"#FF0083"}}/>)}<span className="text-[10px] text-[#9CA3AF]">More</span></div>
+    <div className="flex items-center gap-2 mt-3 justify-end"><span className="text-[10px] text-[#9CA3AF]">0</span>{[0,1,2,3,4].map(i=><div key={i} className="w-3 h-3 rounded-sm" style={{background:i===0?"#F7F7F7":i===1?"#FFE0EF":i===2?"#FFB3D4":i===3?"#FF66AA":"#FF0083"}}/>)}<span className="text-[10px] text-[#9CA3AF]">3+ contributions</span></div>
   </div>
 };
 
@@ -2324,26 +2324,55 @@ const REAL_TIME_NOTIFS=[
 ];
 
 // ───────────────── TOUR OVERLAY ─────────────────
-const TOUR_STEPS=[
-  {title:"Sidebar Navigation",desc:"Navigate between all sections of your journey — dashboard, skills, contributions, resources, and more.",selector:".tour-sidebar",pos:"right"},
-  {title:"Search Bar",desc:"Quickly find employees, skills, contributions, events, and resources across the entire app. Use Cmd+K for the command palette.",selector:".tour-search",pos:"bottom"},
-  {title:"Role Switcher",desc:"Switch between Maker, Lead, and Strategy views to see the app from different perspectives.",selector:".tour-role",pos:"bottom"},
-  {title:"Notifications",desc:"Stay updated with activity from your team — PR reviews, skill verifications, and upcoming events.",selector:".tour-notif",pos:"bottom"},
-  {title:"Meet Lemi",desc:"Your AI onboarding companion. Ask questions about your journey, Lemonade culture, tools, and more.",selector:".tour-lemi",pos:"left"}
+const TOUR_MAKER=[
+  {title:"Sidebar Navigation",desc:"Your home base — navigate between dashboard, journey, skills, contributions, and resources. Use number keys 1-9 for quick access.",selector:".tour-sidebar",pos:"right",topic:"Navigation"},
+  {title:"Search Everything",desc:"Find employees, skills, contributions, events, and resources instantly. Press Cmd+K for the command palette with fuzzy search.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
+  {title:"Role Switcher",desc:"Switch between Maker, Lead, and Strategy views. Each role has different screens and capabilities.",selector:".tour-role",pos:"bottom",topic:"Navigation"},
+  {title:"Notifications",desc:"Stay updated with PR reviews, skill verifications, team events, and more. Click a notification to jump to the relevant screen.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
+  {title:"Your Dashboard",desc:"Your onboarding snapshot — health score, contributions, AI usage, schedule, and smart nudges. Click any stat card to dive deeper.",selector:".tour-sidebar",pos:"right",topic:"Core Features"},
+  {title:"My Tasks",desc:"See all your assigned tickets from GitHub, Jira, Figma, and Monday in one kanban board. Move tasks between columns and open them in the source system.",selector:".tour-sidebar",pos:"right",topic:"Core Features"},
+  {title:"Skills & Contributions",desc:"Track your skill development and log every contribution with AI transparency. Get skills verified by your lead to level up.",selector:".tour-sidebar",pos:"right",topic:"Growth"},
+  {title:"AI Usage Tracking",desc:"Monitor how you use AI in your work. The sweet spot is 30-50% AI usage. Log every contribution honestly — there's no penalty for high AI use.",selector:".tour-sidebar",pos:"right",topic:"Growth"},
+  {title:"Knowledge Base",desc:"23 articles covering everything from insurance products to engineering architecture. Search, browse by category, and track your learning.",selector:".tour-sidebar",pos:"right",topic:"Resources"},
+  {title:"Meet Lemi",desc:"Your AI onboarding companion. Ask about your journey, Lemonade culture, tools, career growth, and more. Lemi learns from your conversation context.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
 ];
+const TOUR_LEAD=[
+  {title:"Sidebar Navigation",desc:"Navigate between team dashboard, employee progress, analytics, alerts, and 1:1 prep tools.",selector:".tour-sidebar",pos:"right",topic:"Navigation"},
+  {title:"Search & Command Palette",desc:"Find any employee, skill, or contribution instantly. Cmd+K opens the command palette for quick navigation.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
+  {title:"Team Dashboard",desc:"Monitor all your direct reports at a glance — health scores, phases, contributions. Filter by status and compare employees side-by-side.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
+  {title:"Employee Profiles",desc:"Click any employee card to see their full profile — skills, contributions, AI logs, and progress timeline. Update skills and verify competencies.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
+  {title:"Alert Center",desc:"Critical alerts surface when employees are at risk — low health scores, stalled progress, high AI reliance. Early intervention improves retention by 40%.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
+  {title:"Team Analytics",desc:"Deep performance insights — health trends, contribution charts, AI reliance distribution, activity heatmap, and sortable employee table.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"1:1 Preparation",desc:"Structured templates for 1:1 meetings based on each employee's data — talking points, skill gaps, and action items auto-generated.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"Review Assistant",desc:"AI-powered review suggestions based on employee contributions and growth trajectory. Ensure consistent and fair feedback.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"Notifications",desc:"Real-time updates on team activity — PRs submitted, skills verified, milestones reached. Click to navigate to the relevant screen.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
+  {title:"Lemi for Leads",desc:"Ask Lemi about team insights, coaching strategies, and onboarding best practices. Lemi provides contextual tips based on the screen you're viewing.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
+];
+const TOUR_STRAT=[
+  {title:"Strategy Overview",desc:"Organization-wide onboarding metrics at a glance — health scores, contribution rates, verification rates, AI reliance, and completion status.",selector:".tour-sidebar",pos:"right",topic:"Overview"},
+  {title:"Search & Navigation",desc:"Find any employee or metric quickly. Use Cmd+K for the command palette. Number keys 1-7 navigate sidebar items.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
+  {title:"Cohort Analytics",desc:"Compare cohort performance with interactive charts. Click any data point for detailed breakdowns. Track health trajectory across the full 30-day journey.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"Skill Gap Map",desc:"Identify skill gaps across roles and categories. Click any cell to see individual employee skills. Spot organization-wide training needs.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"Benchmarks",desc:"Compare your program against industry standards — time to first contribution, time to productivity, retention rate, and NPS.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
+  {title:"Attrition Risk",desc:"AI-powered risk assessment identifies employees who may be struggling. Risk factors include low health, stalled contributions, and high AI reliance.",selector:".tour-sidebar",pos:"right",topic:"Risk"},
+  {title:"Content Intelligence",desc:"See which resources are most queried, by which roles, and trending topics. Use this to improve onboarding content and fill knowledge gaps.",selector:".tour-sidebar",pos:"right",topic:"Risk"},
+  {title:"Notifications",desc:"Organization-wide activity feed — track onboarding progress across all cohorts and teams in real-time.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
+  {title:"Lemi for Strategy",desc:"Ask Lemi about program metrics, best practices, cohort comparisons, and organizational insights. Get data-driven recommendations.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
+];
+const TOUR_STEPS_BY_ROLE={maker:TOUR_MAKER,lead:TOUR_LEAD,strategy:TOUR_STRAT};
 
-const TourOverlay=({step,onNext,onSkip})=>{
+const TourOverlay=({step,steps,onNext,onSkip})=>{
   const[pos,setPos]=useState(null);
   useEffect(()=>{
-    const el=document.querySelector(TOUR_STEPS[step].selector);
+    const el=document.querySelector(steps[step].selector);
     if(el){const r=el.getBoundingClientRect();setPos({top:r.top,left:r.left,width:r.width,height:r.height})}
-  },[step]);
+  },[step,steps]);
   if(pos===null)return null;
-  const s=TOUR_STEPS[step];
+  const s=steps[step];
   const pad=8;
-  const tipW=280;
+  const tipW=300;
   let tipStyle={};
-  const maxTop=window.innerHeight-220;
+  const maxTop=window.innerHeight-240;
   if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:pos.left+pos.width+pad+12};
   else if(s.pos==="bottom")tipStyle={top:pos.top+pos.height+pad+12,left:Math.max(8,pos.left+pos.width/2-tipW/2)};
   else if(s.pos==="left")tipStyle={top:Math.min(pos.top,maxTop),left:Math.max(8,pos.left-tipW-pad-12)};
@@ -2353,14 +2382,15 @@ const TourOverlay=({step,onNext,onSkip})=>{
     <div style={{position:"absolute",inset:0,background:"transparent",boxShadow:`0 0 0 ${pos.top-pad}px rgba(0,0,0,0.5) inset`,clipPath:`polygon(0 0,100% 0,100% 100%,0 100%,0 ${pos.top-pad}px,${pos.left-pad}px ${pos.top-pad}px,${pos.left-pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top-pad}px,0 ${pos.top-pad}px)`}} onClick={onSkip}/>
     <div style={{position:"absolute",top:pos.top-pad,left:pos.left-pad,width:pos.width+pad*2,height:pos.height+pad*2,border:"2px solid #FF0083",borderRadius:12,pointerEvents:"none",boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}/>
     <div style={{position:"absolute",...tipStyle,width:tipW}} className="bg-white rounded-2xl shadow-2xl p-5 border border-[#E5E7EB]">
-      <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-bold text-[#FF0083] uppercase tracking-wider">Step {step+1} of {TOUR_STEPS.length}</span></div>
+      {s.topic&&<span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] mb-2 inline-block">{s.topic}</span>}
+      <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">Step {step+1} of {steps.length}</span></div>
       <h3 className="text-[16px] font-bold text-[#1A1A2E] mb-1.5">{s.title}</h3>
       <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4">{s.desc}</p>
       <div className="flex items-center justify-between">
-        <div className="flex gap-1.5">{TOUR_STEPS.map((_,i)=><div key={i} className="w-2 h-2 rounded-full" style={{background:i===step?"#FF0083":i<step?"#FF008350":"#E5E7EB"}}/>)}</div>
+        <div className="flex gap-1">{steps.map((_,i)=><div key={i} className="w-1.5 h-1.5 rounded-full" style={{background:i===step?"#FF0083":i<step?"#FF008350":"#E5E7EB"}}/>)}</div>
         <div className="flex gap-2">
           <button onClick={onSkip} className="text-[12px] text-[#9CA3AF] font-medium hover:text-[#6B7280]">Skip</button>
-          <button onClick={onNext} className="bg-[#FF0083] text-white text-[12px] font-bold px-4 py-1.5 rounded-lg btn-p">{step===TOUR_STEPS.length-1?"Finish":"Next"}</button>
+          <button onClick={onNext} className="bg-[#FF0083] text-white text-[12px] font-bold px-4 py-1.5 rounded-lg btn-p">{step===steps.length-1?"Finish":"Next"}</button>
         </div>
       </div>
     </div>
@@ -2687,6 +2717,8 @@ const App=()=>{
           {darkMode?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           :<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>}
         </button>
+        {/* TOUR BUTTON */}
+        <button onClick={()=>{setTourStep(0);setTourDone(false)}} aria-label="Take a tour" title="Take a tour" className="hidden sm:flex items-center gap-1.5 h-8 rounded-lg bg-white border border-[#E5E7EB] px-2.5 hover:border-[#FF0083] transition-colors shadow-sm text-[12px] font-medium text-[#9CA3AF] hover:text-[#FF0083]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Tour</button>
         {/* SHORTCUTS BUTTON */}
         <button onClick={()=>setShortcutsOpen(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" className="hidden sm:flex w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm text-[13px] font-mono text-[#9CA3AF] hover:text-[#FF0083]">?</button>
         {role==="maker"&&<div className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full pl-1.5 pr-3 py-1"><ProgressRing pct={Math.round(maker.day/30*100)} sz={28}/><span className="text-[12px] text-[#FF0083] font-bold">Day {maker.day}/30</span></div>}
@@ -2756,7 +2788,7 @@ const App=()=>{
       </div>
       <CompanionPanel open={compOpen} onClose={()=>setCompOpen(false)} scr={scr} setScr={setScr} role={role} emp={maker} personality={lemiPersonality}/>
     </div>
-    {tourStep!==null&&<TourOverlay step={tourStep} onNext={()=>{if(tourStep>=TOUR_STEPS.length-1){setTourStep(null);setTourDone(true)}else setTourStep(tourStep+1)}} onSkip={()=>{setTourStep(null);setTourDone(true)}}/>}
+    {tourStep!==null&&(()=>{const ts=TOUR_STEPS_BY_ROLE[role]||TOUR_MAKER;return<TourOverlay step={tourStep} steps={ts} onNext={()=>{if(tourStep>=ts.length-1){setTourStep(null);setTourDone(true)}else setTourStep(tourStep+1)}} onSkip={()=>{setTourStep(null);setTourDone(true)}}/>})()}
   </div>
 };
 
