@@ -2646,7 +2646,7 @@ const App=()=>{
         {role==="maker"&&<div className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full pl-1.5 pr-3 py-1"><ProgressRing pct={Math.round(maker.day/30*100)} sz={28}/><span className="text-[12px] text-[#FF0083] font-bold">Day {maker.day}/30</span></div>}
         {role==="lead"&&<button onClick={()=>setScr("team")} className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full px-3 py-1 hover:bg-[#FF008325] transition-colors cursor-pointer"><span className="text-[12px] text-[#FF0083] font-bold">{leadE.length} reports</span></button>}
         {/* NOTIFICATIONS */}
-        <div className="relative tour-notif">
+        <div className="relative tour-notif" style={{zIndex:notifOpen?52:1}}>
           <button onClick={()=>setNotifOpen(!notifOpen)} aria-label="Notifications" aria-expanded={notifOpen} className="relative w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{zIndex:notifOpen?51:1,position:'relative'}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode?"#94A3B8":"#6B7280"} strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
             {unread>0&&<div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ef4444] text-white text-[9px] font-bold flex items-center justify-center">{unread}</div>}
@@ -2657,11 +2657,15 @@ const App=()=>{
               <span className="text-[13px] font-semibold" style={{color:darkMode?'#F1F5F9':'#1A1A2E'}}>Notifications</span>
               <button onClick={()=>setNotifs(p=>p.map(n=>({...n,read:true})))} className="text-[11px] text-[#FF0083] font-medium hover:underline">Mark all read</button>
             </div>
-            <div className="max-h-72 overflow-y-auto">{notifs.map(n=><div key={n.id} className={`px-4 py-3 flex items-start gap-2.5`} style={{borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',background:!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}}>
+            <div className="max-h-72 overflow-y-auto">{notifs.map(n=><div key={n.id} onClick={()=>{setNotifs(p=>p.map(x=>x.id===n.id?{...x,read:true}:x));}} className={`px-4 py-3 flex items-start gap-2.5 cursor-pointer transition-colors`} style={{borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',background:!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}} onMouseEnter={e=>e.currentTarget.style.background=darkMode?'rgba(255,0,131,.15)':'rgba(255,0,131,.07)'} onMouseLeave={e=>e.currentTarget.style.background=!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}>
               <span className="mt-0.5 flex-shrink-0"><CI n={n.ic} sz={16}/></span>
               <div className="flex-1 min-w-0"><p className="text-[13px]" style={{color:n.read?(darkMode?'#94A3B8':'#6B7280'):(darkMode?'#F1F5F9':'#1A1A2E'),fontWeight:n.read?400:500}}>{n.tx}</p><p className="text-[11px] mt-0.5" style={{color:darkMode?'#64748B':'#9CA3AF'}}>{n.ts}</p></div>
               {!n.read&&<div className="w-2 h-2 rounded-full bg-[#FF0083] mt-1.5 flex-shrink-0"/>}
             </div>)}</div>
+            <div className="px-4 py-2.5 border-t flex items-center justify-between" style={{borderColor:darkMode?'#475569':'#E5E7EB'}}>
+              <button onClick={()=>{setNotifs([]);setNotifOpen(false)}} className="text-[11px] font-medium hover:underline" style={{color:darkMode?'#94A3B8':'#9CA3AF'}}>Clear all</button>
+              <button onClick={()=>setNotifOpen(false)} className="text-[11px] font-medium text-[#FF0083] hover:underline">Close</button>
+            </div>
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
