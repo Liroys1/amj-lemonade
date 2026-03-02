@@ -144,6 +144,15 @@
       .recharts-wrapper{max-height:200px!important}
       /* Bottom padding for main content to avoid FAB overlap */
       #main-content{padding-bottom:80px!important}
+      /* Minimum touch target size for interactive elements (44px WCAG) */
+      .w-7.h-7{min-width:40px!important;min-height:40px!important}
+      .w-8.h-8{min-width:44px!important;min-height:44px!important}
+      /* Improve tap targets for buttons and links */
+      button,a,[role="button"]{-webkit-tap-highlight-color:rgba(255,0,131,.1);touch-action:manipulation}
+      /* Ensure nav items have enough height */
+      .nav-i{min-height:44px!important}
+      /* Increase spacing between clickable list items */
+      tr.cursor-pointer td{padding-top:12px!important;padding-bottom:12px!important}
     }
     @media(max-width:479px){
       /* Extra-small screen overrides */
@@ -1066,7 +1075,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
   const byDept={};emps.forEach(e=>{if(!byDept[e.dp])byDept[e.dp]=[];byDept[e.dp].push(e)});
   const toggleCompare=(id)=>{if(!onCompare)return;if(compareIds.includes(id)){onCompare(compareIds.filter(x=>x!==id))}else if(compareIds.length<2){onCompare([...compareIds,id])}};
   return<div className="fi">
-  <SpotlightCard emps={emps}/>
+  <SpotlightCard emps={emps} onSel={onSel}/>
   <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding &mdash; {emps.length} reports</p></div>
     <div className="flex items-center gap-2">
       {compareIds&&compareIds.length>0&&<button onClick={()=>onCompare([])} className="text-[12px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear ({compareIds.length})</button>}
@@ -1186,7 +1195,7 @@ const ReviewAssist=({emps})=>{
 };
 
 // ───────────────── PHASE 4: STRATEGY ─────────────────
-const StratOver=({setScr})=>{
+const StratOver=({setScr,onSel})=>{
   const avgH=Math.round(E.reduce((s,e)=>s+e.hp,0)/E.length);const bl=E.filter(e=>e.co.some(c=>c.bl)).length;
   const p20=E.filter(e=>e.day>=20);const vr=p20.length?Math.round(p20.filter(e=>e.sk.some(s=>s.sr==="manager-verified")).length/p20.length*100):0;
   const avgAI=Math.round(E.reduce((s,e)=>s+e.co.reduce((ss,c)=>ss+c.ai,0)/(e.co.length||1),0)/E.length);
@@ -1197,7 +1206,7 @@ const StratOver=({setScr})=>{
   const si=c=>sCol===c?(sDir==="asc"?"↑":"↓"):"";
   const sorted=[...E].sort((a,b)=>{const d=sDir==="asc"?1:-1;if(sCol==="nm")return a.nm.localeCompare(b.nm)*d;if(sCol==="rl")return a.rl.localeCompare(b.rl)*d;if(sCol==="dp")return a.dp.localeCompare(b.dp)*d;if(sCol==="day")return(a.day-b.day)*d;if(sCol==="hp")return(a.hp-b.hp)*d;if(sCol==="co")return(a.co.length-b.co.length)*d;return 0});
   return<div className="fi">
-    <SpotlightCard emps={E}/>
+    <SpotlightCard emps={E} onSel={onSel}/>
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics &mdash; {E.length} active makers</p></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">{kpis.map((k,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-3"><CI n={k.ic} sz={18} co={k.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{k.lb}</p></div>
@@ -1207,7 +1216,7 @@ const StratOver=({setScr})=>{
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm mb-5"><div className="overflow-x-auto"><table className="w-full min-w-[700px]">
       <thead><tr className="border-b border-[#E5E7EB]">{[["nm","Name"],["rl","Role"],["dp","Department"],["day","Day"],["hp","Health"],["phase","Phase"],["co","Contributions"]].map(([k,h])=><th key={k} onClick={()=>k!=="phase"&&doSort(k)} className={`text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-3 sm:p-4 ${k!=="phase"?"cursor-pointer hover:text-[#FF0083] select-none":""}`}>{h} {si(k)}</th>)}</tr></thead>
       <tbody>{sorted.map(e=>{const ph=pInfo(e.day);const hc=e.hp>=75?"#10b981":e.hp>=50?"#f59e0b":"#ef4444";return(
-        <tr key={e.id} className="border-b border-[#E5E7EB] hover:bg-[#FF008306] transition-colors cursor-pointer">
+        <tr key={e.id} onClick={()=>onSel&&onSel(e.id)} className="border-b border-[#E5E7EB] hover:bg-[#FF008306] transition-colors cursor-pointer">
           <td className="p-4"><div className="flex items-center gap-3"><Av e={e} sz={32}/><span className="text-[14px] text-[#1A1A2E] font-medium">{e.nm}</span></div></td>
           <td className="p-4"><RoleBadge rl={e.rl}/></td><td className="p-4 text-[14px] text-[#6B7280]">{e.dp}</td>
           <td className="p-4 text-[14px] text-[#1A1A2E] font-medium">{e.day}</td>
@@ -1489,7 +1498,7 @@ const Integrations=({emp,toast})=>{
 };
 
 // ───────────────── NEW: REFLECTIONS (LEAD) ─────────────────
-const Reflections=({emps})=>{
+const Reflections=({emps,onSel})=>{
   const refs=[
     {emp:emps[0]||E[0],date:"Mar 1",type:"Weekly Reflection",text:"This week I learned how the validation chain works. AI helped with boilerplate but I had to understand the business logic deeply to get edge cases right."},
     {emp:emps[1]||E[1],date:"Feb 28",type:"Fresh Eyes Audit",text:"The claims status page is confusing for new users. Status labels don't match customer expectations. Submitted 5 recommendations to the product backlog."},
@@ -1501,10 +1510,10 @@ const Reflections=({emps})=>{
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Reflections</h1><p className="text-[14px] text-[#6B7280] mt-1">Weekly reflections and audit submissions from your reports</p></div>
     <div className="space-y-4">{refs.map((r,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm fi">
       <div className="flex items-start gap-3">
-        <Av e={r.emp} sz={40}/>
+        <div className="flex-shrink-0 cursor-pointer" onClick={()=>onSel&&onSel(r.emp.id)}><Av e={r.emp} sz={40}/></div>
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-            <span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">{r.emp.nm}</span>
+            <span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E] cursor-pointer hover:text-[#FF0083] transition-colors" onClick={()=>onSel&&onSel(r.emp.id)}>{r.emp.nm}</span>
             <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] font-medium">{r.type}</span>
             <span className="text-[11px] sm:text-[12px] text-[#9CA3AF] ml-auto">{r.date}</span>
           </div>
@@ -1810,7 +1819,7 @@ const FAQLinks=()=>{
 };
 
 // ───────────────── NEW: 1:1 MEETING PREP ─────────────────
-const OneOnOne=({emps})=>{
+const OneOnOne=({emps,onSel})=>{
   const[sid,setSid]=useState(emps[0]?.id||"");
   const emp=emps.find(e=>e.id===sid);
   const genPts=e=>{const pts=[];
@@ -1831,7 +1840,7 @@ const OneOnOne=({emps})=>{
     {emp&&<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
-          <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div className="flex-1 min-w-0"><h3 className="text-[14px] font-semibold text-[#1A1A2E] truncate">{emp.nm}</h3><p className="text-[11px] sm:text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={emp} sz={48}/></div></div>
+          <div className="flex items-center gap-3 mb-4"><div className="flex-shrink-0 cursor-pointer" onClick={()=>onSel&&onSel(emp.id)}><Av e={emp} sz={44}/></div><div className="flex-1 min-w-0 cursor-pointer" onClick={()=>onSel&&onSel(emp.id)}><h3 className="text-[14px] font-semibold text-[#1A1A2E] truncate hover:text-[#FF0083] transition-colors">{emp.nm}</h3><p className="text-[11px] sm:text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={emp} sz={48}/></div></div>
           <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3 text-center">{[["Contributions",emp.co.length],["Verified",emp.sk.filter(s=>s.sr==="manager-verified").length],["Avg AI %",Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/(emp.co.length||1))+"%"]].map(([lb,v],i)=>
             <div key={i} className="bg-[#F7F7F7] rounded-xl p-2 sm:p-3 border border-[#E5E7EB]"><p className="text-[14px] sm:text-[16px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] sm:text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
           )}</div>
@@ -1859,7 +1868,7 @@ const OneOnOne=({emps})=>{
 };
 
 // ───────────────── NEW: ALERT CENTER ─────────────────
-const AlertCenter=({emps,toast})=>{
+const AlertCenter=({emps,toast,onSel})=>{
   const[acked,setAcked]=useState({});
   const alerts=useMemo(()=>{const a=[];
     emps.forEach(e=>{
@@ -1884,9 +1893,9 @@ const AlertCenter=({emps,toast})=>{
     </div>
     <div className="space-y-3">{active.map(a=>{const c=sevC[a.sev];return<div key={a.id} className="rounded-[14px] p-3 sm:p-4 border-l-[3px] shadow-sm fi" style={{background:c.bg,borderLeftColor:c.bd}}>
       <div className="flex items-start gap-3">
-        <Av e={a.emp} sz={36}/>
+        <div className="flex-shrink-0 cursor-pointer" onClick={()=>onSel&&onSel(a.emp.id)}><Av e={a.emp} sz={36}/></div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap"><span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">{a.emp.nm}</span><span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium capitalize" style={{background:c.bd+"20",color:c.tx}}>{a.sev}</span></div>
+          <div className="flex items-center gap-2 mb-1 flex-wrap"><span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E] cursor-pointer hover:text-[#FF0083] transition-colors" onClick={()=>onSel&&onSel(a.emp.id)}>{a.emp.nm}</span><span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium capitalize" style={{background:c.bd+"20",color:c.tx}}>{a.sev}</span></div>
           <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{a.tx}</p>
           <p className="text-[11px] sm:text-[12px] text-[#9CA3AF] mt-1">Recommended: {a.rec}</p>
         </div>
@@ -2120,7 +2129,7 @@ const AttritionRisk=()=>{
 };
 
 // ───────────────── NEW: WELCOME TO LEMONADE ─────────────────
-const Welcome=({emp,setScr,onTour,tourDone})=>{
+const Welcome=({emp,setScr,onTour,tourDone,onSelEmp})=>{
   const team=E.filter(e=>e.ld===emp.ld&&e.id!==emp.id).slice(0,4);
   const phases=[{wk:"Week 1",nm:"Ground Yourself",ds:"Absorb culture, meet your squad, set up tools",ic:"seedling"},{wk:"Week 2",nm:"The Sandbox",ds:"Make small, safe first contributions",ic:"flask"},{wk:"Week 3",nm:"Squad Experience",ds:"Own a task end-to-end, present your Fresh Eyes Audit",ic:"handshake"},{wk:"Week 4",nm:"Ownership",ds:"Lead a feature, solidify your craft identity",ic:"rocket"}];
   return<div className="fi">
@@ -2151,8 +2160,8 @@ const Welcome=({emp,setScr,onTour,tourDone})=>{
       </div>
       {team.length>0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-8">
         <div className="flex items-center gap-3 mb-4"><PersonIll w={36} h={44}/><div><h2 className="h-serif text-[18px] font-bold text-[#1A1A2E]">Your Squad</h2><p className="text-[13px] text-[#6B7280]">Led by {emp.ld} · {emp.dp}</p></div></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">{team.map(t=><div key={t.id} className="flex items-center gap-3 bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]">
-          <Av e={t} sz={36}/><div><p className="text-[13px] font-medium text-[#1A1A2E]">{t.nm}</p><p className="text-[11px] text-[#6B7280]">{t.rl}</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">{team.map(t=><div key={t.id} onClick={()=>onSelEmp&&onSelEmp(t.id)} className="flex items-center gap-3 bg-[#F7F7F7] rounded-xl p-4 border border-[#E5E7EB] cursor-pointer hover:border-[#FF0083] hover:bg-[#FF008306] transition-all active:scale-[0.98]" role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSelEmp&&onSelEmp(t.id)}}}>
+          <Av e={t} sz={36}/><div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E]">{t.nm}</p><p className="text-[11px] text-[#6B7280]">{t.rl}</p></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
         </div>)}</div>
       </div>}
       <div className="text-center pb-6">
@@ -2238,7 +2247,7 @@ const OnboardSetup=({emps,toast,setScr})=>{
 };
 
 // ───────────────── NEW: EMPLOYEE PROGRESS (LEAD) ─────────────────
-const EmpProgress=({emps})=>{
+const EmpProgress=({emps,onSel})=>{
   const[sid,setSid]=useState("all");
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   const genHealth=e=>[{wk:"W1",v:Math.max(40,e.hp-25+Math.floor(Math.random()*8))},{wk:"W2",v:Math.max(50,e.hp-15+Math.floor(Math.random()*6))},{wk:"W3",v:Math.max(55,e.hp-5+Math.floor(Math.random()*5))},{wk:"W4",v:e.hp}];
@@ -2251,7 +2260,7 @@ const EmpProgress=({emps})=>{
     </div>
     {sel?<div className="fi">
       <div className="flex items-center gap-3 sm:gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm">
-        <Av e={sel} sz={44}/><div className="flex-1 min-w-0"><h2 className="text-[16px] sm:text-[18px] font-bold text-[#1A1A2E] truncate">{sel.nm}</h2><p className="text-[12px] sm:text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={sel} sz={48}/></div>
+        <div className="flex-shrink-0 cursor-pointer" onClick={()=>onSel&&onSel(sel.id)}><Av e={sel} sz={44}/></div><div className="flex-1 min-w-0 cursor-pointer" onClick={()=>onSel&&onSel(sel.id)}><h2 className="text-[16px] sm:text-[18px] font-bold text-[#1A1A2E] truncate hover:text-[#FF0083] transition-colors">{sel.nm}</h2><p className="text-[12px] sm:text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={sel} sz={48}/></div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Health Trend <span className="text-[9px] font-normal normal-case">(click point)</span></h3>
@@ -2280,7 +2289,7 @@ const EmpProgress=({emps})=>{
 };
 
 // ───────────────── NEW: TEAM PULSE ─────────────────
-const TeamPulse=({emps,toast})=>{
+const TeamPulse=({emps,toast,onSel})=>{
   const getMood=e=>{const h=e.hp;if(h>=80)return{lb:"Great",co:"#10b981",ic:"trending-up"};if(h>=65)return{lb:"Okay",co:"#f59e0b",ic:"trending-flat"};return{lb:"Needs Support",co:"#ef4444",ic:"trending-down"}};
   const[checkedIn,setCheckedIn]=useState({});
   return<div className="fi">
@@ -2291,7 +2300,7 @@ const TeamPulse=({emps,toast})=>{
       </div>
     )}</div>
     <div className="space-y-3">{emps.map(e=>{const m=getMood(e);return<div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 cursor-pointer hover:bg-[#FF008306] rounded-lg p-1 -m-1 transition-all" onClick={()=>onSel&&onSel(e.id)}>
         <Av e={e} sz={40}/>
         <div className="flex-1 min-w-0"><h3 className="text-[14px] font-semibold text-[#1A1A2E] truncate">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div>
         <span className="text-[12px] px-2 sm:px-3 py-1 rounded-full font-medium flex-shrink-0" style={{background:m.co+"18",color:m.co}}>{m.lb}</span>
@@ -2582,11 +2591,11 @@ const spotlightWhy=(s)=>{
   if(s.verifiedCount>0)parts.push(`${s.verifiedCount} verified skill${s.verifiedCount>1?"s":""}`);
   return parts.length?parts.join(", ")+".":`Strong overall onboarding performance with a score of ${s.score}.`;
 };
-const SpotlightCard=({emps})=>{
+const SpotlightCard=({emps,onSel})=>{
   const star=spotlightMaker(emps);
   if(!star)return null;
   return<div className="spotlight-border mb-6">
-    <div className="spotlight-inner p-5">
+    <div className={`spotlight-inner p-5 ${onSel?"cursor-pointer hover:shadow-md transition-shadow":""}`} onClick={()=>onSel&&onSel(star.id)}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative">
@@ -2698,7 +2707,7 @@ const App=()=>{
     if(scr==="settings")return<Settings {...settingsProps}/>;
     if(role==="maker"){
       if(scr==="home")return<MakerDash emp={maker} setScr={setScr}/>;
-      if(scr==="welcome")return<Welcome emp={maker} setScr={setScr} onTour={()=>setTourStep(0)} tourDone={tourDone}/>;
+      if(scr==="welcome")return<Welcome emp={maker} setScr={setScr} onTour={()=>setTourStep(0)} tourDone={tourDone} onSelEmp={id=>{setRole("lead");setSelId(id);setScr("employee")}}/>;
       if(scr==="journey")return<Journey emp={maker}/>;
       if(scr==="checklist")return<Checklist emp={maker} onCelebrate={fireConfetti}/>;
       if(scr==="goals")return<WeeklyGoals toast={showToast} onCelebrate={fireConfetti}/>;
@@ -2716,14 +2725,14 @@ const App=()=>{
     if(role==="lead"){
       if(scr==="compare"&&compareIds.length===2){const c1=es.find(e=>e.id===compareIds[0]);const c2=es.find(e=>e.id===compareIds[1]);if(c1&&c2)return<CompareView emp1={c1} emp2={c2} onClear={()=>{setCompareIds([]);setScr("team")}}/>;};
       if(scr==="employee"&&selE)return<EmpDetail emp={selE} onBack={()=>setScr("team")} onUpd={u=>setEs(p=>p.map(e=>e.id===u.id?u:e))}/>;
-      if(scr==="progress")return<EmpProgress emps={leadE}/>;
-      if(scr==="pulse")return<TeamPulse emps={leadE} toast={showToast}/>;
-      if(scr==="one-on-one")return<OneOnOne emps={leadE}/>;
-      if(scr==="alerts")return<AlertCenter emps={leadE} toast={showToast}/>;
+      if(scr==="progress")return<EmpProgress emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
+      if(scr==="pulse")return<TeamPulse emps={leadE} toast={showToast} onSel={id=>{setSelId(id);setScr("employee")}}/>;
+      if(scr==="one-on-one")return<OneOnOne emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
+      if(scr==="alerts")return<AlertCenter emps={leadE} toast={showToast} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="onboard-setup")return<OnboardSetup emps={leadE} toast={showToast} setScr={setScr}/>;
       if(scr==="analytics")return<TeamAnalytics emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="review")return<ReviewAssist emps={leadE}/>;
-      if(scr==="reflections")return<Reflections emps={leadE}/>;
+      if(scr==="reflections")return<Reflections emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       return<TeamDash emps={leadE} leadNm={leadSel} onSel={id=>{setSelId(id);setScr("employee")}} compareIds={compareIds} onCompare={setCompareIds} onShowCompare={()=>setScr("compare")}/>;
     }
     if(scr==="cohorts")return<Cohorts/>;
@@ -2731,7 +2740,7 @@ const App=()=>{
     if(scr==="benchmarks")return<BenchmarkView/>;
     if(scr==="attrition")return<AttritionRisk/>;
     if(scr==="content")return<ContentIntel/>;
-    return<StratOver setScr={setScr}/>;
+    return<StratOver setScr={setScr} onSel={id=>{setRole("lead");setSelId(id);setScr("employee")}}/>;
   };
 
   if(!appReady) return <div className="h-screen bg-white flex flex-col items-center justify-center gap-6">
