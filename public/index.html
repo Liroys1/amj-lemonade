@@ -108,6 +108,30 @@
     .spotlight-border{background:linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b);padding:2px;border-radius:16px}
     .spotlight-inner{background:white;border-radius:14px}
     .dark .spotlight-inner{background:#1e293b}
+    /* ── MOBILE RESPONSIVE OVERRIDES ── */
+    @media(max-width:767px){
+      /* Typography scaling */
+      .h-serif{font-size:clamp(18px,5vw,26px)!important}
+      /* Scrolling momentum for horizontal scroll areas */
+      .overflow-x-auto{-webkit-overflow-scrolling:touch}
+      table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+      /* Prevent horizontal overflow on body/root */
+      body{overflow-x:hidden}
+      #root{overflow-x:hidden;max-width:100vw}
+      /* Ensure select dropdowns don't overflow */
+      select{max-width:100%!important}
+      /* Reduce large gaps on mobile */
+      .gap-8{gap:16px!important}
+      .gap-7{gap:14px!important}
+    }
+    @media(max-width:479px){
+      /* Extra-small screen overrides */
+      .h-serif{font-size:clamp(16px,4.5vw,22px)!important}
+      /* Reduce padding on smaller screens */
+      .p-6{padding:12px!important}
+      .p-5{padding:10px!important}
+      .px-5{padding-left:10px!important;padding-right:10px!important}
+    }
   </style>
 </head>
 <body>
@@ -738,20 +762,20 @@ const RoleBadge=({rl})=>{const m={Engineer:{co:"#2563eb",ic:"dot-blue"},Designer
 const Journey=({emp})=>{
   const[sel,setSel]=useState(null);const cur=pDay(emp.day);
   return<div className="fi">
-    <div className="flex items-center justify-between mb-8">
-      <div><div className="flex items-center gap-3 mb-1"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">My Journey</h1><RoleBadge rl={emp.rl}/></div><p className="text-[14px] text-[#6B7280] mt-1">Your 30-day path to ownership</p></div>
-      <div className="flex items-center gap-4 bg-white border border-[#E5E7EB] rounded-[14px] px-5 py-2.5 shadow-sm">
-        <span className="text-[14px] text-[#6B7280]">Progress</span>
-        <div className="w-40 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${(emp.day/30)*100}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
-        <span className="text-[14px] font-semibold text-[#1A1A2E]">Day {emp.day}<span className="text-[#9CA3AF] font-normal"> / 30</span></span>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
+      <div><div className="flex items-center gap-3 mb-1 flex-wrap"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Journey</h1><RoleBadge rl={emp.rl}/></div><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Your 30-day path to ownership</p></div>
+      <div className="flex items-center gap-3 sm:gap-4 bg-white border border-[#E5E7EB] rounded-[14px] px-4 sm:px-5 py-2 sm:py-2.5 shadow-sm w-fit">
+        <span className="text-[13px] sm:text-[14px] text-[#6B7280]">Progress</span>
+        <div className="w-24 sm:w-40 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${(emp.day/30)*100}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
+        <span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">Day {emp.day}<span className="text-[#9CA3AF] font-normal"> / 30</span></span>
       </div>
     </div>
-    <div className="relative mb-10">
-      <div className="absolute top-[30px] left-[60px] right-[60px] h-[2px]" style={{background:"linear-gradient(90deg,#FF0083,#E5E7EB)"}}/>
-      <div className="flex justify-between relative z-10 px-2">
+    <div className="relative mb-10 overflow-x-auto pb-2">
+      <div className="absolute top-[30px] left-[60px] right-[60px] h-[2px] hidden sm:block" style={{background:"linear-gradient(90deg,#FF0083,#E5E7EB)"}}/>
+      <div className="flex justify-between relative z-10 px-2 min-w-[500px] sm:min-w-0">
         {PHASES.map((p,i)=>{const n=i+1,dn=n<cur,nw=n===cur,ft=n>cur;return(
-          <button key={p.id} onClick={()=>setSel(p)} className="flex flex-col items-center gap-3 group cursor-pointer" style={{width:"23%"}}>
-            <div className={`w-[60px] h-[60px] rounded-full flex items-center justify-center text-base font-bold border-2 transition-all duration-300 group-hover:scale-110
+          <button key={p.id} onClick={()=>setSel(p)} className="flex flex-col items-center gap-2 sm:gap-3 group cursor-pointer" style={{width:"23%"}}>
+            <div className={`w-[48px] h-[48px] sm:w-[60px] sm:h-[60px] rounded-full flex items-center justify-center text-sm sm:text-base font-bold border-2 transition-all duration-300 group-hover:scale-110
               ${dn?"bg-[#FF0083] border-[#FF0083] text-white shadow-[0_0_20px_rgba(255,0,131,.3)]":""}
               ${nw?"border-[#FF0083] text-[#FF0083] pulse-p bg-white":""}
               ${ft?"border-[#E5E7EB] text-[#9CA3AF] bg-white":""}`}>
@@ -772,9 +796,9 @@ const Journey=({emp})=>{
         <button onClick={()=>setSel(null)} className="w-8 h-8 rounded-lg bg-[#F7F7F7] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A2E] transition-colors">✕</button>
       </div>
       <p className="text-[14px] text-[#6B7280] mb-5 leading-relaxed">{sel.desc}</p>
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
         <div><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Key Activities</h3>
-          <div className="space-y-2">{sel.acts.map((a,i)=><div key={i} className="flex items-start gap-2.5 text-[14px] text-[#6B7280]"><span className="text-[#FF0083] mt-0.5 text-xs">●</span><span>{a}</span></div>)}</div>
+          <div className="space-y-2">{sel.acts.map((a,i)=><div key={i} className="flex items-start gap-2.5 text-[13px] sm:text-[14px] text-[#6B7280]"><span className="text-[#FF0083] mt-0.5 text-xs">●</span><span>{a}</span></div>)}</div>
         </div>
         <div><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Expected Output</h3>
           <div className="bg-[#F7F7F7] rounded-xl p-4 border border-[#E5E7EB] text-[14px] text-[#6B7280] leading-relaxed">{sel.out}</div>
@@ -802,9 +826,9 @@ const Skills=({emp,ro=false,onV=null})=>{
       <div className="flex justify-center">
         <ResponsiveContainer width="100%" height={320}><RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}><PolarGrid stroke="#E5E7EB"/><PolarAngleAxis dataKey="cat" tick={{fill:"#6B7280",fontSize:12,fontWeight:600}}/><PolarRadiusAxis angle={90} domain={[0,100]} tick={{fill:"#9CA3AF",fontSize:10}}/><Radar name="Skills" dataKey="value" stroke="#FF0083" fill="#FF0083" fillOpacity={0.2} strokeWidth={2}/></RadarChart></ResponsiveContainer>
       </div>
-      <div className="grid grid-cols-4 gap-3 mt-4">{radarData.map((d,i)=>{const cc=CC[d.cat]||CC.Technical;return<div key={i} className="text-center p-3 rounded-xl border" style={{background:cc.bg,borderColor:cc.bd}}><p className="text-[20px] font-bold" style={{color:cc.tx}}>{d.value}%</p><p className="text-[11px] font-medium" style={{color:cc.tx}}>{d.cat}</p><p className="text-[10px] text-[#9CA3AF]">{d.count} skills</p></div>})}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">{radarData.map((d,i)=>{const cc=CC[d.cat]||CC.Technical;return<div key={i} className="text-center p-3 rounded-xl border" style={{background:cc.bg,borderColor:cc.bd}}><p className="text-[20px] font-bold" style={{color:cc.tx}}>{d.value}%</p><p className="text-[11px] font-medium" style={{color:cc.tx}}>{d.cat}</p><p className="text-[10px] text-[#9CA3AF]">{d.count} skills</p></div>})}</div>
     </div>
-    :<div className="grid grid-cols-3 gap-4">
+    :<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {emp.sk.map((s,i)=>{
         const ev=emp.co.filter(c=>{if(s.ct==="Technical"&&(c.ty==="PR"||c.ty==="Audit"))return true;if(s.ct==="Design"&&(c.ty==="Design"||c.ty==="Audit"))return true;if(s.ct==="Product"&&c.ty==="Brief")return true;if(s.ct==="AI-Native")return true;return false}).slice(0,2);
         const canV=onV&&(s.lv==="practicing"||s.lv==="proficient")&&s.sr!=="manager-verified"&&s.sr!=="resume";
@@ -826,16 +850,16 @@ const Contribs=({emp,showRev=false})=>{
     {emp.co.map(c=><div key={c.id} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm card-h overflow-hidden">
       <button onClick={()=>setExp(exp===c.id?null:c.id)} className="w-full p-4 flex items-center justify-between text-left group">
         <div className="flex items-center gap-3 flex-1 min-w-0"><TyB t={c.ty}/><span className="text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</span></div>
-        <div className="flex items-center gap-4 flex-shrink-0">
-          <div className="flex items-center gap-2"><div className="w-14 h-1 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${c.ai}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div><span className="text-[11px] text-[#9CA3AF] w-7 text-right">{c.ai}%</span></div>
-          <span className="text-[11px] text-[#9CA3AF]">{c.da}d</span>
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <div className="hidden sm:flex items-center gap-2"><div className="w-14 h-1 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${c.ai}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div><span className="text-[11px] text-[#9CA3AF] w-7 text-right">{c.ai}%</span></div>
+          <span className="text-[11px] text-[#9CA3AF] hidden sm:inline">{c.da}d</span>
           <StP s={c.st}/>
           <svg className={`w-4 h-4 text-[#9CA3AF] transition-transform ${exp===c.id?"rotate-180":""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
         </div>
       </button>
       {exp===c.id&&<div className="px-4 pb-5 border-t border-[#E5E7EB] pt-4 fi">
         {c.bl&&<div className="bg-[#f0fdf4] border border-[#10b98130] rounded-xl p-3.5 mb-4 flex items-center gap-2.5"><CI n="check-round" sz={16} co="#10b981"/><span className="text-[14px] text-[#059669] font-medium">This finding was added to the product backlog</span></div>}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">AI Contribution Log</h4>
             <div className="space-y-2">
               {[["AI Generated",c.al.ai,"#FF0083"],["I Wrote",c.al.hm,"#10b981"],["I Changed",c.al.ch,"#d97706"],["Unsure About",c.al.un,"#9CA3AF"]].map(([lb,tx,co],j)=><div key={j} className="bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><span className="text-[11px] font-semibold" style={{color:co}}>{lb}</span><p className="text-[12px] text-[#6B7280] mt-1 leading-relaxed">{tx}</p></div>)}
@@ -844,7 +868,7 @@ const Contribs=({emp,showRev=false})=>{
           <div className="space-y-4">
             {c.rv&&<div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-2">Review Feedback</h4><div className="bg-[#F7F7F7] rounded-xl p-3.5 border border-[#E5E7EB] text-[14px] text-[#6B7280] leading-relaxed">{c.rv}</div></div>}
             {c.ln&&<div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-2">Learning Note</h4><div className="bg-[#F7F7F7] rounded-xl p-3.5 border border-[#E5E7EB] text-[14px] text-[#6B7280] leading-relaxed">{c.ln}</div></div>}
-            {!c.rv&&!c.ln&&<div className="bg-[#F7F7F7] rounded-xl p-8 border border-[#E5E7EB] text-center"><p className="text-[14px] text-[#D1D5DB]">No feedback yet</p></div>}
+            {!c.rv&&!c.ln&&<div className="bg-[#F7F7F7] rounded-xl p-4 sm:p-8 border border-[#E5E7EB] text-center"><p className="text-[14px] text-[#D1D5DB]">No feedback yet</p></div>}
           </div>
         </div>
       </div>}
@@ -859,11 +883,11 @@ const AIU=({emp})=>{
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   const[drillBar,setDrillBar]=useState(null);const[drillLine,setDrillLine]=useState(null);
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">AI Usage</h1><p className="text-[14px] text-[#6B7280] mt-1">Track how you use AI in your work</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">AI Usage</h1><p className="text-[14px] text-[#6B7280] mt-1">Track how you use AI in your work</p></div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI vs Human Contribution <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
         <ResponsiveContainer width="100%" height={200}><BarChart data={bd} barGap={2}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="ai" name="AI" fill="#FF0083" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/><Bar dataKey="human" name="Human" fill="#10b981" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillBar(bd[idx])}/></BarChart></ResponsiveContainer>
-        {drillBar&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillBar._src.ti}</h4><button onClick={()=>setDrillBar(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-3 text-center"><div><p className="text-[20px] font-bold text-[#FF0083]">{drillBar.ai}%</p><p className="text-[10px] text-[#9CA3AF]">AI Generated</p></div><div><p className="text-[20px] font-bold text-[#10b981]">{drillBar.human}%</p><p className="text-[10px] text-[#9CA3AF]">Human Written</p></div><div><StP s={drillBar._src.st}/><p className="text-[10px] text-[#9CA3AF] mt-1">{drillBar._src.ty}</p></div></div></div>}
+        {drillBar&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillBar._src.ti}</h4><button onClick={()=>setDrillBar(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-2 sm:gap-3 text-center"><div><p className="text-[20px] font-bold text-[#FF0083]">{drillBar.ai}%</p><p className="text-[10px] text-[#9CA3AF]">AI Generated</p></div><div><p className="text-[20px] font-bold text-[#10b981]">{drillBar.human}%</p><p className="text-[10px] text-[#9CA3AF]">Human Written</p></div><div><StP s={drillBar._src.st}/><p className="text-[10px] text-[#9CA3AF] mt-1">{drillBar._src.ty}</p></div></div></div>}
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">AI Contribution Trend <span className="text-[9px] font-normal normal-case">(click point for details)</span></h3>
         <ResponsiveContainer width="100%" height={200}><LineChart data={ld}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/><Line type="monotone" dataKey="ai" stroke="#FF0083" strokeWidth={2.5} dot={{r:5,fill:"#FF0083",stroke:"#fff",strokeWidth:2}} name="AI %" activeDot={{r:7,cursor:"pointer",onClick:(_,p)=>setDrillLine(ld[p.index])}}/></LineChart></ResponsiveContainer>
@@ -1009,7 +1033,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
   const toggleCompare=(id)=>{if(!onCompare)return;if(compareIds.includes(id)){onCompare(compareIds.filter(x=>x!==id))}else if(compareIds.length<2){onCompare([...compareIds,id])}};
   return<div className="fi">
   <SpotlightCard emps={emps}/>
-  <div className="mb-6 flex items-center justify-between"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding &mdash; {emps.length} reports</p></div>
+  <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding &mdash; {emps.length} reports</p></div>
     <div className="flex items-center gap-2">
       {compareIds&&compareIds.length>0&&<button onClick={()=>onCompare([])} className="text-[12px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear ({compareIds.length})</button>}
       {compareIds&&compareIds.length===2&&<button onClick={onShowCompare} className="text-[12px] px-4 py-1.5 rounded-full bg-[#FF0083] text-white font-semibold btn-p flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Compare</button>}
@@ -1022,7 +1046,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
       <div className="flex flex-col items-center mb-2"><Av e={lead} sz={56}/><p className="text-[14px] font-bold text-[#1A1A2E] mt-2">{lead.nm}</p><p className="text-[11px] text-[#FF0083] font-semibold">{lead.rl}</p></div>
       <div className="w-px h-6 bg-[#E5E7EB]"/>
     </div>
-    <div className="flex justify-center gap-8">{Object.entries(byDept).map(([dept,members])=><div key={dept} className="flex flex-col items-center">
+    <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8">{Object.entries(byDept).map(([dept,members])=><div key={dept} className="flex flex-col items-center">
       <span className="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] mb-3 px-3 py-1 bg-[#F7F7F7] rounded-full border border-[#E5E7EB]">{dept}</span>
       <div className="flex gap-3">{members.map(e=><button key={e.id} onClick={()=>onSel(e.id)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
         <div className={`rounded-xl border-2 transition-all group-hover:scale-110 group-hover:border-[#FF0083] ${e.hp<65?"border-[#ef4444]":"border-[#E5E7EB]"}`}><Av e={e} sz={40}/></div>
@@ -1031,7 +1055,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
       </button>)}</div>
     </div>)}</div>
   </div>
-  <div className="flex gap-3 mb-5">
+  <div className="flex flex-wrap gap-2 sm:gap-3 mb-5">
     {[["all",`All (${emps.length})`,"#6B7280"],["on-track",`On Track (${onTrack})`,"#10b981"],["attention",`Needs Attention (${attn})`,"#f59e0b"],["at-risk",`At Risk (${atRisk})`,"#ef4444"]].map(([k,lb,co])=>
       <button key={k} onClick={()=>setFilter(k)} className={`text-[12px] px-3.5 py-1.5 rounded-full border font-medium transition-all ${filter===k?"text-white shadow-sm":"hover:border-current"}`} style={filter===k?{background:co,borderColor:co,color:"white"}:{borderColor:"#E5E7EB",color:co}}>{lb}</button>
     )}
@@ -1073,12 +1097,12 @@ const EmpDetail=({emp,onBack,onUpd})=>{
   const handleV=nm=>{onUpd({...emp,sk:emp.sk.map(s=>s.nm===nm?{...s,sr:"manager-verified"}:s)})};
   return<div className="fi">
     <button onClick={onBack} className="flex items-center gap-2 text-[14px] text-[#6B7280] hover:text-[#1A1A2E] transition-colors mb-5">← Back to Dashboard</button>
-    <div className="flex items-center gap-4 mb-6">
-      <Av e={emp} sz={56}/>
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">{emp.nm}</h1><p className="text-[14px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div>
-      <div className="ml-auto"><HealthBreakdown emp={emp} sz={60}/></div>
+    <div className="flex items-center gap-3 sm:gap-4 mb-6">
+      <Av e={emp} sz={48}/>
+      <div className="flex-1 min-w-0"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E] truncate">{emp.nm}</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div>
+      <div className="flex-shrink-0"><HealthBreakdown emp={emp} sz={52}/></div>
     </div>
-    <div className="flex gap-1 mb-6 bg-[#F3F4F6] rounded-xl p-1">{tabs.map(t=><button key={t.id} onClick={()=>setTab(t.id)} className={`px-5 py-2 rounded-lg text-[14px] font-medium transition-all ${tab===t.id?"text-white shadow-lg":"text-[#6B7280] hover:text-[#1A1A2E]"}`} style={tab===t.id?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>{t.lb}</button>)}</div>
+    <div className="flex gap-1 mb-6 bg-[#F3F4F6] rounded-xl p-1 overflow-x-auto">{tabs.map(t=><button key={t.id} onClick={()=>setTab(t.id)} className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg text-[13px] sm:text-[14px] font-medium transition-all whitespace-nowrap ${tab===t.id?"text-white shadow-lg":"text-[#6B7280] hover:text-[#1A1A2E]"}`} style={tab===t.id?{background:"linear-gradient(135deg,#FF0083,#e6007a)"}:{}}>{t.lb}</button>)}</div>
     {tab==="journey"&&<Journey emp={emp}/>}
     {tab==="skills"&&<Skills emp={emp} onV={handleV}/>}
     {tab==="contributions"&&<Contribs emp={emp} showRev/>}
@@ -1092,7 +1116,7 @@ const ReviewAssist=({emps})=>{
   const qs={Engineer:["Why this data structure?","What if this API call fails?","How would you test this edge case?","Performance implications?"],Designer:["What does this look like on mobile?","What accessibility standard?","How does it degrade on slow connections?","What user feedback informed this?"],PM:["What assumption invalidates the spec?","How would you measure success?","What's the smallest shippable version?","Who are the stakeholders?"]};
   const brief=[["Context","My approach and key decisions"],["AI Usage","AI for scaffolding, refined with conventions"],["Uncertainties","Not confident about error handling"],["Learn Goal","Understand internal API patterns better"],["Feedback Request","Code structure and naming feedback"]];
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Review Assistant</h1><p className="text-[14px] text-[#6B7280] mt-1">Structured contribution review</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Review Assistant</h1><p className="text-[14px] text-[#6B7280] mt-1">Structured contribution review</p></div>
     <select value={sid} onChange={e=>{setSid(e.target.value);setDn(false)}} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] mb-6 shadow-sm">{emps.map(e=><option key={e.id} value={e.id}>{e.nm} — {e.rl}</option>)}</select>
     {emp&&lc&&!dn&&<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div>
@@ -1140,14 +1164,14 @@ const StratOver=({setScr})=>{
   const sorted=[...E].sort((a,b)=>{const d=sDir==="asc"?1:-1;if(sCol==="nm")return a.nm.localeCompare(b.nm)*d;if(sCol==="rl")return a.rl.localeCompare(b.rl)*d;if(sCol==="dp")return a.dp.localeCompare(b.dp)*d;if(sCol==="day")return(a.day-b.day)*d;if(sCol==="hp")return(a.hp-b.hp)*d;if(sCol==="co")return(a.co.length-b.co.length)*d;return 0});
   return<div className="fi">
     <SpotlightCard emps={E}/>
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics &mdash; {E.length} active makers</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics &mdash; {E.length} active makers</p></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">{kpis.map((k,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <div className="flex items-center gap-2 mb-3"><CI n={k.ic} sz={18} co={k.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{k.lb}</p></div>
       <p className="text-3xl font-bold tracking-tight" style={{color:k.co}}>{k.v}</p>
       <p className="text-[11px] text-[#6B7280] mt-1">{k.tr}</p>
     </div>)}</div>
-    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm mb-5"><table className="w-full">
-      <thead><tr className="border-b border-[#E5E7EB]">{[["nm","Name"],["rl","Role"],["dp","Department"],["day","Day"],["hp","Health"],["phase","Phase"],["co","Contributions"]].map(([k,h])=><th key={k} onClick={()=>k!=="phase"&&doSort(k)} className={`text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-4 ${k!=="phase"?"cursor-pointer hover:text-[#FF0083] select-none":""}`}>{h} {si(k)}</th>)}</tr></thead>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm mb-5"><div className="overflow-x-auto"><table className="w-full min-w-[700px]">
+      <thead><tr className="border-b border-[#E5E7EB]">{[["nm","Name"],["rl","Role"],["dp","Department"],["day","Day"],["hp","Health"],["phase","Phase"],["co","Contributions"]].map(([k,h])=><th key={k} onClick={()=>k!=="phase"&&doSort(k)} className={`text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-3 sm:p-4 ${k!=="phase"?"cursor-pointer hover:text-[#FF0083] select-none":""}`}>{h} {si(k)}</th>)}</tr></thead>
       <tbody>{sorted.map(e=>{const ph=pInfo(e.day);const hc=e.hp>=75?"#10b981":e.hp>=50?"#f59e0b":"#ef4444";return(
         <tr key={e.id} className="border-b border-[#E5E7EB] hover:bg-[#FF008306] transition-colors cursor-pointer">
           <td className="p-4"><div className="flex items-center gap-3"><Av e={e} sz={32}/><span className="text-[14px] text-[#1A1A2E] font-medium">{e.nm}</span></div></td>
@@ -1155,9 +1179,9 @@ const StratOver=({setScr})=>{
           <td className="p-4 text-[14px] text-[#1A1A2E] font-medium">{e.day}</td>
           <td className="p-4"><span className="text-[14px] font-bold" style={{color:hc}}>{e.hp}</span></td>
           <td className="p-4 text-[14px] text-[#6B7280]">{ph.wk} — {ph.nm}</td>
-          <td className="p-4 text-[14px] text-[#1A1A2E] font-medium">{e.co.length}</td>
+          <td className="p-3 sm:p-4 text-[14px] text-[#1A1A2E] font-medium">{e.co.length}</td>
         </tr>)})}</tbody>
-    </table></div>
+    </table></div></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Recent Activity</h3>
       <ActivityFeed items={TIMELINE} limit={5} onNav={setScr}/>
@@ -1172,7 +1196,7 @@ const Cohorts=()=>{
   const avg=c=>Math.round(c.es.reduce((s,e)=>s+e.hp,0)/c.es.length);
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Cohort Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Compare cohort performance</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Cohort Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Compare cohort performance</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
       <div className="flex items-center justify-between mb-4"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trajectory <span className="text-[9px] font-normal normal-case">(click chart for day details)</span></h3>
         <div className="flex gap-2">{cohorts.map((c,i)=><button key={i} onClick={()=>setShow(p=>({...p,[i]:!p[i]}))} className={`text-[11px] px-3 py-1 rounded-full border transition-all`} style={show[i]?{borderColor:c.co,color:c.co,background:c.co+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{c.nm}</button>)}</div>
@@ -1182,17 +1206,17 @@ const Cohorts=()=>{
         {show[1]&&<Line type="monotone" dataKey="Cohort B" stroke="#38bdf8" strokeWidth={2.5} dot={false} cursor="pointer"/>}
         {show[2]&&<Line type="monotone" dataKey="Cohort C" stroke="#10b981" strokeWidth={2.5} dot={false} cursor="pointer"/>}
       </LineChart></ResponsiveContainer>
-      {drillCohort&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Day {drillCohort.day} Health Scores</h4><button onClick={()=>setDrillCohort(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="flex gap-4">{cohorts.map((c,i)=>show[i]&&<div key={i} className="flex-1 text-center p-3 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[20px] font-bold" style={{color:c.co}}>{drillCohort[c.nm]}</p><p className="text-[10px] text-[#9CA3AF]">{c.nm}</p><p className="text-[9px] text-[#6B7280]">{c.es.length} members</p></div>)}</div></div>}
+      {drillCohort&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Day {drillCohort.day} Health Scores</h4><button onClick={()=>setDrillCohort(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="flex flex-wrap gap-3 sm:gap-4">{cohorts.map((c,i)=>show[i]&&<div key={i} className="flex-1 min-w-[80px] text-center p-3 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[20px] font-bold" style={{color:c.co}}>{drillCohort[c.nm]}</p><p className="text-[10px] text-[#9CA3AF]">{c.nm}</p><p className="text-[9px] text-[#6B7280]">{c.es.length} members</p></div>)}</div></div>}
     </div>
-    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm"><table className="w-full">
-      <thead><tr className="border-b border-[#E5E7EB]"><th className="text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-4">Metric</th>{cohorts.map((c,i)=><th key={i} className="text-center text-[10px] font-semibold uppercase tracking-[.1em] p-4" style={{color:c.co}}>{c.nm}</th>)}</tr></thead>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[400px]">
+      <thead><tr className="border-b border-[#E5E7EB]"><th className="text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-3 sm:p-4">Metric</th>{cohorts.map((c,i)=><th key={i} className="text-center text-[10px] font-semibold uppercase tracking-[.1em] p-3 sm:p-4" style={{color:c.co}}>{c.nm}</th>)}</tr></thead>
       <tbody>
         <tr className="border-b border-[#E5E7EB]"><td className="p-4 text-[14px] text-[#6B7280]">Avg Health</td>{cohorts.map((c,i)=><td key={i} className="p-4 text-center text-[14px] font-bold text-[#1A1A2E]">{avg(c)}</td>)}</tr>
         <tr className="border-b border-[#E5E7EB]"><td className="p-4 text-[14px] text-[#6B7280]">Avg Contributions</td>{cohorts.map((c,i)=><td key={i} className="p-4 text-center text-[14px] font-bold text-[#1A1A2E]">{(c.es.reduce((s,e)=>s+e.co.length,0)/c.es.length).toFixed(1)}</td>)}</tr>
         <tr className="border-b border-[#E5E7EB]"><td className="p-4 text-[14px] text-[#6B7280]">Members</td>{cohorts.map((c,i)=><td key={i} className="p-4 text-center text-[11px] text-[#6B7280]">{c.es.map(e=>e.nm).join(", ")}</td>)}</tr>
-        <tr><td className="p-4 text-[14px] text-[#6B7280]">Size</td>{cohorts.map((c,i)=><td key={i} className="p-4 text-center text-[14px] font-bold text-[#1A1A2E]">{c.es.length}</td>)}</tr>
+        <tr><td className="p-3 sm:p-4 text-[14px] text-[#6B7280]">Size</td>{cohorts.map((c,i)=><td key={i} className="p-3 sm:p-4 text-center text-[14px] font-bold text-[#1A1A2E]">{c.es.length}</td>)}</tr>
       </tbody>
-    </table></div>
+    </table></div></div>
   </div>
 };
 
@@ -1201,9 +1225,9 @@ const SkillGap=()=>{
   const avg=(ct,rl)=>{const lv={learning:1,practicing:2,proficient:3,expert:4};const es=E.filter(e=>e.rl===rl);const sc=[];es.forEach(e=>e.sk.filter(s=>s.ct===ct).forEach(s=>sc.push(lv[s.lv]||0)));return sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:0};
   const cellC=v=>v>=2.5?{bg:"rgba(16,185,129,.12)",tx:"#059669"}:v>=1.5?{bg:"rgba(245,158,11,.12)",tx:"#d97706"}:{bg:"rgba(239,68,68,.12)",tx:"#dc2626"};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Skill Gap Map</h1><p className="text-[14px] text-[#6B7280] mt-1">Identify gaps across roles</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Skill Gap Map</h1><p className="text-[14px] text-[#6B7280] mt-1">Identify gaps across roles</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 mb-5 shadow-sm">
-      <div className="grid" style={{gridTemplateColumns:"150px repeat(3,1fr)",gap:"6px"}}>
+      <div className="grid overflow-x-auto" style={{gridTemplateColumns:"100px repeat(3,1fr)",gap:"6px",minWidth:"380px"}}>
         <div/>{roles.map(r=><div key={r} className="text-center text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] py-3">{r}</div>)}
         {cats.map(ct=><React.Fragment key={ct}>
           <div className="flex items-center"><CatB c={ct}/></div>
@@ -1232,11 +1256,11 @@ const ContentIntel=()=>{
   const send=t=>{if(!t.trim())return;setMsgs(p=>[...p,{r:"u",t:t.trim()}]);setInp("");setTyp(true);setTimeout(()=>{setTyp(false);setMsgs(p=>{const history=p.filter(m=>m.r);return[...p,{r:"a",t:stratR(t,history)}]})},800)};
   const ttS={background:"#FFFFFF",border:"1px solid #E5E7EB",borderRadius:"10px",color:"#1A1A2E",fontSize:"12px",boxShadow:"0 4px 20px rgba(0,0,0,.08)"};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Content Intelligence</h1><p className="text-[14px] text-[#6B7280] mt-1">What onboarding content resonates</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Content Intelligence</h1><p className="text-[14px] text-[#6B7280] mt-1">What onboarding content resonates</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Top Companion Queries <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
-      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:10}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:11}} width={130}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillQuery(data[idx])}/></BarChart></ResponsiveContainer>
-      {drillQuery&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillQuery.topic}</h4><button onClick={()=>setDrillQuery(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-3"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB] text-center"><p className="text-[20px] font-bold text-[#FF0083]">{drillQuery.queries}</p><p className="text-[10px] text-[#9CA3AF]">Total Queries</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.roles}</p><p className="text-[10px] text-[#9CA3AF]">Role Split</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.trend}</p><p className="text-[10px] text-[#9CA3AF]">Trend</p></div></div></div>}
+      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:0}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:10}} width={100}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillQuery(data[idx])}/></BarChart></ResponsiveContainer>
+      {drillQuery&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillQuery.topic}</h4><button onClick={()=>setDrillQuery(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB] text-center"><p className="text-[20px] font-bold text-[#FF0083]">{drillQuery.queries}</p><p className="text-[10px] text-[#9CA3AF]">Total Queries</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.roles}</p><p className="text-[10px] text-[#9CA3AF]">Role Split</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.trend}</p><p className="text-[10px] text-[#9CA3AF]">Trend</p></div></div></div>}
       <div className="mt-4 space-y-1">{data.map((t,i)=><div key={i} className="flex items-center gap-3 text-[11px]"><span className="text-[#6B7280] font-medium w-36">{t.topic}</span><span className="text-[#D1D5DB]">— {t.ins}</span></div>)}</div>
     </div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1256,11 +1280,11 @@ const Checklist=({emp,onCelebrate})=>{
   const items=[{id:1,tx:"Download the Lemonade app and buy a policy",ic:"phone"},{id:2,tx:"Run a full quote flow as a customer",ic:"bubble"},{id:3,tx:"Write your first impressions (3+ observations)",ic:"pencil"},{id:4,tx:"Set up your development environment",ic:"laptop"},{id:5,tx:"Read the Lemonade Architecture overview",ic:"books"},{id:6,tx:"Shadow a customer interaction",ic:"people"},{id:7,tx:"Submit your Day 1 reflection",ic:"sparkle"}];
   const done=Object.values(checks).filter(Boolean).length;
   return<div className="fi">
-    <div className="flex items-center justify-between mb-8">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Day 1 Checklist</h1><p className="text-[14px] text-[#6B7280] mt-1">Complete these tasks to get started</p></div>
-      <div className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-[14px] px-5 py-3 shadow-sm">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Day 1 Checklist</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Complete these tasks to get started</p></div>
+      <div className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-[14px] px-4 sm:px-5 py-2 sm:py-3 shadow-sm w-fit">
         <span className="text-[14px] font-bold text-[#FF0083]">{done}/{items.length}</span>
-        <div className="w-32 h-2 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${(done/items.length)*100}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
+        <div className="w-24 sm:w-32 h-2 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${(done/items.length)*100}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
       </div>
     </div>
     <div className="space-y-3">
@@ -1290,13 +1314,13 @@ const AILogForm=({emp})=>{
   const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0;
   return<div className="fi">
     <div className="flex items-center justify-between mb-6">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">AI Contribution Log</h1><p className="text-[14px] text-[#6B7280] mt-1">Auto-tracked from your submissions — AI logs every contribution automatically</p></div>
-      <div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-4 py-2"><CI n="robot" sz={14} co="#FF0083"/><span className="text-[13px] text-[#FF0083] font-bold">Avg AI: {avgAI}%</span></div>
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">AI Contribution Log</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Auto-tracked from your submissions</p></div>
+      <div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-3 sm:px-4 py-1.5 sm:py-2"><CI n="robot" sz={14} co="#FF0083"/><span className="text-[12px] sm:text-[13px] text-[#FF0083] font-bold">Avg AI: {avgAI}%</span></div>
     </div>
     <div className="bg-gradient-to-r from-[#FF008312] to-transparent border border-[#FF008325] rounded-[14px] p-4 mb-5 flex items-center gap-3">
       <CI n="bulb" sz={18} co="#FF0083"/><p className="text-[13px] text-[#6B7280]"><strong className="text-[#1A1A2E]">How it works:</strong> Every time you submit a PR, design, or brief, your AI usage is automatically logged. The system tracks what AI generated vs. what you crafted — no manual entry needed.</p>
     </div>
-    <div className="grid grid-cols-3 gap-4 mb-5">{[["Total Logged",emp.co.length,"#3b82f6"],["High AI (>60%)",emp.co.filter(c=>c.ai>60).length,"#ef4444"],["Low AI (<40%)",emp.co.filter(c=>c.ai<40).length,"#10b981"]].map(([lb,v,co],i)=>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">{[["Total Logged",emp.co.length,"#3b82f6"],["High AI (>60%)",emp.co.filter(c=>c.ai>60).length,"#ef4444"],["Low AI (<40%)",emp.co.filter(c=>c.ai<40).length,"#10b981"]].map(([lb,v,co],i)=>
       <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm text-center"><p className="text-[24px] font-bold" style={{color:co}}>{v}</p><p className="text-[11px] text-[#9CA3AF] uppercase font-semibold">{lb}</p></div>
     )}</div>
     <div className="space-y-3">{sorted.map(c=><div key={c.id} className={`bg-white border rounded-[14px] shadow-sm overflow-hidden transition-all ${selC===c.id?"border-[#FF0083]":"border-[#E5E7EB]"}`}>
@@ -1308,7 +1332,7 @@ const AILogForm=({emp})=>{
         </div>
       </button>
       {selC===c.id&&<div className="px-4 pb-4 border-t border-[#E5E7EB] pt-4 fi">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[["AI Generated",c.al.ai,"#FF0083"],["I Wrote",c.al.hm,"#10b981"],["I Changed",c.al.ch,"#d97706"],["Unsure About",c.al.un,"#9CA3AF"]].map(([lb,tx,co],j)=><div key={j} className="bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><span className="text-[11px] font-semibold" style={{color:co}}>{lb}</span><p className="text-[12px] text-[#6B7280] mt-1 leading-relaxed">{tx}</p></div>)}
         </div>
         {c.rv&&<div className="mt-3 bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><span className="text-[11px] font-semibold text-[#3b82f6]">Review Feedback</span><p className="text-[12px] text-[#6B7280] mt-1">{c.rv}</p></div>}
@@ -1345,8 +1369,8 @@ const CrisisSim=()=>{
   const toggle=fid=>{if(revealed)return;setFlagged(p=>({...p,[sel]:{...(p[sel]||{}),[fid]:!(p[sel]||{})[fid]}}))};
   const reset=()=>{setFlagged({});setRevealed(false)};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Crisis Simulation</h1><p className="text-[14px] text-[#6B7280] mt-1">Spot the flaws in AI-generated output</p></div>
-    <div className="flex gap-2 mb-6">{scenarios.map((s,i)=><button key={i} onClick={()=>{setSel(i);setRevealed(false)}} className={`px-4 py-2 rounded-[14px] text-[14px] font-medium transition-all ${sel===i?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{s.title}</button>)}</div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Crisis Simulation</h1><p className="text-[14px] text-[#6B7280] mt-1">Spot the flaws in AI-generated output</p></div>
+    <div className="flex flex-wrap gap-2 mb-6">{scenarios.map((s,i)=><button key={i} onClick={()=>{setSel(i);setRevealed(false)}} className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-[14px] text-[13px] sm:text-[14px] font-medium transition-all ${sel===i?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{s.title}</button>)}</div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
@@ -1394,11 +1418,11 @@ const Integrations=({emp,toast})=>{
   const addTask=()=>{if(!newTask.ti.trim())return;setTasks(p=>[{id:"tk-"+Date.now(),ti:newTask.ti,src:newTask.src,srcId:newTask.src.slice(0,3).toUpperCase()+"-"+Math.floor(Math.random()*900+100),url:"#",pri:newTask.pri,st:"todo",as:emp.ld,due:newTask.due||"This week",emp:emp.id},...p]);setNewTask({ti:"",src:"Jira",pri:"medium",due:""});setAdding(false);toast&&toast("Task added")};
   const priCo={high:{bg:"#fef2f2",tx:"#dc2626"},medium:{bg:"#fffbeb",tx:"#d97706"},low:{bg:"#F3F4F6",tx:"#9CA3AF"}};
   return<div className="fi">
-    <div className="flex items-center justify-between mb-6">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">My Tasks This Week</h1><p className="text-[14px] text-[#6B7280] mt-1">Synced from your connected tools — assigned by {emp.ld}</p></div>
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[11px] text-[#6B7280] shadow-sm"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>2-way sync active</div>
-        <button onClick={()=>setAdding(!adding)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p flex items-center gap-1.5">+ Add Task</button>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Tasks This Week</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Synced from your connected tools</p></div>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[11px] text-[#6B7280] shadow-sm"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>2-way sync</div>
+        <button onClick={()=>setAdding(!adding)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p flex items-center gap-1.5">+ Add</button>
       </div>
     </div>
     {adding&&<div className="bg-white border border-[#FF008330] rounded-[14px] p-5 shadow-sm mb-5 fi">
@@ -1440,7 +1464,7 @@ const Reflections=({emps})=>{
     {emp:emps[1]||E[1],date:"Feb 20",type:"Weekly Reflection",text:"Getting comfortable with the design system. The token naming convention makes sense now. Still learning when to use which component variant."}
   ];
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Reflections</h1><p className="text-[14px] text-[#6B7280] mt-1">Weekly reflections and audit submissions from your reports</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Reflections</h1><p className="text-[14px] text-[#6B7280] mt-1">Weekly reflections and audit submissions from your reports</p></div>
     <div className="space-y-4">{refs.map((r,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm fi">
       <div className="flex items-start gap-4">
         <Av e={r.emp} sz={44}/>
@@ -1517,11 +1541,11 @@ const MakerDash=({emp,setScr})=>{
   const earned=BADGES.filter(b=>b.un(emp));
   const firstShip=emp.co.some(c=>c.st==="merged"||c.st==="shipped");
   return<div className="fi">
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-4"><LemonIll w={48} h={48}/><div><div className="flex items-center gap-3 mb-1"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Good morning, {emp.nm.split(" ")[0]}</h1><RoleBadge rl={emp.rl}/></div><p className="text-[14px] text-[#6B7280]">Here's your onboarding snapshot</p></div></div>
-      <div className="flex items-center gap-3">
-        {streak>=3&&<div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-4 py-2"><CI n="fire" sz={18} co="#FF0083"/><span className="text-[14px] font-bold text-[#FF0083]">{streak}-day streak</span></div>}
-        {LEADS[emp.ld]&&<div className="flex items-center gap-2.5 bg-white border border-[#E5E7EB] rounded-full px-3 py-1.5 shadow-sm"><img src={LEADS[emp.ld].ph} alt="" className="w-7 h-7 rounded-full object-cover"/><div><p className="text-[11px] font-semibold text-[#1A1A2E]">{LEADS[emp.ld].nm}</p><p className="text-[9px] text-[#9CA3AF]">Your Lead</p></div></div>}
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+      <div className="flex items-center gap-3 sm:gap-4"><LemonIll w={48} h={48}/><div><div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Good morning, {emp.nm.split(" ")[0]}</h1><RoleBadge rl={emp.rl}/></div><p className="text-[13px] sm:text-[14px] text-[#6B7280]">Here's your onboarding snapshot</p></div></div>
+      <div className="flex items-center gap-3 flex-wrap">
+        {streak>=3&&<div className="flex items-center gap-2 bg-[#FF008310] border border-[#FF008325] rounded-full px-3 sm:px-4 py-1.5 sm:py-2"><CI n="fire" sz={18} co="#FF0083"/><span className="text-[13px] sm:text-[14px] font-bold text-[#FF0083]">{streak}-day streak</span></div>}
+        {LEADS[emp.ld]&&<div className="hidden sm:flex items-center gap-2.5 bg-white border border-[#E5E7EB] rounded-full px-3 py-1.5 shadow-sm"><img src={LEADS[emp.ld].ph} alt="" className="w-7 h-7 rounded-full object-cover"/><div><p className="text-[11px] font-semibold text-[#1A1A2E]">{LEADS[emp.ld].nm}</p><p className="text-[9px] text-[#9CA3AF]">Your Lead</p></div></div>}
       </div>
     </div>
     {firstShip&&emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length===1&&<div className="bg-gradient-to-r from-[#FF008315] to-[#FF008305] border border-[#FF008330] rounded-[14px] p-4 mb-5 flex items-center gap-3 fi">
@@ -1533,13 +1557,13 @@ const MakerDash=({emp,setScr})=>{
     :staticNudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-center gap-3">
       <CI n={staticNudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706]"><strong>Nudge:</strong> {staticNudge.tx}</p>
     </div>}
-    <div className="grid grid-cols-4 gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm relative cursor-pointer hover:border-[#FF008340] transition-all`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):s.scr?()=>setScr(s.scr):undefined}>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm relative cursor-pointer hover:border-[#FF008340] transition-all`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):s.scr?()=>setScr(s.scr):undefined}>
       <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}{s.isHealth&&<span className="text-[9px] font-normal ml-1 normal-case">(click)</span>}</p></div>
       <p className="text-[28px] font-bold tracking-tight" style={{color:s.co}}>{s.v}</p>
       <p className="text-[12px] text-[#6B7280] mt-1">{s.sub}</p>
       {s.isHealth&&showHealthBD&&<div className="absolute z-50 left-0 top-full mt-2 bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-lg w-64 fi"><div className="flex items-center justify-between mb-3"><h4 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Breakdown</h4></div><div className="space-y-2.5">{computeHealthBreakdown(emp).map((f,j)=><div key={j}><div className="flex items-center justify-between mb-1"><span className="text-[12px] text-[#6B7280]">{f.lb}</span><span className="text-[12px] font-bold" style={{color:f.co}}>{f.v}%</span></div><div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${f.v}%`,background:f.co}}/></div></div>)}</div></div>}
     </div>)}</div>
-    <div className="grid grid-cols-3 gap-5 mb-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
           <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Today's Schedule</h3>
@@ -1551,7 +1575,7 @@ const MakerDash=({emp,setScr})=>{
         </div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
           <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-3 gap-2">{[["checklist","Checklist","check-round"],["ai-log","AI Log","clipboard"],["companion","Ask Lemi","bubble"]].map(([id,lb,ic])=>
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">{[["checklist","Checklist","check-round"],["ai-log","AI Log","clipboard"],["companion","Ask Lemi","bubble"]].map(([id,lb,ic])=>
             <button key={id} onClick={()=>setScr(id)} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3 text-center hover:border-[#FF0083] transition-all flex flex-col items-center">
               <span className="block mb-1"><CI n={ic} sz={18}/></span><span className="text-[11px] text-[#6B7280] font-medium">{lb}</span>
             </button>
@@ -1594,9 +1618,9 @@ const WeeklyGoals=({toast,onCelebrate})=>{
   const onDragOver=(e,i)=>{e.preventDefault();e.dataTransfer.dropEffect="move";setHoverIdx(i)};
   const onDragEnd=()=>{if(dragIdx!==null&&hoverIdx!==null&&dragIdx!==hoverIdx){setGoals(p=>{const ng=[...p];const[item]=ng.splice(dragIdx,1);ng.splice(hoverIdx,0,item);return ng});toast("Goals reordered")}setDragIdx(null);setHoverIdx(null)};
   return<div className="fi">
-    <div className="flex items-center justify-between mb-8">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Weekly Goals</h1><p className="text-[14px] text-[#6B7280] mt-1">Week 2 objectives &mdash; drag to reorder</p></div>
-      <div className="flex items-center gap-4"><HR s={Math.round(done/goals.length*100)} sz={56}/><div><p className="text-[14px] font-bold text-[#1A1A2E]">{done}/{goals.length}</p><p className="text-[12px] text-[#6B7280]">completed</p></div></div>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Weekly Goals</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Week 2 objectives &mdash; drag to reorder</p></div>
+      <div className="flex items-center gap-3 sm:gap-4"><HR s={Math.round(done/goals.length*100)} sz={48}/><div><p className="text-[14px] font-bold text-[#1A1A2E]">{done}/{goals.length}</p><p className="text-[12px] text-[#6B7280]">completed</p></div></div>
     </div>
     <div className="space-y-3 mb-6">{goals.map((g,gi)=>{const dn=g.cur>=g.tgt;return<div key={g.id} draggable="true" onDragStart={e=>onDragStart(e,gi)} onDragOver={e=>onDragOver(e,gi)} onDragEnd={onDragEnd} className={`bg-white border rounded-[14px] p-4 flex items-center gap-4 shadow-sm transition-all cursor-pointer select-none ${dragIdx===gi?"dragging-item":""} ${hoverIdx===gi&&dragIdx!==null&&dragIdx!==gi?"drag-over-line":""} ${dn?"border-[#10b981] bg-[#f0fdf4]":"border-[#E5E7EB] hover:border-[#FF0083]"}`}>
       <span className="text-[#D1D5DB] cursor-grab active:cursor-grabbing flex-shrink-0 text-[16px]" title="Drag to reorder">&#x2807;</span>
@@ -1622,11 +1646,11 @@ const Calendar=({toast})=>{
   const tyCo={meeting:"#3b82f6",ceremony:"#FF0083",collab:"#8b5cf6",milestone:"#10b981",learning:"#f59e0b"};
   const addEvent=()=>{if(!newEv.nm.trim()){setNewEv(p=>({...p,_errNm:true}));return}setEvents(p=>[...p,{id:"s"+Date.now(),nm:newEv.nm,dt:newEv.dt||"Today 12:00",ty:newEv.ty,wi:newEv.wi||"\u2014",co:tyCo[newEv.ty]||"#6B7280"}]);setNewEv({nm:"",dt:"",ty:"meeting",wi:""});setAdding(false);toast&&toast("Event added to calendar")};
   return<div className="fi">
-    <div className="flex items-center justify-between mb-6">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Calendar</h1><p className="text-[14px] text-[#6B7280] mt-1">Upcoming events and milestones</p></div>
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[11px] text-[#6B7280] shadow-sm"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>Connected via API ↔ Google Calendar</div>
-        <button onClick={()=>setAdding(!adding)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p flex items-center gap-1.5">+ Add Event</button>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Calendar</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Upcoming events and milestones</p></div>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[11px] text-[#6B7280] shadow-sm"><span className="w-2 h-2 rounded-full bg-[#10b981]"/>GCal synced</div>
+        <button onClick={()=>setAdding(!adding)} className="bg-[#FF0083] text-white rounded-xl px-4 py-2 text-[13px] font-semibold btn-p flex items-center gap-1.5">+ Add</button>
       </div>
     </div>
     {adding&&<div className="bg-white border border-[#FF008330] rounded-[14px] p-5 shadow-sm mb-5 fi">
@@ -1664,31 +1688,31 @@ const Resources=({emp})=>{
     {openArt?<div className="fi">
       <button onClick={()=>setOpenId(null)} className="flex items-center gap-2 text-[14px] text-[#6B7280] hover:text-[#1A1A2E] transition-colors mb-5">← Back to Knowledge Base</button>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
-        <div className="bg-gradient-to-r from-[#FF008310] to-[#FF008305] px-8 py-6 border-b border-[#E5E7EB]">
+        <div className="bg-gradient-to-r from-[#FF008310] to-[#FF008305] px-4 sm:px-8 py-4 sm:py-6 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2 mb-2"><span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FF008315] text-[#FF0083] font-semibold uppercase tracking-wider">{openArt.ct}</span><span className="text-[11px] text-[#9CA3AF]">·</span><span className="text-[11px] text-[#9CA3AF]">{openArt.tm} read</span>{openArt.rl!=="All"&&<><span className="text-[11px] text-[#9CA3AF]">·</span><span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{openArt.rl}</span></>}</div>
-          <h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">{openArt.ti}</h1>
+          <h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">{openArt.ti}</h1>
           <p className="text-[14px] text-[#6B7280] mt-1">{openArt.ds}</p>
           {openArt.au&&<div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#E5E7EB30]"><div className="w-8 h-8 rounded-full bg-[#FF008320] flex items-center justify-center text-[12px] font-bold text-[#FF0083]">{openArt.au[0]}</div><div><p className="text-[12px] font-medium text-[#1A1A2E]">{openArt.au}</p><p className="text-[10px] text-[#9CA3AF]">Updated {openArt.dt||"Jan 2026"}</p></div></div>}
         </div>
-        <div className="px-8 py-6 space-y-6">{(openArt.body||[]).map((s,i)=><div key={i}>
+        <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6">{(openArt.body||[]).map((s,i)=><div key={i}>
           <h2 className="text-[18px] font-bold text-[#1A1A2E] mb-2 flex items-center gap-2"><span className="w-1.5 h-6 rounded-full bg-[#FF0083]"/>{s.h}</h2>
           <p className="text-[14px] text-[#6B7280] leading-relaxed pl-4">{s.p}</p>
         </div>)}</div>
-        <div className="px-8 py-5 border-t border-[#E5E7EB] bg-[#F7F7F7] flex items-center justify-between">
+        <div className="px-4 sm:px-8 py-4 sm:py-5 border-t border-[#E5E7EB] bg-[#F7F7F7] flex items-center justify-between">
           <p className="text-[11px] text-[#9CA3AF]">Was this article helpful?</p>
           <div className="flex gap-2"><button className="px-3 py-1 rounded-lg border border-[#E5E7EB] text-[12px] text-[#6B7280] hover:border-[#10b981] hover:text-[#10b981] transition-all">👍 Yes</button><button className="px-3 py-1 rounded-lg border border-[#E5E7EB] text-[12px] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">👎 No</button></div>
         </div>
       </div>
     </div>
     :<>
-    <div className="flex items-center justify-between mb-6">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Knowledge Base</h1><p className="text-[14px] text-[#6B7280] mt-1">Everything you need to know — curated for {emp.rl}s</p></div>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Knowledge Base</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Curated for {emp.rl}s</p></div>
       <div className="flex items-center gap-3">
-        <span className="text-[11px] text-[#9CA3AF]">{myRes.length} articles</span>
-        <input value={search} onChange={e=>setSearch(e.target.value)} className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] w-48 shadow-sm" placeholder="Search articles..."/>
+        <span className="hidden sm:inline text-[11px] text-[#9CA3AF]">{myRes.length} articles</span>
+        <input value={search} onChange={e=>setSearch(e.target.value)} className="bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] w-full sm:w-48 shadow-sm" placeholder="Search articles..."/>
       </div>
     </div>
-    {!search&&<div className="flex gap-2 mb-6">{cats.map(c=><button key={c} onClick={()=>setTab(c)} className={`px-4 py-2 rounded-[14px] text-[14px] font-medium transition-all ${tab===c?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{c}</button>)}</div>}
+    {!search&&<div className="flex flex-wrap gap-2 mb-6">{cats.map(c=><button key={c} onClick={()=>setTab(c)} className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-[14px] text-[13px] sm:text-[14px] font-medium transition-all ${tab===c?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{c}</button>)}</div>}
     {search&&<p className="text-[13px] text-[#6B7280] mb-4">{filtered.length} result{filtered.length!==1?"s":""} for "{search}"</p>}
     <div className="space-y-3">{filtered.map(r=><div key={r.id} onClick={()=>{setOpenId(r.id);setSearch("")}} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm cursor-pointer card-h transition-all hover:border-[#FF008340] group">
       <div className="flex items-start gap-4">
@@ -1725,7 +1749,7 @@ const IMP_LINKS=[
 const FAQLinks=()=>{
   const[openQ,setOpenQ]=useState(null);const[tab,setTab]=useState("faq");
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">FAQs & Important Links</h1><p className="text-[14px] text-[#6B7280] mt-1">Quick answers and essential resources</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">FAQs & Important Links</h1><p className="text-[14px] text-[#6B7280] mt-1">Quick answers and essential resources</p></div>
     <div className="flex gap-2 mb-6">{[["faq","FAQs"],["links","Important Links"]].map(([id,lb])=>
       <button key={id} onClick={()=>setTab(id)} className={`px-5 py-2.5 rounded-[14px] text-[14px] font-medium transition-all ${tab===id?"bg-[#FF0083] text-white shadow-lg":"bg-white border border-[#E5E7EB] text-[#6B7280] hover:border-[#FF0083] shadow-sm"}`}>{lb}</button>
     )}</div>
@@ -1739,7 +1763,7 @@ const FAQLinks=()=>{
     </div>)}</div>}
     {tab==="links"&&<div className="space-y-5">{IMP_LINKS.map((cat,i)=><div key={i}>
       <h3 className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#9CA3AF] mb-3">{cat.cat}</h3>
-      <div className="grid grid-cols-2 gap-3">{cat.links.map((l,j)=><a key={j} href={l.ur} target="_blank" rel="noopener noreferrer" className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-3 card-h no-underline">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{cat.links.map((l,j)=><a key={j} href={l.ur} target="_blank" rel="noopener noreferrer" className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-3 card-h no-underline">
         <div className="w-8 h-8 rounded-lg bg-[#FF008310] flex items-center justify-center text-[#FF0083] text-sm font-bold flex-shrink-0">{l.nm[0]=="#"?"#":l.nm[0]}</div>
         <div className="flex-1 min-w-0"><p className="text-[13px] font-medium text-[#1A1A2E] truncate">{l.nm}</p><p className="text-[11px] text-[#6B7280]">{l.ds}</p></div>
         <span className="text-[11px] text-[#FF0083]">→</span>
@@ -1765,14 +1789,14 @@ const OneOnOne=({emps})=>{
   const qs={Engineer:["How's the codebase feeling? Any patterns confusing you?","Walk me through your last PR — what was hardest?","Where do you want to grow technically?","Any blockers I can remove?"],Designer:["How's the design system landing for you?","What user insight surprised you recently?","Where do you feel most/least confident?","Any design critiques you'd like to discuss?"],PM:["How's the squad dynamic?","What's your biggest unknown right now?","How are you using data to inform decisions?","Any stakeholder challenges?"]};
   const prev=[{tx:"Review architecture docs",dn:true},{tx:"Pair with Tamar on service pattern",dn:false},{tx:"Submit Fresh Eyes Audit",dn:true}];
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">1:1 Meeting Prep</h1><p className="text-[14px] text-[#6B7280] mt-1">Auto-generated talking points for your next 1:1</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">1:1 Meeting Prep</h1><p className="text-[14px] text-[#6B7280] mt-1">Auto-generated talking points for your next 1:1</p></div>
     <select value={sid} onChange={e=>setSid(e.target.value)} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] mb-6 shadow-sm">{emps.map(e=><option key={e.id} value={e.id}>{e.nm} — {e.rl} · Day {e.day}</option>)}</select>
-    {emp&&<div className="grid grid-cols-2 gap-5">
+    {emp&&<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
           <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{emp.nm}</h3><p className="text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="ml-auto"><HealthBreakdown emp={emp} sz={48}/></div></div>
-          <div className="grid grid-cols-3 gap-3 text-center">{[["Contributions",emp.co.length],["Verified",emp.sk.filter(s=>s.sr==="manager-verified").length],["Avg AI %",Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/(emp.co.length||1))+"%"]].map(([lb,v],i)=>
-            <div key={i} className="bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3 text-center">{[["Contributions",emp.co.length],["Verified",emp.sk.filter(s=>s.sr==="manager-verified").length],["Avg AI %",Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/(emp.co.length||1))+"%"]].map(([lb,v],i)=>
+            <div key={i} className="bg-[#F7F7F7] rounded-xl p-2 sm:p-3 border border-[#E5E7EB]"><p className="text-[14px] sm:text-[16px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] sm:text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
           )}</div>
         </div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1815,7 +1839,7 @@ const AlertCenter=({emps,toast})=>{
   const ct={critical:active.filter(a=>a.sev==="critical").length,warning:active.filter(a=>a.sev==="warning").length,info:active.filter(a=>a.sev==="info").length};
   const sevC={critical:{bg:"#fef2f2",bd:"#ef4444",tx:"#dc2626"},warning:{bg:"#fffbeb",bd:"#f59e0b",tx:"#d97706"},info:{bg:"#eff6ff",bd:"#3b82f6",tx:"#2563eb"}};
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Alert Center</h1><p className="text-[14px] text-[#6B7280] mt-1">At-risk indicators and recommended actions</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Alert Center</h1><p className="text-[14px] text-[#6B7280] mt-1">At-risk indicators and recommended actions</p></div>
     <div className="flex gap-3 mb-6">
       {[["critical","Critical",ct.critical],["warning","Warning",ct.warning],["info","Info",ct.info]].map(([k,lb,n])=><div key={k} className="bg-white border border-[#E5E7EB] rounded-[14px] px-5 py-3 shadow-sm flex items-center gap-2">
         <span className="w-3 h-3 rounded-full" style={{background:sevC[k].bd}}/><span className="text-[14px] font-bold" style={{color:sevC[k].tx}}>{n}</span><span className="text-[12px] text-[#9CA3AF]">{lb}</span>
@@ -1854,7 +1878,7 @@ const CompareView=({emp1,emp2,onClear})=>{
   const barData=rows.slice(0,5).map(r=>({name:r.lb,[emp1.nm.split(" ")[0]]:r.v1,[emp2.nm.split(" ")[0]]:r.v2}));
   return<div className="fi">
     <div className="mb-6 flex items-center justify-between">
-      <div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
       <button onClick={onClear} className="text-[12px] px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear Comparison</button>
     </div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
@@ -1866,7 +1890,7 @@ const CompareView=({emp1,emp2,onClear})=>{
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Side-by-Side Metrics</h3>
       <div className="space-y-3">{rows.map((r,i)=><div key={i} className="flex items-center gap-3">
-        <span className="w-32 text-[12px] text-[#9CA3AF] text-right flex-shrink-0">{r.lb}</span>
+        <span className="w-20 sm:w-32 text-[11px] sm:text-[12px] text-[#9CA3AF] text-right flex-shrink-0">{r.lb}</span>
         <div className="flex-1 flex items-center gap-2">
           <span className="text-[14px] font-bold w-12 text-right" style={{color:co1(r.v1,r.v2,r.better)}}>{r.v1}{r.lb==="Avg AI %"?"%":""}</span>
           <div className="flex-1 h-2 bg-[#F3F4F6] rounded-full overflow-hidden relative">
@@ -1897,7 +1921,7 @@ const HeatmapCalendar=({emps})=>{
   return<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
     <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Activity Heatmap (30 Days)</h3>
     <div className="overflow-x-auto">
-      <div style={{display:"grid",gridTemplateColumns:`80px repeat(30, 1fr)`,gap:"2px",minWidth:"700px"}}>
+      <div style={{display:"grid",gridTemplateColumns:`60px repeat(30, minmax(14px, 1fr))`,gap:"2px",minWidth:"540px"}}>
         {/* Header row — day numbers */}
         <div/>
         {days.map(d=><div key={d} className="text-[8px] text-[#9CA3AF] text-center font-medium" style={{lineHeight:"14px"}}>{d}</div>)}
@@ -1932,7 +1956,7 @@ const TeamAnalytics=({emps,onSel})=>{
   const sortIc=col=>sortCol===col?(sortDir==="asc"?"↑":"↓"):"";
   const[drillHealth,setDrillHealth]=useState(null);const[drillContrib,setDrillContrib]=useState(null);
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Performance insights for your {emps.length} reports</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Performance insights for your {emps.length} reports</p></div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trend (per employee)</h3>
@@ -1941,33 +1965,33 @@ const TeamAnalytics=({emps,onSel})=>{
         <ResponsiveContainer width="100%" height={200}><LineChart data={empHealth} onClick={(e)=>{if(e&&e.activeLabel)setDrillHealth(empHealth.find(d=>d.wk===e.activeLabel))}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
           {emps.map((e,i)=>showLines[e.id]&&<Line key={e.id} type="monotone" dataKey={e.nm.split(" ")[0]} stroke={empColors[i%empColors.length]} strokeWidth={2} dot={{r:3}} cursor="pointer"/>)}
         </LineChart></ResponsiveContainer>
-        {drillHealth&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Health Scores — {drillHealth.wk}</h4><button onClick={()=>setDrillHealth(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-3 gap-2">{emps.filter(e=>showLines[e.id]).map((e,i)=>{const val=drillHealth[e.nm.split(" ")[0]];return val!=null&&<div key={e.id} className="text-center p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:val>=75?"#10b981":val>=50?"#f59e0b":"#ef4444"}}>{val}</p><p className="text-[10px] text-[#9CA3AF]">{e.nm.split(" ")[0]}</p></div>})}</div></div>}
+        {drillHealth&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">Health Scores — {drillHealth.wk}</h4><button onClick={()=>setDrillHealth(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{emps.filter(e=>showLines[e.id]).map((e,i)=>{const val=drillHealth[e.nm.split(" ")[0]];return val!=null&&<div key={e.id} className="text-center p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:val>=75?"#10b981":val>=50?"#f59e0b":"#ef4444"}}>{val}</p><p className="text-[10px] text-[#9CA3AF]">{e.nm.split(" ")[0]}</p></div>})}</div></div>}
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Contributions per Employee <span className="text-[9px] font-normal normal-case">(click bar)</span></h3>
         <ResponsiveContainer width="100%" height={200}><BarChart data={cData}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="nm" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}}/><Tooltip contentStyle={ttS}/><Bar dataKey="co" name="Contributions" fill="#FF0083" radius={[6,6,0,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>{const d=cData[idx];const emp=emps.find(e=>e.nm.split(" ")[0]===d.nm);setDrillContrib(emp?{...d,emp}:d)}}/></BarChart></ResponsiveContainer>
-        {drillContrib&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillContrib.nm}'s Contributions</h4><button onClick={()=>setDrillContrib(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div>{drillContrib.emp&&<div className="grid grid-cols-4 gap-2 text-center"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#FF0083]">{drillContrib.co}</p><p className="text-[10px] text-[#9CA3AF]">Total</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#10b981]">{drillContrib.emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length}</p><p className="text-[10px] text-[#9CA3AF]">Shipped</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#f59e0b]">{drillContrib.emp.co.filter(c=>c.st==="in-review").length}</p><p className="text-[10px] text-[#9CA3AF]">In Review</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:drillContrib.ai>60?"#ef4444":"#10b981"}}>{drillContrib.ai}%</p><p className="text-[10px] text-[#9CA3AF]">Avg AI</p></div></div>}</div>}
+        {drillContrib&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillContrib.nm}'s Contributions</h4><button onClick={()=>setDrillContrib(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div>{drillContrib.emp&&<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#FF0083]">{drillContrib.co}</p><p className="text-[10px] text-[#9CA3AF]">Total</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#10b981]">{drillContrib.emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length}</p><p className="text-[10px] text-[#9CA3AF]">Shipped</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold text-[#f59e0b]">{drillContrib.emp.co.filter(c=>c.st==="in-review").length}</p><p className="text-[10px] text-[#9CA3AF]">In Review</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[16px] font-bold" style={{color:drillContrib.ai>60?"#ef4444":"#10b981"}}>{drillContrib.ai}%</p><p className="text-[10px] text-[#9CA3AF]">Avg AI</p></div></div>}</div>}
       </div>
     </div>
-    <div className="grid grid-cols-3 gap-4 mb-5">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
       {[["High (>60%)",aiDist.high,"#ef4444"],["Medium (40-60%)",aiDist.med,"#f59e0b"],["Low (<40%)",aiDist.low,"#10b981"]].map(([lb,v,co],i)=>
         <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm text-center">
           <p className="text-[10px] text-[#9CA3AF] uppercase font-semibold mb-1">AI Reliance: {lb}</p>
-          <p className="text-[28px] font-bold" style={{color:co}}>{v}</p>
+          <p className="text-[22px] sm:text-[28px] font-bold" style={{color:co}}>{v}</p>
           <p className="text-[12px] text-[#6B7280]">employees</p>
         </div>
       )}
     </div>
-    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm mb-5"><table className="w-full">
-      <thead><tr className="border-b border-[#E5E7EB]">{[["nm","Name"],["rl","Role"],["hp","Health"],["co","Contrib."],["ai","Avg AI %"]].map(([k,h])=><th key={k} onClick={()=>doSort(k)} className="text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-4 cursor-pointer hover:text-[#FF0083] select-none">{h} {sortIc(k)}</th>)}</tr></thead>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] overflow-hidden shadow-sm mb-5"><div className="overflow-x-auto"><table className="w-full min-w-[500px]">
+      <thead><tr className="border-b border-[#E5E7EB]">{[["nm","Name"],["rl","Role"],["hp","Health"],["co","Contrib."],["ai","Avg AI %"]].map(([k,h])=><th key={k} onClick={()=>doSort(k)} className="text-left text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] p-3 sm:p-4 cursor-pointer hover:text-[#FF0083] select-none">{h} {sortIc(k)}</th>)}</tr></thead>
       <tbody>{sortedE.map(e=>{const avgAI=e.co.length?Math.round(e.co.reduce((s,c)=>s+c.ai,0)/e.co.length):0;const hc=e.hp>=75?"#10b981":e.hp>=50?"#f59e0b":"#ef4444";return(
         <tr key={e.id} onClick={()=>onSel&&onSel(e.id)} className="border-b border-[#E5E7EB] hover:bg-[#FF008306] transition-colors cursor-pointer">
           <td className="p-4"><div className="flex items-center gap-3"><Av e={e} sz={28}/><span className="text-[13px] text-[#1A1A2E] font-medium">{e.nm}</span></div></td>
           <td className="p-4 text-[13px] text-[#6B7280]"><RoleBadge rl={e.rl}/></td>
           <td className="p-4"><span className="text-[13px] font-bold" style={{color:hc}}>{e.hp}</span></td>
           <td className="p-4 text-[13px] text-[#1A1A2E] font-medium">{e.co.length}</td>
-          <td className="p-4"><span className="text-[13px] font-medium" style={{color:avgAI>60?"#ef4444":avgAI>40?"#f59e0b":"#10b981"}}>{avgAI}%</span></td>
+          <td className="p-3 sm:p-4"><span className="text-[13px] font-medium" style={{color:avgAI>60?"#ef4444":avgAI>40?"#f59e0b":"#10b981"}}>{avgAI}%</span></td>
         </tr>)})}</tbody>
-    </table></div>
+    </table></div></div>
     <div className="mb-5"><HeatmapCalendar emps={emps}/></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Recent Team Activity</h3>
@@ -1986,14 +2010,14 @@ const BenchmarkView=()=>{
   const[loaded,setLoaded]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setLoaded(true),200);return()=>clearTimeout(t)},[]);
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Benchmarks</h1><p className="text-[14px] text-[#6B7280] mt-1">How Lemonade compares to industry standards</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Benchmarks</h1><p className="text-[14px] text-[#6B7280] mt-1">How Lemonade compares to industry standards</p></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">{BENCHMARKS.map((b,i)=>{
       const delta=b.better==="lower"?Math.round((1-b.us/b.ind)*100):Math.round((b.us/b.ind-1)*100);
       const barW=Math.min(100,b.better==="lower"?(1-b.us/b.ind)*100+50:b.us/b.ind*50);
       return<div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold mb-4">{b.lb}</p>
         <div className="flex items-end gap-4 mb-4">
-          <div><p className="text-[32px] font-bold text-[#FF0083]"><BenchCounter target={b.us} loaded={loaded} suffix={b.un}/></p><p className="text-[12px] text-[#6B7280]">Lemonade</p></div>
+          <div><p className="text-[24px] sm:text-[32px] font-bold text-[#FF0083]"><BenchCounter target={b.us} loaded={loaded} suffix={b.un}/></p><p className="text-[12px] text-[#6B7280]">Lemonade</p></div>
           <div><p className="text-[20px] font-bold text-[#9CA3AF]">{b.ind}{b.un&&<span className="text-[12px]">{b.un}</span>}</p><p className="text-[12px] text-[#9CA3AF]">Industry</p></div>
           <span className="text-[14px] font-bold text-[#10b981] ml-auto">+{delta}% better</span>
         </div>
@@ -2020,19 +2044,19 @@ const AttritionRisk=()=>{
   const qC={thriving:{lb:"Thriving",co:"#10b981",bg:"#f0fdf4"},"needs-challenge":{lb:"Needs Challenge",co:"#3b82f6",bg:"#eff6ff"},"needs-support":{lb:"Needs Support",co:"#f59e0b",bg:"#fffbeb"},"at-risk":{lb:"At Risk",co:"#ef4444",bg:"#fef2f2"}};
   const counts={};Object.keys(qC).forEach(k=>counts[k]=scored.filter(s=>s.quad===k).length);
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Attrition Risk</h1><p className="text-[14px] text-[#6B7280] mt-1">Engagement vs progress matrix</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Attrition Risk</h1><p className="text-[14px] text-[#6B7280] mt-1">Engagement vs progress matrix</p></div>
     <div className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-[14px] p-4 mb-5 text-[13px] text-[#6B7280]">
       <p className="font-semibold text-[#1A1A2E] mb-2 flex items-center gap-2"><CI n="bar-chart" sz={16} co="#1A1A2E"/> How scores are computed:</p>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div><strong className="text-[#FF0083]">Engagement</strong> = Contribution frequency (contributions per week × 25) + Health score (× 0.25). Higher engagement means more consistent output and better wellbeing.</div>
         <div><strong className="text-[#3b82f6]">Progress</strong> = Day progress (day/30 × 50) + Verified skills count (× 10). Higher progress means advancing through phases and getting skills verified by leads.</div>
       </div>
     </div>
-    <div className="flex gap-3 mb-6">{Object.entries(qC).map(([k,v])=><div key={k} className="bg-white border border-[#E5E7EB] rounded-[14px] px-4 py-2.5 shadow-sm flex items-center gap-2">
+    <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">{Object.entries(qC).map(([k,v])=><div key={k} className="bg-white border border-[#E5E7EB] rounded-[14px] px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm flex items-center gap-2">
       <div className="w-2.5 h-2.5 rounded-full" style={{background:v.co}}/><span className="text-[14px] font-bold" style={{color:v.co}}>{counts[k]}</span><span className="text-[12px] text-[#9CA3AF]">{v.lb}</span>
     </div>)}</div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-5">
-      <div className="relative" style={{height:320}}>
+      <div className="relative" style={{height:'min(320px, 60vw)'}}>
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
           {[["needs-support","top-0 left-0"],["thriving","top-0 right-0"],["at-risk","bottom-0 left-0"],["needs-challenge","bottom-0 right-0"]].map(([q,pos])=>
             <div key={q} className={`rounded-xl m-1 flex items-center justify-center`} style={{background:qC[q].bg}}><span className="text-[11px] font-semibold uppercase tracking-wider" style={{color:qC[q].co,opacity:.5}}>{qC[q].lb}</span></div>
@@ -2051,8 +2075,8 @@ const AttritionRisk=()=>{
       <div className="flex items-center gap-3 mb-3"><Av e={sel} sz={40}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{sel.nm}</h3><p className="text-[12px] text-[#6B7280]">{sel.rl} · Day {sel.day}</p></div>
         <span className="ml-auto text-[11px] px-3 py-1 rounded-full font-semibold" style={{background:qC[sel.quad].bg,color:qC[sel.quad].co}}>{qC[sel.quad].lb}</span>
       </div>
-      <div className="grid grid-cols-3 gap-3">{[["Engagement",sel.eng],["Progress",sel.prog],["Health",sel.hp]].map(([lb,v],i)=>
-        <div key={i} className="bg-[#F7F7F7] rounded-xl p-3 text-center border border-[#E5E7EB]"><p className="text-[18px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3">{[["Engagement",sel.eng],["Progress",sel.prog],["Health",sel.hp]].map(([lb,v],i)=>
+        <div key={i} className="bg-[#F7F7F7] rounded-xl p-2 sm:p-3 text-center border border-[#E5E7EB]"><p className="text-[16px] sm:text-[18px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] sm:text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
       )}</div>
     </div>}
   </div>
@@ -2065,11 +2089,11 @@ const Welcome=({emp,setScr,onTour,tourDone})=>{
   return<div className="fi">
     <div className="text-center mb-10 pt-6">
       <div className="flex justify-center mb-6"><LemonIll w={100} h={100}/></div>
-      <h1 className="h-serif text-[42px] font-bold text-[#1A1A2E] mb-3 leading-tight">Welcome to Lemonade, {emp.nm.split(" ")[0]}!</h1>
-      <p className="text-[18px] text-[#6B7280] max-w-xl mx-auto leading-relaxed">You're joining 1,200+ Lemonade Makers on a mission to turn insurance into a social good.</p>
+      <h1 className="h-serif text-[28px] sm:text-[42px] font-bold text-[#1A1A2E] mb-3 leading-tight">Welcome to Lemonade, {emp.nm.split(" ")[0]}!</h1>
+      <p className="text-[15px] sm:text-[18px] text-[#6B7280] max-w-xl mx-auto leading-relaxed">You're joining 1,200+ Lemonade Makers on a mission to turn insurance into a social good.</p>
     </div>
     <div className="max-w-3xl mx-auto">
-      <div className="grid grid-cols-3 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-8">
         {[["flask","Be a Maker","We don't have employees, we have Makers. Think like a founder, ship like a startup."],
           ["heart-fill","Giveback","Every policy means more money for causes — education, clean water, animal welfare. Over $12M donated."],
           ["robot","AI-Native","We granted a claim in 3 seconds. AI isn't a tool here, it's how we think."]
@@ -2081,7 +2105,7 @@ const Welcome=({emp,setScr,onTour,tourDone})=>{
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-8">
         <div className="flex items-center gap-3 mb-5"><RocketIll w={40} h={50}/><div><h2 className="h-serif text-[20px] font-bold text-[#1A1A2E]">Your 30-Day Journey</h2><p className="text-[13px] text-[#6B7280]">From day one to full ownership</p></div></div>
-        <div className="grid grid-cols-4 gap-3">{phases.map((p,i)=><div key={i} className={`bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-4 text-center stag-${i+1}`}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">{phases.map((p,i)=><div key={i} className={`bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-4 text-center stag-${i+1}`}>
           <span className="block mb-2 flex justify-center"><CI n={p.ic} sz={24} co="#FF0083"/></span>
           <p className="text-[10px] text-[#FF0083] font-semibold uppercase tracking-wider mb-1">{p.wk}</p>
           <h4 className="text-[13px] font-semibold text-[#1A1A2E] mb-1">{p.nm}</h4>
@@ -2090,13 +2114,13 @@ const Welcome=({emp,setScr,onTour,tourDone})=>{
       </div>
       {team.length>0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-8">
         <div className="flex items-center gap-3 mb-4"><PersonIll w={36} h={44}/><div><h2 className="h-serif text-[18px] font-bold text-[#1A1A2E]">Your Squad</h2><p className="text-[13px] text-[#6B7280]">Led by {emp.ld} · {emp.dp}</p></div></div>
-        <div className="grid grid-cols-4 gap-3">{team.map(t=><div key={t.id} className="flex items-center gap-3 bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">{team.map(t=><div key={t.id} className="flex items-center gap-3 bg-[#F7F7F7] rounded-xl p-3 border border-[#E5E7EB]">
           <Av e={t} sz={36}/><div><p className="text-[13px] font-medium text-[#1A1A2E]">{t.nm}</p><p className="text-[11px] text-[#6B7280]">{t.rl}</p></div>
         </div>)}</div>
       </div>}
       <div className="text-center pb-6">
-        <button onClick={()=>setScr("home")} className="bg-[#FF0083] text-white rounded-full px-10 py-4 text-[16px] font-bold btn-p inline-flex items-center gap-2">Start Your Journey <span>→</span></button>
-        {onTour&&<button onClick={onTour} className="ml-3 border-2 border-[#FF0083] text-[#FF0083] rounded-full px-8 py-4 text-[16px] font-bold hover:bg-[#FF008310] transition-colors inline-flex items-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 3c0 1.5-2 2-2 3"/><circle cx="12" cy="18" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="1"/></svg>{tourDone?"Retake Tour":"Take a Tour"}</button>}
+        <button onClick={()=>setScr("home")} className="bg-[#FF0083] text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 text-[15px] sm:text-[16px] font-bold btn-p inline-flex items-center gap-2">Start Your Journey <span>→</span></button>
+        {onTour&&<button onClick={onTour} className="ml-3 border-2 border-[#FF0083] text-[#FF0083] rounded-full px-6 sm:px-8 py-3 sm:py-4 text-[15px] sm:text-[16px] font-bold hover:bg-[#FF008310] transition-colors inline-flex items-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 3c0 1.5-2 2-2 3"/><circle cx="12" cy="18" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="1"/></svg>{tourDone?"Retake Tour":"Take a Tour"}</button>}
         <p className="text-[12px] text-[#9CA3AF] mt-3">You can always come back to this page from the sidebar</p>
       </div>
     </div>
@@ -2113,8 +2137,8 @@ const OnboardSetup=({emps,toast,setScr})=>{
   const steps=[{n:1,lb:"System Overview"},{n:2,lb:"Your Team"},{n:3,lb:"Focus Areas"}];
   return<div className="fi">
     {/* Step indicator */}
-    <div className="flex items-center gap-2 mb-8">{steps.map((s,i)=><React.Fragment key={s.n}>
-      <button onClick={()=>s.n<=step&&setStep(s.n)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all ${step===s.n?"bg-[#FF0083] text-white shadow-lg":step>s.n?"bg-[#f0fdf4] text-[#10b981] border border-[#10b981]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>
+    <div className="flex flex-wrap items-center gap-2 mb-8">{steps.map((s,i)=><React.Fragment key={s.n}>
+      <button onClick={()=>s.n<=step&&setStep(s.n)} className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[12px] sm:text-[13px] font-semibold transition-all ${step===s.n?"bg-[#FF0083] text-white shadow-lg":step>s.n?"bg-[#f0fdf4] text-[#10b981] border border-[#10b981]":"bg-[#F3F4F6] text-[#9CA3AF]"}`}>
         {step>s.n?<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>:<span>{s.n}</span>}
         <span>{s.lb}</span>
       </button>
@@ -2123,10 +2147,10 @@ const OnboardSetup=({emps,toast,setScr})=>{
 
     {/* Step 1: System Overview */}
     {step===1&&<div className="max-w-2xl mx-auto fi">
-      <div className="text-center mb-8"><LemonIll w={80} h={80}/><h1 className="h-serif text-[32px] font-bold text-[#1A1A2E] mt-4 mb-3">Welcome to AMJ</h1><p className="text-[16px] text-[#6B7280] leading-relaxed">Autonomous Maker Journey — your onboarding management system</p></div>
+      <div className="text-center mb-8"><LemonIll w={80} h={80}/><h1 className="h-serif text-[24px] sm:text-[32px] font-bold text-[#1A1A2E] mt-4 mb-3">Welcome to AMJ</h1><p className="text-[14px] sm:text-[16px] text-[#6B7280] leading-relaxed">Autonomous Maker Journey — your onboarding management system</p></div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-6">
         <h3 className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#9CA3AF] mb-4">What you can do</h3>
-        <div className="grid grid-cols-2 gap-4">{[
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{[
           ["Monitor team health","Track each maker's health score, progress, and engagement in real-time","heart"],
           ["Track skills & growth","See which skills are developing, which need attention, and verify mastery","skill"],
           ["Prep 1:1 meetings","Auto-generated talking points based on data — PRs, AI usage, skill gaps","hand"],
@@ -2144,10 +2168,10 @@ const OnboardSetup=({emps,toast,setScr})=>{
 
     {/* Step 2: Your Team */}
     {step===2&&<div className="fi">
-      <div className="flex items-center justify-between mb-6"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Your Team</h1><p className="text-[14px] text-[#6B7280] mt-1">Review and confirm your direct reports ({emps.length} makers)</p></div>
+      <div className="flex items-center justify-between mb-6"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Your Team</h1><p className="text-[14px] text-[#6B7280] mt-1">Review and confirm your direct reports ({emps.length} makers)</p></div>
         {teamOk&&<span className="text-[12px] px-4 py-2 rounded-full bg-[#f0fdf4] text-[#10b981] font-semibold border border-[#10b981]">✓ Team Confirmed</span>}
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-6">{emps.map(e=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm flex items-center gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">{emps.map(e=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
         <Av e={e} sz={48}/>
         <div className="flex-1">
           <h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3>
@@ -2164,10 +2188,10 @@ const OnboardSetup=({emps,toast,setScr})=>{
 
     {/* Step 3: Focus Areas */}
     {step===3&&<div className="fi">
-      <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Learning Focus Areas</h1><p className="text-[14px] text-[#6B7280] mt-1">Choose onboarding priorities for each team member</p></div>
+      <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Learning Focus Areas</h1><p className="text-[14px] text-[#6B7280] mt-1">Choose onboarding priorities for each team member</p></div>
       <div className="space-y-4">{emps.map(e=>{const ph=pInfo(e.day);return<div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <div className="flex items-center gap-3 mb-4"><Av e={e} sz={36}/><div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · {ph.wk} — {ph.nm} · Day {e.day}</p></div><RoleBadge rl={e.rl}/></div>
-        <div className="flex gap-2">{focusCats.map(cat=>{const sel=(focus[e.id]||[]).includes(cat);return<button key={cat} onClick={()=>toggleFocus(e.id,cat)} className={`text-[12px] px-3 py-1.5 rounded-full border font-medium transition-all ${sel?"bg-[#FF008310] border-[#FF0083] text-[#FF0083]":"border-[#E5E7EB] text-[#9CA3AF] hover:border-[#FF0083]"}`}>{cat}</button>})}</div>
+        <div className="flex flex-wrap gap-2">{focusCats.map(cat=>{const sel=(focus[e.id]||[]).includes(cat);return<button key={cat} onClick={()=>toggleFocus(e.id,cat)} className={`text-[11px] sm:text-[12px] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border font-medium transition-all ${sel?"bg-[#FF008310] border-[#FF0083] text-[#FF0083]":"border-[#E5E7EB] text-[#9CA3AF] hover:border-[#FF0083]"}`}>{cat}</button>})}</div>
       </div>})}</div>
       <button onClick={()=>{toast("Focus areas saved — setup complete!");if(setScr)setScr("team")}} className="mt-6 bg-[#FF0083] text-white rounded-xl px-6 py-3 text-[14px] font-semibold btn-p">Save & Go to Dashboard →</button>
     </div>}
@@ -2183,8 +2207,8 @@ const EmpProgress=({emps})=>{
   const sel=sid==="all"?null:emps.find(e=>e.id===sid);
   const[drillEmpH,setDrillEmpH]=useState(null);const[drillEmpC,setDrillEmpC]=useState(null);
   return<div className="fi">
-    <div className="flex items-center justify-between mb-6"><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Employee Progress</h1><p className="text-[14px] text-[#6B7280] mt-1">Individual growth trajectories</p></div>
-      <select value={sid} onChange={e=>{setSid(e.target.value);setDrillEmpH(null);setDrillEmpC(null)}} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-2.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm"><option value="all">All Employees</option>{emps.map(e=><option key={e.id} value={e.id}>{e.nm}</option>)}</select>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Employee Progress</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Individual growth trajectories</p></div>
+      <select value={sid} onChange={e=>{setSid(e.target.value);setDrillEmpH(null);setDrillEmpC(null)}} className="bg-white border border-[#E5E7EB] rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-[13px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm w-full sm:w-auto"><option value="all">All Employees</option>{emps.map(e=><option key={e.id} value={e.id}>{e.nm}</option>)}</select>
     </div>
     {sel?<div className="fi">
       <div className="flex items-center gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -2209,9 +2233,9 @@ const EmpProgress=({emps})=>{
         </div>})}</div>
       </div>
     </div>
-    :<div className="grid grid-cols-2 gap-4">{emps.map(e=>{const avgAI=e.co.length?Math.round(e.co.reduce((s,c)=>s+c.ai,0)/e.co.length):0;const trend=e.hp>=80?"\u2197":e.hp>=65?"\u2192":"\u2198";return<div key={e.id} onClick={()=>setSid(e.id)} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm card-h cursor-pointer">
+    :<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{emps.map(e=>{const avgAI=e.co.length?Math.round(e.co.reduce((s,c)=>s+c.ai,0)/e.co.length):0;const trend=e.hp>=80?"\u2197":e.hp>=65?"\u2192":"\u2198";return<div key={e.id} onClick={()=>setSid(e.id)} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm card-h cursor-pointer">
       <div className="flex items-center gap-3 mb-4"><Av e={e} sz={40}/><div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div><HealthBreakdown emp={e} sz={44}/></div>
-      <div className="grid grid-cols-4 gap-2 text-center">{[[`${e.co.length}`,`Contrib.`],[`${e.sk.filter(s=>s.sr==="manager-verified").length}`,`Verified`],[`${avgAI}%`,`AI`],[trend,`Trend`]].map(([v,lb],i)=><div key={i} className="bg-[#F7F7F7] rounded-lg p-2 border border-[#E5E7EB]"><p className="text-[14px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] text-[#9CA3AF] uppercase">{lb}</p></div>)}</div>
+      <div className="grid grid-cols-4 sm:grid-cols-4 gap-1 sm:gap-2 text-center">{[[`${e.co.length}`,`Contrib.`],[`${e.sk.filter(s=>s.sr==="manager-verified").length}`,`Verified`],[`${avgAI}%`,`AI`],[trend,`Trend`]].map(([v,lb],i)=><div key={i} className="bg-[#F7F7F7] rounded-lg p-1.5 sm:p-2 border border-[#E5E7EB]"><p className="text-[13px] sm:text-[14px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[8px] sm:text-[9px] text-[#9CA3AF] uppercase">{lb}</p></div>)}</div>
     </div>})}</div>}
   </div>
 };
@@ -2221,8 +2245,8 @@ const TeamPulse=({emps,toast})=>{
   const getMood=e=>{const h=e.hp;if(h>=80)return{lb:"Great",co:"#10b981",ic:"trending-up"};if(h>=65)return{lb:"Okay",co:"#f59e0b",ic:"trending-flat"};return{lb:"Needs Support",co:"#ef4444",ic:"trending-down"}};
   const[checkedIn,setCheckedIn]=useState({});
   return<div className="fi">
-    <div className="flex items-center gap-4 mb-8"><PersonIll w={40} h={48}/><div><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Team Pulse</h1><p className="text-[14px] text-[#6B7280]">How's your team feeling today?</p></div></div>
-    <div className="grid grid-cols-3 gap-3 mb-6">{[["Great",emps.filter(e=>e.hp>=80).length,"#10b981","trend"],["Okay",emps.filter(e=>e.hp>=65&&e.hp<80).length,"#f59e0b","target-sm"],["Needs Support",emps.filter(e=>e.hp<65).length,"#ef4444","alert"]].map(([lb,n,co,ic],i)=>
+    <div className="flex items-center gap-4 mb-8"><PersonIll w={40} h={48}/><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Pulse</h1><p className="text-[14px] text-[#6B7280]">How's your team feeling today?</p></div></div>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">{[["Great",emps.filter(e=>e.hp>=80).length,"#10b981","trend"],["Okay",emps.filter(e=>e.hp>=65&&e.hp<80).length,"#f59e0b","target-sm"],["Needs Support",emps.filter(e=>e.hp<65).length,"#ef4444","alert"]].map(([lb,n,co,ic],i)=>
       <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm text-center">
         <span className="block mb-2"><CI n={ic} sz={28} co={co}/></span><span className="text-[24px] font-bold" style={{color:co}}>{n}</span><p className="text-[12px] text-[#6B7280]">{lb}</p>
       </div>
@@ -2243,8 +2267,8 @@ const TeamPulse=({emps,toast})=>{
 const Skel=({w,h,r,mb})=><div className="skel" style={{width:w||'100%',height:h||'20px',borderRadius:r||'12px',marginBottom:mb||'0'}}/>;
 const PageSkeleton=()=><div className="p-2 space-y-5">
   <div className="flex gap-4"><Skel w="200px" h="36px"/><Skel w="120px" h="36px"/></div>
-  <div className="grid grid-cols-4 gap-4">{[1,2,3,4].map(i=><Skel key={i} h="100px"/>)}</div>
-  <div className="grid grid-cols-2 gap-5">{[1,2].map(i=><Skel key={i} h="200px"/>)}</div>
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[1,2,3,4].map(i=><Skel key={i} h="100px"/>)}</div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">{[1,2].map(i=><Skel key={i} h="200px"/>)}</div>
   <div className="space-y-3">{[1,2,3].map(i=><Skel key={i} h="60px"/>)}</div>
 </div>;
 
@@ -2274,7 +2298,7 @@ const CmdPalette=({open,onClose,query,setQuery,results,idx,setIdx,onSelect})=>{
   };
   return<div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh]" onClick={onClose}>
     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"/>
-    <div className="relative w-[560px] bg-white rounded-2xl shadow-2xl overflow-hidden cmd-in" onClick={e=>e.stopPropagation()}>
+    <div className="relative w-[calc(100vw-32px)] sm:w-[560px] bg-white rounded-2xl shadow-2xl overflow-hidden cmd-in" onClick={e=>e.stopPropagation()}>
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E5E7EB]">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <input ref={ref} value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={handleKey}
@@ -2407,7 +2431,7 @@ const SettingsToggle=({label,desc,checked,onChange})=><div className="flex items
 
 const Settings=({darkMode,setDarkMode,liveNotifs,setLiveNotifs,reduceMotion,setReduceMotion,highContrast,setHighContrast,lemiPersonality,setLemiPersonality})=>{
   return<div className="fi">
-    <div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">Settings</h1><p className="text-[14px] text-[#6B7280] mt-1">Customize your AMJ experience</p></div>
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Settings</h1><p className="text-[14px] text-[#6B7280] mt-1">Customize your AMJ experience</p></div>
     <div className="max-w-2xl space-y-6">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm">
         <h2 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Appearance</h2>
@@ -2469,7 +2493,7 @@ const ShortcutsOverlay=({open,onClose})=>{
   ];
   return<div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
     <div className="absolute inset-0 bg-black/40"/>
-    <div className="relative bg-white border border-[#E5E7EB] rounded-[18px] shadow-2xl p-8 w-[420px] fi" onClick={e=>e.stopPropagation()}>
+    <div className="relative bg-white border border-[#E5E7EB] rounded-[18px] shadow-2xl p-4 sm:p-8 w-[calc(100vw-32px)] sm:w-[420px] fi" onClick={e=>e.stopPropagation()}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-[20px] font-bold text-[#1A1A2E] h-serif">Keyboard Shortcuts</h2>
         <button onClick={onClose} className="w-7 h-7 rounded-lg bg-[#F7F7F7] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A2E] hover:bg-[#E5E7EB] transition-all text-xs">&#x2715;</button>
@@ -2518,19 +2542,21 @@ const SpotlightCard=({emps})=>{
   if(!star)return null;
   return<div className="spotlight-border mb-6">
     <div className="spotlight-inner p-5">
-      <div className="flex items-center gap-4">
-        <div className="relative">
-          <Av e={star} sz={56}/>
-          <span className="absolute -top-1 -right-1 text-[18px]" role="img" aria-label="star">&#x2B50;</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative">
+            <Av e={star} sz={48}/>
+            <span className="absolute -top-1 -right-1 text-[16px]" role="img" aria-label="star">&#x2B50;</span>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#d97706]">Maker of the Week</span></div>
+            <h3 className="text-[16px] sm:text-[18px] font-bold text-[#1A1A2E] h-serif">{star.nm}</h3>
+            <p className="text-[11px] sm:text-[12px] text-[#6B7280]">{star.rl} &middot; {star.dp} &middot; Day {star.day}</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#d97706]">Maker of the Week</span></div>
-          <h3 className="text-[18px] font-bold text-[#1A1A2E] h-serif">{star.nm}</h3>
-          <p className="text-[12px] text-[#6B7280]">{star.rl} &middot; {star.dp} &middot; Day {star.day}</p>
-        </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 ml-0 sm:ml-auto">
           {[["Contributions",star.co.length,"#FF0083"],["Health",star.hp,"#10b981"],["Verified",star.verifiedCount,"#3b82f6"]].map(([lb,v,co],i)=>
-            <div key={i} className="text-center px-3"><p className="text-[20px] font-bold" style={{color:co}}>{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
+            <div key={i} className="text-center px-2 sm:px-3"><p className="text-[18px] sm:text-[20px] font-bold" style={{color:co}}>{v}</p><p className="text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
           )}
         </div>
       </div>
@@ -2631,8 +2657,8 @@ const App=()=>{
       if(scr==="journey")return<Journey emp={maker}/>;
       if(scr==="checklist")return<Checklist emp={maker} onCelebrate={fireConfetti}/>;
       if(scr==="goals")return<WeeklyGoals toast={showToast} onCelebrate={fireConfetti}/>;
-      if(scr==="skills")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">My Skills</h1><p className="text-[14px] text-[#6B7280] mt-1">Track your skill development</p></div><Skills emp={maker} ro/></div>;
-      if(scr==="contributions")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[28px] font-bold text-[#1A1A2E]">My Contributions</h1><p className="text-[14px] text-[#6B7280] mt-1">All submissions and review status</p></div><Contribs emp={maker}/></div>;
+      if(scr==="skills")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Skills</h1><p className="text-[14px] text-[#6B7280] mt-1">Track your skill development</p></div><Skills emp={maker} ro/></div>;
+      if(scr==="contributions")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Contributions</h1><p className="text-[14px] text-[#6B7280] mt-1">All submissions and review status</p></div><Contribs emp={maker}/></div>;
       if(scr==="ai-log")return<AILogForm emp={maker}/>;
       if(scr==="ai-usage")return<AIU emp={maker}/>;
       if(scr==="crisis")return<CrisisSim/>;
@@ -2730,7 +2756,7 @@ const App=()=>{
             {unread>0&&<div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ef4444] text-white text-[9px] font-bold flex items-center justify-center">{unread}</div>}
           </button>
           {notifOpen&&<div style={{position:'fixed',inset:0,zIndex:50}} onClick={()=>setNotifOpen(false)}/>}
-          {notifOpen&&<div onClick={e=>e.stopPropagation()} style={{position:'fixed',top:56,right:16,width:320,zIndex:51,background:darkMode?'#1e293b':'#fff',border:darkMode?'1px solid #475569':'1px solid #E5E7EB',borderRadius:14,boxShadow:darkMode?'0 10px 40px rgba(0,0,0,.5)':'0 10px 40px rgba(0,0,0,.12)',overflow:'hidden'}}>
+          {notifOpen&&<div onClick={e=>e.stopPropagation()} style={{position:'fixed',top:56,right:8,width:'min(320px, calc(100vw - 16px))',zIndex:51,background:darkMode?'#1e293b':'#fff',border:darkMode?'1px solid #475569':'1px solid #E5E7EB',borderRadius:14,boxShadow:darkMode?'0 10px 40px rgba(0,0,0,.5)':'0 10px 40px rgba(0,0,0,.12)',overflow:'hidden'}}>
             <div style={{padding:'12px 16px',borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
               <span style={{fontSize:13,fontWeight:600,color:darkMode?'#F1F5F9':'#1A1A2E'}}>Notifications</span>
               <button onClick={()=>{setNotifs(p=>p.map(n=>({...n,read:true})));showToast({msg:"All marked as read",type:"success"})}} style={{fontSize:11,color:'#FF0083',fontWeight:500,background:'none',border:'none',cursor:'pointer'}}>Mark all read</button>
@@ -2747,7 +2773,7 @@ const App=()=>{
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
-        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role hidden sm:block bg-white border border-[#E5E7EB] rounded-lg px-3.5 py-1.5 text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-8 shadow-sm" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center"}}>
+        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-2 sm:px-3.5 py-1.5 text-[12px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[120px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center"}}>
           <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
           <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
