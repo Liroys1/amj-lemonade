@@ -142,6 +142,8 @@
       .tour-lemi{bottom:16px!important;right:16px!important;width:48px!important;height:48px!important}
       /* Recharts: reduce chart height slightly */
       .recharts-wrapper{max-height:200px!important}
+      /* Bottom padding for main content to avoid FAB overlap */
+      #main-content{padding-bottom:80px!important}
     }
     @media(max-width:479px){
       /* Extra-small screen overrides */
@@ -802,11 +804,11 @@ const Journey=({emp})=>{
         <span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">Day {emp.day}<span className="text-[#9CA3AF] font-normal"> / 30</span></span>
       </div>
     </div>
-    <div className="relative mb-10 overflow-x-auto pb-2">
+    <div className="relative mb-10 overflow-x-auto pb-2" style={{WebkitOverflowScrolling:"touch"}}>
       <div className="absolute top-[30px] left-[60px] right-[60px] h-[2px] hidden sm:block" style={{background:"linear-gradient(90deg,#FF0083,#E5E7EB)"}}/>
-      <div className="flex justify-between relative z-10 px-1 sm:px-2 min-w-[420px] sm:min-w-0">
+      <div className="flex justify-between relative z-10 px-2 sm:px-2 min-w-[340px] sm:min-w-0">
         {PHASES.map((p,i)=>{const n=i+1,dn=n<cur,nw=n===cur,ft=n>cur;return(
-          <button key={p.id} onClick={()=>setSel(p)} className="flex flex-col items-center gap-2 sm:gap-3 group cursor-pointer" style={{width:"23%"}}>
+          <button key={p.id} onClick={()=>setSel(p)} className="flex flex-col items-center gap-2 sm:gap-3 group cursor-pointer flex-1 min-w-0">
             <div className={`w-[48px] h-[48px] sm:w-[60px] sm:h-[60px] rounded-full flex items-center justify-center text-sm sm:text-base font-bold border-2 transition-all duration-300 group-hover:scale-110
               ${dn?"bg-[#FF0083] border-[#FF0083] text-white shadow-[0_0_20px_rgba(255,0,131,.3)]":""}
               ${nw?"border-[#FF0083] text-[#FF0083] pulse-p bg-white":""}
@@ -1258,8 +1260,8 @@ const SkillGap=()=>{
   const cellC=v=>v>=2.5?{bg:"rgba(16,185,129,.12)",tx:"#059669"}:v>=1.5?{bg:"rgba(245,158,11,.12)",tx:"#d97706"}:{bg:"rgba(239,68,68,.12)",tx:"#dc2626"};
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Skill Gap Map</h1><p className="text-[14px] text-[#6B7280] mt-1">Identify gaps across roles</p></div>
-    <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 mb-5 shadow-sm">
-      <div className="grid overflow-x-auto" style={{gridTemplateColumns:"100px repeat(3,1fr)",gap:"6px",minWidth:"380px"}}>
+    <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 mb-5 shadow-sm overflow-hidden">
+      <div className="grid overflow-x-auto" style={{gridTemplateColumns:"80px repeat(3,1fr)",gap:"6px"}}>
         <div/>{roles.map(r=><div key={r} className="text-center text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] py-3">{r}</div>)}
         {cats.map(ct=><React.Fragment key={ct}>
           <div className="flex items-center"><CatB c={ct}/></div>
@@ -2437,15 +2439,18 @@ const TourOverlay=({step,steps,onNext,onSkip})=>{
   const tipW=Math.min(300,window.innerWidth-32);
   let tipStyle={};
   const maxTop=window.innerHeight-240;
-  if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:pos.left+pos.width+pad+12};
-  else if(s.pos==="bottom")tipStyle={top:pos.top+pos.height+pad+12,left:Math.max(8,pos.left+pos.width/2-tipW/2)};
+  const maxLeft=window.innerWidth-tipW-16;
+  if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:Math.min(pos.left+pos.width+pad+12,maxLeft)};
+  else if(s.pos==="bottom")tipStyle={top:pos.top+pos.height+pad+12,left:Math.max(8,Math.min(pos.left+pos.width/2-tipW/2,maxLeft))};
   else if(s.pos==="left")tipStyle={top:Math.min(pos.top,maxTop),left:Math.max(8,pos.left-tipW-pad-12)};
-  else tipStyle={top:pos.top-160,left:pos.left+pos.width/2-tipW/2};
+  else tipStyle={top:pos.top-160,left:Math.max(8,Math.min(pos.left+pos.width/2-tipW/2,maxLeft))};
   if(tipStyle.top>maxTop)tipStyle.top=maxTop;
+  if(tipStyle.left<8)tipStyle.left=8;
+  if(tipStyle.left>maxLeft)tipStyle.left=maxLeft;
   return<div style={{position:"fixed",inset:0,zIndex:200}}>
     <div style={{position:"absolute",inset:0,background:"transparent",boxShadow:`0 0 0 ${pos.top-pad}px rgba(0,0,0,0.5) inset`,clipPath:`polygon(0 0,100% 0,100% 100%,0 100%,0 ${pos.top-pad}px,${pos.left-pad}px ${pos.top-pad}px,${pos.left-pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top-pad}px,0 ${pos.top-pad}px)`}} onClick={onSkip}/>
     <div style={{position:"absolute",top:pos.top-pad,left:pos.left-pad,width:pos.width+pad*2,height:pos.height+pad*2,border:"2px solid #FF0083",borderRadius:12,pointerEvents:"none",boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}/>
-    <div style={{position:"absolute",...tipStyle,width:tipW}} className="bg-white rounded-2xl shadow-2xl p-5 border border-[#E5E7EB]">
+    <div style={{position:"absolute",...tipStyle,width:tipW,maxWidth:"calc(100vw - 32px)",overflow:"hidden"}} className="bg-white rounded-2xl shadow-2xl p-5 border border-[#E5E7EB]">
       {s.topic&&<span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] mb-2 inline-block">{s.topic}</span>}
       <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">Step {step+1} of {steps.length}</span></div>
       <h3 className="text-[16px] font-bold text-[#1A1A2E] mb-1.5">{s.title}</h3>
@@ -2814,7 +2819,7 @@ const App=()=>{
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
-        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-5 sm:pr-8 shadow-sm max-w-[110px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
+        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[200px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
           <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
           <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
