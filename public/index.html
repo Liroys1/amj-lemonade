@@ -2829,9 +2829,9 @@ const App=()=>{
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
         <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[200px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
-          <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
+          <optgroup label="Strategy"><option value="strategy">L&D — Strategy Overview</option></optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
-          <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
+          <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
         </select>
       </div>
     </div>
