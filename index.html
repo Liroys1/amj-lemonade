@@ -301,11 +301,11 @@ const TASKS=[
   {id:"tk1",ti:"Fix notification service unit tests",src:"GitHub",srcId:"PR #247",url:"https://github.com/lemonade-inc/core/pull/247",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e1"},
   {id:"tk2",ti:"Update claims dashboard mobile layout",src:"Figma",srcId:"Design #F-892",url:"https://figma.com/file/lemonade-claims-v2",pri:"medium",st:"todo",as:"Ran",due:"Tomorrow",emp:"e1"},
   {id:"tk3",ti:"Review pricing API documentation",src:"Monday",srcId:"LEM-445",url:"https://lemonade.monday.com/boards/1234/items/445",pri:"low",st:"todo",as:"Ran",due:"Wed",emp:"e1"},
-  {id:"tk4",ti:"Implement error boundary for policy view",src:"Jira",srcId:"LEM-342",url:"https://lemonade.atlassian.net/browse/LEM-342",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e2"},
+  {id:"tk4",ti:"Design claims dashboard mobile layout",src:"Figma",srcId:"Design #F-893",url:"https://figma.com/file/lemonade-claims-mobile",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e2"},
   {id:"tk5",ti:"Design onboarding flow improvements",src:"Figma",srcId:"Design #F-901",url:"https://figma.com/file/lemonade-onboard-v3",pri:"high",st:"todo",as:"Ran",due:"Tomorrow",emp:"e2"},
-  {id:"tk6",ti:"Add A/B test tracking for signup",src:"Jira",srcId:"LEM-356",url:"https://lemonade.atlassian.net/browse/LEM-356",pri:"medium",st:"todo",as:"Ran",due:"Thu",emp:"e3"},
+  {id:"tk6",ti:"Write PRD for AI Jim escalation v2",src:"Monday",srcId:"LEM-356",url:"https://lemonade.monday.com/boards/1234/items/356",pri:"medium",st:"todo",as:"Dana",due:"Thu",emp:"e3"},
   {id:"tk7",ti:"Write product brief: AI Jim escalation improvements",src:"Monday",srcId:"LEM-501",url:"https://lemonade.monday.com/boards/1234/items/501",pri:"high",st:"in-progress",as:"Yael",due:"Today",emp:"e6"},
-  {id:"tk8",ti:"CX flow user testing analysis",src:"Monday",srcId:"LEM-488",url:"https://lemonade.monday.com/boards/1234/items/488",pri:"medium",st:"todo",as:"Yael",due:"Wed",emp:"e5"},
+  {id:"tk8",ti:"User testing analysis for CX flow",src:"Figma",srcId:"Design #F-920",url:"https://figma.com/file/lemonade-cx-testing",pri:"medium",st:"todo",as:"Ran",due:"Wed",emp:"e5"},
   {id:"tk9",ti:"Create micro-interaction specs for claims video flow",src:"Figma",srcId:"Design #F-910",url:"https://figma.com/file/lemonade-micro-int",pri:"high",st:"in-progress",as:"Ran",due:"Today",emp:"e9"},
   {id:"tk10",ti:"Stakeholder map presentation prep",src:"Monday",srcId:"LEM-512",url:"https://lemonade.monday.com/boards/1234/items/512",pri:"low",st:"todo",as:"Yael",due:"Fri",emp:"e8"},
   {id:"tk11",ti:"API rate limiter implementation",src:"GitHub",srcId:"PR #251",url:"https://github.com/lemonade-inc/core/pull/251",pri:"medium",st:"todo",as:"Ran",due:"Wed",emp:"e4"},
@@ -326,11 +326,11 @@ const SCHEDULE=[
 ];
 
 const GOALS=[
-  {id:"g1",tx:"Submit 2 PRs with AI logs",cur:1,tgt:2,cat:"Contributions",ic:"pencil"},
-  {id:"g2",tx:"Get 1 skill to 'practicing' level",cur:1,tgt:1,cat:"Skills",ic:"target-sm"},
-  {id:"g3",tx:"Pair program with squad member",cur:0,tgt:1,cat:"Collaboration",ic:"people"},
-  {id:"g4",tx:"Write weekly reflection",cur:0,tgt:1,cat:"Growth",ic:"sparkle"},
-  {id:"g5",tx:"Complete crisis simulation",cur:0,tgt:1,cat:"AI-Native",ic:"bolt"}
+  {id:"g1",tx:"Submit 2 PRs with AI logs",cur:1,tgt:2,cat:"Contributions",ic:"pencil",link:"contributions",ds:"Track your contributions and document AI usage"},
+  {id:"g2",tx:"Get 1 skill to 'practicing' level",cur:1,tgt:1,cat:"Skills",ic:"target-sm",link:"skills",ds:"Apply a skill in a real task to level up"},
+  {id:"g3",tx:"Pair program with squad member",cur:0,tgt:1,cat:"Collaboration",ic:"people",link:"integrations",ds:"Shadow or pair with a teammate on a task"},
+  {id:"g4",tx:"Write weekly reflection",cur:0,tgt:1,cat:"Growth",ic:"sparkle",link:"ai-usage",ds:"Document your learnings and growth"},
+  {id:"g5",tx:"Complete crisis simulation",cur:0,tgt:1,cat:"AI-Native",ic:"bolt",link:"crisis",ds:"Test your decision-making in a real-world scenario"}
 ];
 
 const RESOURCES=[
@@ -1037,7 +1037,7 @@ const CompanionPanel=({open,onClose,scr,setScr,role,emp,personality})=>{
   const topicCount=msgs.filter(m=>m.r==="u").length;
   const chips=getChips();
   if(!open)return null;
-  return<div className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white border-l border-[#E5E7EB] shadow-2xl z-50 flex flex-col fi" style={{boxShadow:"-8px 0 30px rgba(0,0,0,.08)"}}>
+  return<div className="fixed right-0 w-full sm:w-[380px] bg-white border-l border-[#E5E7EB] shadow-2xl z-[45] flex flex-col fi" style={{top:56,height:'calc(100% - 56px)',boxShadow:"-8px 0 30px rgba(0,0,0,.08)"}}>
     <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between flex-shrink-0">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-sm">
@@ -1373,6 +1373,25 @@ const ContentIntel=()=>{
 const Checklist=({emp,onCelebrate})=>{
   const[checks,setChecks]=usePersistedState('cl-'+emp.id,{});const[sub,setSub]=usePersistedState('cl-sub-'+emp.id,false);
   const ph=pDay(emp.day);
+  const roleTools={Engineer:[
+      {id:20,tx:"Clone the monorepo and run the dev server",ic:"laptop",link:"https://github.com/lemonade-inc",linkTx:"GitHub",logo:"https://cdn.simpleicons.org/github/181717"},
+      {id:21,tx:"Set up your Jira board and pick your first ticket",ic:"clipboard",link:"https://lemonade.atlassian.net",linkTx:"Jira",logo:"https://cdn.simpleicons.org/jira/0052CC"},
+      {id:22,tx:"Run Docker locally and verify the services",ic:"bolt",link:null,logo:"https://cdn.simpleicons.org/docker/2496ED"},
+      {id:23,tx:"Get Datadog access and explore the dashboards",ic:"chart",link:"https://app.datadoghq.com",linkTx:"Datadog",logo:"https://cdn.simpleicons.org/datadog/632CA6"},
+      {id:24,tx:"Trigger a CI/CD pipeline on your test branch",ic:"bolt",link:null}
+    ],Designer:[
+      {id:20,tx:"Get added to the Figma team and open the Design System",ic:"paint",link:"https://figma.com/files/team/lemonade-inc",linkTx:"Figma",logo:"https://cdn.simpleicons.org/figma/F24E1E"},
+      {id:21,tx:"Review the component library in Storybook",ic:"books",link:null,logo:"https://cdn.simpleicons.org/storybook/FF4785"},
+      {id:22,tx:"Set up Zeplin for dev handoff workflows",ic:"link",link:null,logo:"https://cdn.simpleicons.org/zeplin/FDBD39"},
+      {id:23,tx:"Run a test usability session in Maze",ic:"search",link:null,logo:"https://cdn.simpleicons.org/maze/000000"},
+      {id:24,tx:"Explore the brand guidelines and illustration style",ic:"paint",link:null}
+    ],PM:[
+      {id:20,tx:"Set up your Monday.com board with squad sprints",ic:"target",link:"https://lemonade-inc.monday.com",linkTx:"Monday",logo:"https://cdn.simpleicons.org/mondaydotcom/6C36F9"},
+      {id:21,tx:"Get Mixpanel access and explore key funnels",ic:"chart",link:"https://mixpanel.com/project/lemonade",linkTx:"Mixpanel",logo:"https://cdn.simpleicons.org/mixpanel/7856FF"},
+      {id:22,tx:"Review your squad's Jira backlog and priorities",ic:"clipboard",link:"https://lemonade.atlassian.net",linkTx:"Jira",logo:"https://cdn.simpleicons.org/jira/0052CC"},
+      {id:23,tx:"Explore the Confluence wiki for product specs",ic:"books",link:"https://lemonade.atlassian.net/wiki",linkTx:"Confluence",logo:"https://cdn.simpleicons.org/confluence/172B4D"},
+      {id:24,tx:"Set up your first stakeholder mapping doc",ic:"people",link:null}
+    ]};
   const categories=[
     {cat:"Become a Customer First",ic:"phone",desc:"Experience Lemonade as a real customer before building for customers",items:[
       {id:1,tx:"Download the Lemonade app and get a quote",ic:"phone",link:"https://lemonade.com/app",linkTx:"Open App Store"},
@@ -1381,15 +1400,14 @@ const Checklist=({emp,onCelebrate})=>{
       {id:4,tx:"Write your first impressions (3+ observations)",ic:"pencil",link:null},
       {id:5,tx:"Complete the Customer Experience Review",ic:"clipboard",link:null}
     ]},
-    {cat:"Set Up Your Workspace",ic:"laptop",desc:"Get your tools and environment ready for real work",items:[
-      {id:6,tx:"Set up your development environment",ic:"laptop",link:"https://lemonade.atlassian.net/wiki/setup",linkTx:"Setup Guide"},
-      {id:7,tx:"Read the Lemonade Architecture overview",ic:"books",link:null,navTo:"resources"},
-      {id:8,tx:"Join your squad's Slack channel",ic:"bubble",link:"slack://channel/onboarding-2026",linkTx:"Open Slack"},
+    {cat:`Set Up Your ${emp.rl} Workspace`,ic:"laptop",desc:`Get your ${emp.rl.toLowerCase()}-specific tools and environment ready`,items:[
+      {id:6,tx:"Join your squad's Slack channel",ic:"bubble",link:"slack://channel/onboarding-2026",linkTx:"Open Slack"},
+      ...(roleTools[emp.rl]||roleTools.Engineer)
     ]},
     {cat:"Connect with Your Team",ic:"people",desc:"Meet your buddy, lead, and squad members",items:[
-      {id:9,tx:"Shadow a customer interaction with your buddy",ic:"people",link:null},
-      {id:10,tx:"Schedule a coffee chat with your lead",ic:"hand",link:null},
-      {id:11,tx:"Submit your Day 1 reflection",ic:"sparkle",link:null}
+      {id:30,tx:"Shadow a customer interaction with your buddy",ic:"people",link:null},
+      {id:31,tx:"Schedule a coffee chat with your lead",ic:"hand",link:null},
+      {id:32,tx:"Submit your Day 1 reflection",ic:"sparkle",link:null}
     ]}
   ];
   const allItems=categories.flatMap(c=>c.items);
@@ -1418,9 +1436,9 @@ const Checklist=({emp,onCelebrate})=>{
             <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 cursor-pointer ${checks[it.id]?"bg-[#10b981] border-[#10b981] text-white":"border-[#D1D5DB] hover:border-[#FF0083]"}`} onClick={()=>!sub&&setChecks(p=>({...p,[it.id]:!p[it.id]}))}>
               {checks[it.id]&&<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
             </div>
-            <span className="flex-shrink-0"><CI n={it.ic} sz={16}/></span>
+            {it.logo?<img src={it.logo} alt="" className="w-4 h-4 flex-shrink-0" loading="lazy"/>:<span className="flex-shrink-0"><CI n={it.ic} sz={16}/></span>}
             <span className={`text-[13px] font-medium flex-1 ${checks[it.id]?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{it.tx}</span>
-            {it.link&&<a href={it.link} target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#FF0083] border border-[#FF008330] rounded-lg px-2 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0 no-underline">{it.linkTx||"Open"}</a>}
+            {it.link&&<a href={it.link} target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold text-[#FF0083] border border-[#FF008330] rounded-lg px-2.5 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0 no-underline">{it.linkTx||"Open"} →</a>}
             {it.navTo&&<button onClick={()=>window.__setScr&&window.__setScr(it.navTo)} className="text-[11px] text-[#FF0083] border border-[#FF008330] rounded-lg px-2 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0">View →</button>}
           </div>)}
         </div>
@@ -1531,12 +1549,15 @@ const CrisisSim=()=>{
 const SrcLogo=({src,sz=16})=>{const s={GitHub:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>,Jira:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><defs><linearGradient id="jg1" x1="98%" y1="0%" x2="58%" y2="90%"><stop offset="18%" stopColor="#0052CC"/><stop offset="100%" stopColor="#2684FF"/></linearGradient></defs><path d="M11.53 2L2 11.53l3.54 3.54 5.99-5.99 5.99 5.99 3.54-3.54L11.53 2z" fill="url(#jg1)"/><path d="M11.53 8.59L7.47 12.65l4.06 4.06 4.06-4.06-4.06-4.06z" fill="#2684FF"/></svg>,Figma:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4z" fill="#0ACF83"/><path d="M4 12c0-2.2 1.8-4 4-4h4v8H8c-2.2 0-4-1.8-4-4z" fill="#A259FF"/><path d="M4 4c0-2.2 1.8-4 4-4h4v8H8C5.8 8 4 6.2 4 4z" fill="#F24E1E"/><path d="M12 0h4c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4V0z" fill="#FF7262"/><path d="M20 12c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4z" fill="#1ABCFE"/></svg>,Monday:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><circle cx="5" cy="17" r="3.5" fill="#FF3D57"/><circle cx="12" cy="12" r="3.5" fill="#FFCB00"/><circle cx="19" cy="7" r="3.5" fill="#00D647"/></svg>,Slack:<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><path d="M5.04 15.16a2.53 2.53 0 01-2.52 2.53A2.53 2.53 0 010 15.16a2.53 2.53 0 012.52-2.52h2.52v2.52zm1.27 0a2.53 2.53 0 012.52-2.52 2.53 2.53 0 012.52 2.52v6.32A2.53 2.53 0 018.83 24a2.53 2.53 0 01-2.52-2.52v-6.32z" fill="#E01E5A"/><path d="M8.83 5.04a2.53 2.53 0 01-2.52-2.52A2.53 2.53 0 018.83 0a2.53 2.53 0 012.52 2.52v2.52H8.83zm0 1.27a2.53 2.53 0 012.52 2.52 2.53 2.53 0 01-2.52 2.52H2.52A2.53 2.53 0 010 8.83a2.53 2.53 0 012.52-2.52h6.31z" fill="#36C5F0"/><path d="M18.96 8.83a2.53 2.53 0 012.52-2.52A2.53 2.53 0 0124 8.83a2.53 2.53 0 01-2.52 2.52h-2.52V8.83zm-1.27 0a2.53 2.53 0 01-2.52 2.52 2.53 2.53 0 01-2.52-2.52V2.52A2.53 2.53 0 0115.17 0a2.53 2.53 0 012.52 2.52v6.31z" fill="#2EB67D"/><path d="M15.17 18.96a2.53 2.53 0 012.52 2.52A2.53 2.53 0 0115.17 24a2.53 2.53 0 01-2.52-2.52v-2.52h2.52zm0-1.27a2.53 2.53 0 01-2.52-2.52 2.53 2.53 0 012.52-2.52h6.31A2.53 2.53 0 0124 15.17a2.53 2.53 0 01-2.52 2.52h-6.31z" fill="#ECB22E"/></svg>};return<span className="flex-shrink-0" style={{color:"#6B7280"}}>{s[src]||<CI n="bolt" sz={sz}/>}</span>};
 
 const Integrations=({emp,toast})=>{
+  const roleTools={Engineer:["GitHub","Jira","Slack"],Designer:["Figma","Jira","Slack"],PM:["Monday","Jira","Slack"]};
+  const myTools=roleTools[emp.rl]||["Jira","Slack"];
   const myTasks=TASKS.filter(t=>t.emp===emp.id);
   const[tasks,setTasks]=useState(myTasks);
   const[srcFilter,setSrcFilter]=useState("all");
   const[adding,setAdding]=useState(false);
-  const[newTask,setNewTask]=useState({ti:"",src:"Jira",pri:"medium",due:""});
-  const srcs=["all",...new Set(tasks.map(t=>t.src))];
+  const[newTask,setNewTask]=useState({ti:"",src:myTools[0]||"Jira",pri:"medium",due:""});
+  const allSrcs=["all",...new Set(tasks.map(t=>t.src))];
+  const srcs=allSrcs.filter(s=>s==="all"||myTools.includes(s));
   const filtered=srcFilter==="all"?tasks:tasks.filter(t=>t.src===srcFilter);
   const cols=[{k:"todo",lb:"To Do",co:"#9CA3AF"},{k:"in-progress",lb:"In Progress",co:"#3b82f6"},{k:"done",lb:"Done",co:"#10b981"}];
   const cycleSt=(id)=>{setTasks(p=>p.map(t=>{if(t.id!==id)return t;const nx=t.st==="todo"?"in-progress":t.st==="in-progress"?"done":"todo";return{...t,st:nx}}));toast&&toast("Task status updated")};
@@ -1554,7 +1575,7 @@ const Integrations=({emp,toast})=>{
       <h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">New Task</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
         <input value={newTask.ti} onChange={e=>setNewTask(p=>({...p,ti:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Task title *"/>
-        <select value={newTask.src} onChange={e=>setNewTask(p=>({...p,src:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]"><option>Jira</option><option>GitHub</option><option>Figma</option><option>Monday</option></select>
+        <select value={newTask.src} onChange={e=>setNewTask(p=>({...p,src:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]">{myTools.map(t=><option key={t}>{t}</option>)}</select>
         <select value={newTask.pri} onChange={e=>setNewTask(p=>({...p,pri:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
         <input value={newTask.due} onChange={e=>setNewTask(p=>({...p,due:e.target.value}))} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083]" placeholder="Due: Today, Tomorrow..."/>
       </div>
@@ -1575,7 +1596,7 @@ const Integrations=({emp,toast})=>{
         </div>
       </div>)}</div>
     </div>})}</div>
-    <div className="mt-5 flex items-center gap-4 px-1 flex-wrap">{["GitHub","Jira","Figma","Monday","Slack"].map(s=><div key={s} className="flex items-center gap-1.5 text-[11px] text-[#9CA3AF]"><SrcLogo src={s} sz={12}/>{s}<span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"/></div>)}</div>
+    <div className="mt-5 flex items-center gap-4 px-1 flex-wrap">{myTools.map(s=><div key={s} className="flex items-center gap-1.5 text-[11px] text-[#9CA3AF]"><SrcLogo src={s} sz={12}/>{s}<span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"/></div>)}</div>
   </div>
 };
 
@@ -1608,36 +1629,36 @@ const Reflections=({emps,onSel})=>{
 
 // ───────────────── NEW: MAKER DASHBOARD ─────────────────
 const NUDGES=[
-  {day:3,tx:"Set up your dev environment yet? Check Resources → Tools",ic:"tool"},
-  {day:5,tx:"Time to submit your Day 1 Checklist to your lead!",ic:"check-round"},
-  {day:8,tx:"Your first Fresh Eyes Audit is coming up — start observing!",ic:"eye"},
-  {day:12,tx:"You're almost halfway! Submit your weekly reflection.",ic:"pencil"},
-  {day:15,tx:"Halfway through! Reflect on your biggest learning so far.",ic:"target-sm"},
-  {day:20,tx:"Start thinking about your ownership project for Week 4.",ic:"rocket"},
-  {day:25,tx:"Almost there — begin your 60-day growth goals document.",ic:"chart-up"},
-  {day:28,tx:"Final stretch! Prepare your 'What I Learned' reflection.",ic:"sparkle"}
+  {day:3,tx:"Set up your dev environment yet? Check Resources → Tools",ic:"tool",scr:"resources"},
+  {day:5,tx:"Time to submit your Day 1 Checklist to your lead!",ic:"check-round",scr:"checklist"},
+  {day:8,tx:"Your first Fresh Eyes Audit is coming up — start observing!",ic:"eye",scr:"contributions"},
+  {day:12,tx:"You're almost halfway! Submit your weekly reflection.",ic:"pencil",scr:"ai-usage"},
+  {day:15,tx:"Halfway through! Reflect on your biggest learning so far.",ic:"target-sm",scr:"journey"},
+  {day:20,tx:"Start thinking about your ownership project for Week 4.",ic:"rocket",scr:"contributions"},
+  {day:25,tx:"Almost there — begin your 60-day growth goals document.",ic:"chart-up",scr:"goals"},
+  {day:28,tx:"Final stretch! Prepare your 'What I Learned' reflection.",ic:"sparkle",scr:"ai-review"}
 ];
 const computeNudges=(emp)=>{
   const nudges=[];
   // PR stuck in review > 3 days
-  emp.co.filter(c=>c.st==="in-review"&&c.da>3).forEach(c=>{nudges.push({tx:`"${c.ti}" has been in review for ${c.da} days — follow up with your reviewer`,ic:"clock",priority:1,type:"stuck"})});
+  emp.co.filter(c=>c.st==="in-review"&&c.da>3).forEach(c=>{nudges.push({tx:`"${c.ti}" has been in review for ${c.da} days — follow up with your reviewer`,ic:"clock",priority:1,type:"stuck",scr:"contributions"})});
   // Skills stuck in "learning" status
   const learningSkills=emp.sk.filter(s=>s.sr==="onboarding"&&s.lv==="learning");
-  if(learningSkills.length>=2){nudges.push({tx:`${learningSkills.length} skills still at "learning" level (${learningSkills.slice(0,2).map(s=>s.nm).join(", ")}) — try applying them in your next contribution`,ic:"target-sm",priority:2,type:"skill-gap"})}
+  if(learningSkills.length>=2){nudges.push({tx:`${learningSkills.length} skills still at "learning" level (${learningSkills.slice(0,2).map(s=>s.nm).join(", ")}) — try applying them in your next contribution`,ic:"target-sm",priority:2,type:"skill-gap",scr:"skills"})}
   // Low contribution count for the day
   const expectedContribs=Math.floor(emp.day/5);
-  if(emp.co.length<expectedContribs){nudges.push({tx:`You've made ${emp.co.length} contributions by Day ${emp.day} — aim for at least ${expectedContribs} to stay on track`,ic:"pencil",priority:2,type:"low-contrib"})}
+  if(emp.co.length<expectedContribs){nudges.push({tx:`You've made ${emp.co.length} contributions by Day ${emp.day} — aim for at least ${expectedContribs} to stay on track`,ic:"pencil",priority:2,type:"low-contrib",scr:"contributions"})}
   // High AI usage average
   const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0;
-  if(avgAI>60&&emp.co.length>=2){nudges.push({tx:`Your avg AI usage is ${avgAI}% — try reducing AI reliance on your next submission to build craft skills`,ic:"robot",priority:2,type:"high-ai"})}
+  if(avgAI>60&&emp.co.length>=2){nudges.push({tx:`Your avg AI usage is ${avgAI}% — try reducing AI reliance on your next submission to build craft skills`,ic:"robot",priority:2,type:"high-ai",scr:"ai-usage"})}
   // Upcoming phase transition
   const nextPhase=emp.day<=5?6:emp.day<=10?11:emp.day<=18?19:31;
   const daysToNext=nextPhase-emp.day;
-  if(daysToNext>0&&daysToNext<=3){const nextPh=pInfo(nextPhase<=30?nextPhase:30);nudges.push({tx:`Phase transition in ${daysToNext} day${daysToNext>1?"s":""}! Prepare for "${nextPh.nm}" — check the journey map`,ic:"rocket",priority:1,type:"phase-transition"})}
+  if(daysToNext>0&&daysToNext<=3){const nextPh=pInfo(nextPhase<=30?nextPhase:30);nudges.push({tx:`Phase transition in ${daysToNext} day${daysToNext>1?"s":""}! Prepare for "${nextPh.nm}" — check the journey map`,ic:"rocket",priority:1,type:"phase-transition",scr:"journey"})}
   // No audit yet and past day 10
-  if(emp.day>10&&!emp.co.some(c=>c.ty==="Audit")){nudges.push({tx:"You haven't submitted a Fresh Eyes Audit yet — this is a key milestone for Week 3",ic:"eye",priority:3,type:"missing-audit"})}
+  if(emp.day>10&&!emp.co.some(c=>c.ty==="Audit")){nudges.push({tx:"You haven't submitted a Fresh Eyes Audit yet — this is a key milestone for Week 3",ic:"eye",priority:3,type:"missing-audit",scr:"contributions"})}
   // Draft items sitting too long
-  emp.co.filter(c=>c.st==="draft"&&c.da>5).forEach(c=>{nudges.push({tx:`"${c.ti}" is still a draft after ${c.da} days — consider finalizing it`,ic:"pencil",priority:3,type:"stale-draft"})});
+  emp.co.filter(c=>c.st==="draft"&&c.da>5).forEach(c=>{nudges.push({tx:`"${c.ti}" is still a draft after ${c.da} days — consider finalizing it`,ic:"pencil",priority:3,type:"stale-draft",scr:"contributions"})});
   // Sort by priority
   nudges.sort((a,b)=>a.priority-b.priority);
   return nudges;
@@ -1770,11 +1791,11 @@ const MakerDash=({emp,setScr})=>{
     {firstShip&&emp.co.filter(c=>c.st==="merged"||c.st==="shipped").length===1&&<div className="bg-gradient-to-r from-[#FF008315] to-[#FF008305] border border-[#FF008330] rounded-[14px] p-4 mb-5 flex items-center gap-3 fi">
       <CI n="party" sz={24} co="#FF0083"/><div><p className="text-[14px] font-bold text-[#1A1A2E]">You shipped your first contribution!</p><p className="text-[12px] text-[#6B7280]">Here's what your lead said: "{emp.co.find(c=>c.st==="merged"||c.st==="shipped")?.rv||'Great work — keep it up!'}"</p></div>
     </div>}
-    {smartNudges.length>0?<div className="space-y-2 mb-5">{smartNudges.slice(0,3).map((n,i)=>{const cols={stuck:{bg:"#fef2f2",bd:"#ef444430",co:"#dc2626"},"skill-gap":{bg:"#fff7ed",bd:"#f59e0b30",co:"#d97706"},"low-contrib":{bg:"#eff6ff",bd:"#3b82f630",co:"#2563eb"},"high-ai":{bg:"#fdf4ff",bd:"#a855f730",co:"#9333ea"},"phase-transition":{bg:"#f0fdf4",bd:"#10b98130",co:"#059669"},"missing-audit":{bg:"#fffbeb",bd:"#f59e0b30",co:"#d97706"},"stale-draft":{bg:"#f8fafc",bd:"#64748b30",co:"#475569"}};const c=cols[n.type]||cols["skill-gap"];return<div key={i} className="rounded-[14px] px-4 py-3 flex items-center gap-3 fi" style={{background:c.bg,border:`1px solid ${c.bd}`}}>
-      <CI n={n.ic} sz={18} co={c.co}/><p className="text-[13px]" style={{color:c.co}}><strong>Smart Nudge:</strong> {n.tx}</p>
+    {smartNudges.length>0?<div className="space-y-2 mb-5">{smartNudges.slice(0,3).map((n,i)=>{const cols={stuck:{bg:"#fef2f2",bd:"#ef444430",co:"#dc2626"},"skill-gap":{bg:"#fff7ed",bd:"#f59e0b30",co:"#d97706"},"low-contrib":{bg:"#eff6ff",bd:"#3b82f630",co:"#2563eb"},"high-ai":{bg:"#fdf4ff",bd:"#a855f730",co:"#9333ea"},"phase-transition":{bg:"#f0fdf4",bd:"#10b98130",co:"#059669"},"missing-audit":{bg:"#fffbeb",bd:"#f59e0b30",co:"#d97706"},"stale-draft":{bg:"#f8fafc",bd:"#64748b30",co:"#475569"}};const c=cols[n.type]||cols["skill-gap"];return<div key={i} className="rounded-[14px] px-4 py-3 flex items-start gap-3 fi" style={{background:c.bg,border:`1px solid ${c.bd}`}}>
+      <CI n={n.ic} sz={18} co={c.co}/><p className="text-[13px] flex-1" style={{color:c.co}}><strong>Smart Nudge:</strong> {n.tx}</p>{n.scr&&<button onClick={()=>setScr(n.scr)} className="text-[11px] font-semibold px-3 py-1 rounded-full border flex-shrink-0 hover:opacity-80 transition-opacity" style={{color:c.co,borderColor:c.bd,background:'rgba(255,255,255,.5)'}}>Go →</button>}
     </div>})}</div>
-    :staticNudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-center gap-3">
-      <CI n={staticNudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706]"><strong>Nudge:</strong> {staticNudge.tx}</p>
+    :staticNudge&&<div className="bg-[#fffbeb] border border-[#f59e0b30] rounded-[14px] px-4 py-3 mb-5 flex items-start gap-3">
+      <CI n={staticNudge.ic} sz={18} co="#d97706"/><p className="text-[13px] text-[#d97706] flex-1"><strong>Nudge:</strong> {staticNudge.tx}</p>{staticNudge.scr&&<button onClick={()=>setScr(staticNudge.scr)} className="text-[11px] font-semibold px-3 py-1 rounded-full border flex-shrink-0 hover:opacity-80 transition-opacity" style={{color:'#d97706',borderColor:'#f59e0b30',background:'rgba(255,255,255,.5)'}}>Go →</button>}
     </div>}
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">{stats.map((s,i)=><div key={i} className={`bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm relative cursor-pointer hover:border-[#FF008340] transition-all`} ref={s.isHealth?healthBDRef:null} onClick={s.isHealth?()=>setShowHealthBD(!showHealthBD):s.scr?()=>setScr(s.scr):undefined}>
       <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}{s.isHealth&&<span className="text-[9px] font-normal ml-1 normal-case">(click)</span>}</p></div>
@@ -1835,7 +1856,7 @@ const MakerDash=({emp,setScr})=>{
 };
 
 // ───────────────── NEW: WEEKLY GOALS ─────────────────
-const WeeklyGoals=({toast,onCelebrate})=>{
+const WeeklyGoals=({toast,onCelebrate,setScr})=>{
   const[goals,setGoals]=useState(GOALS);const[prevW,setPrevW]=useState(false);
   const[dragIdx,setDragIdx]=useState(null);const[hoverIdx,setHoverIdx]=useState(null);
   const done=goals.filter(g=>g.cur>=g.tgt).length;
@@ -1853,9 +1874,13 @@ const WeeklyGoals=({toast,onCelebrate})=>{
       <div onClick={()=>toggle(g.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${dn?"bg-[#10b981] border-[#10b981] text-white":"border-[#D1D5DB]"}`}>{dn&&<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}</div>
       <span className="flex-shrink-0"><CI n={g.ic} sz={18}/></span>
       <div className="flex-1" onClick={()=>toggle(g.id)}><span className={`text-[14px] font-medium ${dn?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{g.tx}</span>
+        {g.ds&&<p className="text-[11px] text-[#9CA3AF] mt-0.5">{g.ds}</p>}
         <div className="flex items-center gap-2 mt-1"><div className="w-24 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full transition-all" style={{width:`${(g.cur/g.tgt)*100}%`,background:dn?"#10b981":"#FF0083"}}/></div><span className="text-[11px] text-[#9CA3AF]">{g.cur}/{g.tgt}</span></div>
       </div>
-      <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{g.cat}</span>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#9CA3AF] font-medium">{g.cat}</span>
+        {g.link&&setScr&&<button onClick={e=>{e.stopPropagation();setScr(g.link)}} className="text-[11px] px-2.5 py-0.5 rounded-full border border-[#FF008330] text-[#FF0083] font-medium hover:bg-[#FF008310] transition-all whitespace-nowrap">Go &rarr;</button>}
+      </div>
     </div>})}</div>
     <button onClick={()=>setPrevW(!prevW)} className="text-[14px] text-[#FF0083] font-medium hover:underline mb-4">{prevW?"Hide":"Show"} previous week</button>
     {prevW&&<div className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-[14px] p-5 fi"><h3 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Week 1 Results</h3>
@@ -1969,10 +1994,10 @@ const FAQS=[
   {q:"What happens after my 30-day onboarding?",a:"You'll set 60-day growth goals with your lead, take on larger ownership, and potentially mentor the next new joiner. The AMJ system continues tracking your growth."}
 ];
 const IMP_LINKS=[
-  {cat:"Slack Channels",logo:"https://cdn.simpleicons.org/slack/4A154B",links:[{nm:"#onboarding-2026",ds:"Your cohort's main channel",ur:"slack://channel/onboarding-2026"},{nm:"#engineering-help",ds:"Quick engineering questions",ur:"slack://channel/engineering-help"},{nm:"#design-crit",ds:"Design feedback and critique",ur:"slack://channel/design-crit"},{nm:"#product-all",ds:"Product announcements",ur:"slack://channel/product-all"},{nm:"#lemon-ask",ds:"AI-powered Q&A bot",ur:"slack://channel/lemon-ask"}]},
-  {cat:"Knowledge Bases",logo:null,links:[{nm:"Confluence Wiki",ds:"Internal documentation hub",ur:"https://lemonade.atlassian.net/wiki",logo:"https://cdn.simpleicons.org/confluence/172B4D"},{nm:"Notion Handbook",ds:"Company policies and guides",ur:"https://notion.so/lemonade-inc/handbook",logo:"https://cdn.simpleicons.org/notion/000000"},{nm:"Design System Docs",ds:"Component library reference",ur:"https://figma.com/file/lemonade-ds/design-system-v3",logo:"https://cdn.simpleicons.org/figma/F24E1E"},{nm:"API Documentation",ds:"Internal API reference",ur:"https://docs.internal.lemonade.com/api",logo:"https://cdn.simpleicons.org/swagger/85EA2D"}]},
-  {cat:"Mailing Lists",logo:null,links:[{nm:"eng-all@lemonade.com",ds:"All engineering updates",ur:"mailto:eng-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail/EA4335"},{nm:"design-all@lemonade.com",ds:"Design team updates",ur:"mailto:design-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail/EA4335"},{nm:"product-all@lemonade.com",ds:"Product announcements",ur:"mailto:product-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail/EA4335"},{nm:"new-joiners@lemonade.com",ds:"Onboarding cohort updates",ur:"mailto:new-joiners@lemonade.com",logo:"https://cdn.simpleicons.org/gmail/EA4335"}]},
-  {cat:"Key Tools",logo:null,links:[{nm:"Monday.com",ds:"Sprint boards and project management",ur:"https://lemonade-inc.monday.com",logo:"https://cdn.simpleicons.org/mondaydotcom/6C36F9"},{nm:"Mixpanel",ds:"Product analytics dashboards",ur:"https://mixpanel.com/project/lemonade",logo:"https://cdn.simpleicons.org/mixpanel/7856FF"},{nm:"Figma",ds:"Design files and prototypes",ur:"https://figma.com/files/team/lemonade-inc",logo:"https://cdn.simpleicons.org/figma/F24E1E"},{nm:"GitHub",ds:"Code repositories",ur:"https://github.com/lemonade-inc",logo:"https://cdn.simpleicons.org/github/181717"},{nm:"Jira",ds:"Ticket tracking",ur:"https://lemonade.atlassian.net",logo:"https://cdn.simpleicons.org/jira/0052CC"},{nm:"Google Calendar",ds:"Team schedules and meetings",ur:"https://calendar.google.com",logo:"https://cdn.simpleicons.org/googlecalendar/4285F4"}]}
+  {cat:"Slack Channels",logo:"https://cdn.simpleicons.org/slack",links:[{nm:"#onboarding-2026",ds:"Your cohort's main channel",ur:"slack://channel/onboarding-2026"},{nm:"#engineering-help",ds:"Quick engineering questions",ur:"slack://channel/engineering-help"},{nm:"#design-crit",ds:"Design feedback and critique",ur:"slack://channel/design-crit"},{nm:"#product-all",ds:"Product announcements",ur:"slack://channel/product-all"},{nm:"#lemon-ask",ds:"AI-powered Q&A bot",ur:"slack://channel/lemon-ask"}]},
+  {cat:"Knowledge Bases",logo:null,links:[{nm:"Confluence Wiki",ds:"Internal documentation hub",ur:"https://lemonade.atlassian.net/wiki",logo:"https://cdn.simpleicons.org/confluence"},{nm:"Notion Handbook",ds:"Company policies and guides",ur:"https://notion.so/lemonade-inc/handbook",logo:"https://cdn.simpleicons.org/notion"},{nm:"Design System Docs",ds:"Component library reference",ur:"https://figma.com/file/lemonade-ds/design-system-v3",logo:"https://cdn.simpleicons.org/figma"},{nm:"API Documentation",ds:"Internal API reference",ur:"https://docs.internal.lemonade.com/api",logo:"https://cdn.simpleicons.org/swagger"}]},
+  {cat:"Mailing Lists",logo:null,links:[{nm:"eng-all@lemonade.com",ds:"All engineering updates",ur:"mailto:eng-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail"},{nm:"design-all@lemonade.com",ds:"Design team updates",ur:"mailto:design-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail"},{nm:"product-all@lemonade.com",ds:"Product announcements",ur:"mailto:product-all@lemonade.com",logo:"https://cdn.simpleicons.org/gmail"},{nm:"new-joiners@lemonade.com",ds:"Onboarding cohort updates",ur:"mailto:new-joiners@lemonade.com",logo:"https://cdn.simpleicons.org/gmail"}]},
+  {cat:"Key Tools",logo:null,links:[{nm:"Monday.com",ds:"Sprint boards and project management",ur:"https://lemonade-inc.monday.com",logo:"https://cdn.simpleicons.org/mondaydotcom"},{nm:"Mixpanel",ds:"Product analytics dashboards",ur:"https://mixpanel.com/project/lemonade",logo:"https://cdn.simpleicons.org/mixpanel"},{nm:"Figma",ds:"Design files and prototypes",ur:"https://figma.com/files/team/lemonade-inc",logo:"https://cdn.simpleicons.org/figma"},{nm:"GitHub",ds:"Code repositories",ur:"https://github.com/lemonade-inc",logo:"https://cdn.simpleicons.org/github"},{nm:"Jira",ds:"Ticket tracking",ur:"https://lemonade.atlassian.net",logo:"https://cdn.simpleicons.org/jira"},{nm:"Google Calendar",ds:"Team schedules and meetings",ur:"https://calendar.google.com",logo:"https://cdn.simpleicons.org/googlecalendar"}]}
 ];
 const FAQLinks=()=>{
   const[openQ,setOpenQ]=useState(null);const[tab,setTab]=useState("faq");const[sq,setSq]=useState("");
@@ -2412,12 +2437,15 @@ const Welcome=({emp,setScr,onTour,tourDone,onSelEmp})=>{
 };
 
 // ───────────────── NEW: MANAGER ONBOARDING SETUP ─────────────────
-const OnboardSetup=({emps,toast,setScr})=>{
+const OnboardSetup=({emps,toast,setScr,onSel})=>{
   const[step,setStep]=useState(1);
   const[teamOk,setTeamOk]=useState(false);
   const focusCats=["Technical Skills","Product Knowledge","AI Literacy","Culture & Collaboration"];
   const[focus,setFocus]=useState(()=>{const o={};emps.forEach(e=>{o[e.id]=["Technical Skills","Culture & Collaboration"]});return o});
   const toggleFocus=(eid,cat)=>setFocus(p=>({...p,[eid]:p[eid]?.includes(cat)?p[eid].filter(c=>c!==cat):[...(p[eid]||[]),cat]}));
+  const[teamNotes,setTeamNotes]=useState({});
+  const[editingId,setEditingId]=useState(null);
+  const[noteExpandId,setNoteExpandId]=useState(null);
   const steps=[{n:1,lb:"System Overview"},{n:2,lb:"Your Team"},{n:3,lb:"Focus Areas"}];
   return<div className="fi">
     {/* Step indicator */}
@@ -2455,14 +2483,31 @@ const OnboardSetup=({emps,toast,setScr})=>{
       <div className="flex items-center justify-between mb-6"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Your Team</h1><p className="text-[14px] text-[#6B7280] mt-1">Review and confirm your direct reports ({emps.length} makers)</p></div>
         {teamOk&&<span className="text-[12px] px-4 py-2 rounded-full bg-[#f0fdf4] text-[#10b981] font-semibold border border-[#10b981]">✓ Team Confirmed</span>}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">{emps.map(e=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
-        <Av e={e} sz={48}/>
-        <div className="flex-1">
-          <h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3>
-          <p className="text-[12px] text-[#6B7280]">{e.rl} · {e.dp}</p>
-          <div className="flex items-center gap-2 mt-1.5"><span className="text-[11px] px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] font-medium">Day {e.day}/30</span><span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{background:e.hp>=75?"#f0fdf4":e.hp>=60?"#fffbeb":"#fef2f2",color:e.hp>=75?"#10b981":e.hp>=60?"#d97706":"#ef4444"}}>Health {e.hp}</span></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">{emps.map(e=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Av e={e} sz={48}/>
+          <div className="flex-1">
+            <h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3>
+            <p className="text-[12px] text-[#6B7280]">{e.rl} · {e.dp}</p>
+            <div className="flex items-center gap-2 mt-1.5"><span className="text-[11px] px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] font-medium">Day {e.day}/30</span><span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{background:e.hp>=75?"#f0fdf4":e.hp>=60?"#fffbeb":"#fef2f2",color:e.hp>=75?"#10b981":e.hp>=60?"#d97706":"#ef4444"}}>Health {e.hp}</span></div>
+          </div>
+          <RoleBadge rl={e.rl}/>
         </div>
-        <RoleBadge rl={e.rl}/>
+        {editingId===e.id&&<div className="mt-3 pt-3 border-t border-[#E5E7EB] fi">
+          <p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-2">Edit Focus Areas</p>
+          <div className="flex flex-wrap gap-1.5">{focusCats.map(cat=>{const sel=(focus[e.id]||[]).includes(cat);return<button key={cat} onClick={()=>toggleFocus(e.id,cat)} className={`text-[10px] px-2 py-1 rounded-full border font-medium transition-all ${sel?"bg-[#FF008310] border-[#FF0083] text-[#FF0083]":"border-[#E5E7EB] text-[#9CA3AF] hover:border-[#FF0083]"}`}>{cat}</button>})}</div>
+          <button onClick={()=>{setEditingId(null);toast("Focus areas updated")}} className="mt-2 text-[11px] text-[#FF0083] font-medium hover:underline">Done</button>
+        </div>}
+        {noteExpandId===e.id&&<div className="mt-3 pt-3 border-t border-[#E5E7EB] fi">
+          <p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-2">Notes</p>
+          <textarea value={teamNotes[e.id]||""} onChange={ev=>setTeamNotes(p=>({...p,[e.id]:ev.target.value}))} placeholder="Add notes about this team member..." className="w-full bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl px-3 py-2 text-[12px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] resize-none" rows={2}/>
+          <button onClick={()=>{setNoteExpandId(null);toast("Note saved")}} className="mt-1.5 text-[11px] text-[#FF0083] font-medium hover:underline">Save</button>
+        </div>}
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#E5E7EB]">
+          {onSel&&<button onClick={()=>{onSel(e.id)}} className="text-[11px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#FF0083] font-medium hover:border-[#FF0083] hover:bg-[#FF008310] transition-all">View Profile</button>}
+          <button onClick={()=>setEditingId(editingId===e.id?null:e.id)} className="text-[11px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] font-medium hover:border-[#FF0083] hover:text-[#FF0083] transition-all">{editingId===e.id?"Cancel Edit":"Edit Focus"}</button>
+          <button onClick={()=>setNoteExpandId(noteExpandId===e.id?null:e.id)} className="text-[11px] px-3 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] font-medium hover:border-[#FF0083] hover:text-[#FF0083] transition-all">{noteExpandId===e.id?"Hide Notes":"Add Note"}</button>
+        </div>
       </div>)}</div>
       <p className="text-[12px] text-[#9CA3AF] mb-4 italic">Need to change team members? Contact HR through People & Culture.</p>
       <div className="flex items-center gap-3">{!teamOk?<button onClick={()=>{setTeamOk(true);toast("Team confirmed");setTimeout(()=>setStep(3),600)}} className="bg-[#FF0083] text-white rounded-xl px-6 py-3 text-[14px] font-semibold btn-p">Confirm Team & Continue →</button>:
@@ -2953,7 +2998,7 @@ const App=()=>{
       if(scr==="welcome")return<Welcome emp={maker} setScr={setScr} onTour={()=>setTourStep(0)} tourDone={tourDone} onSelEmp={id=>{setRole("lead");setSelId(id);setScr("employee")}}/>;
       if(scr==="journey")return<Journey emp={maker}/>;
       if(scr==="checklist")return<Checklist emp={maker} onCelebrate={fireConfetti}/>;
-      if(scr==="goals")return<WeeklyGoals toast={showToast} onCelebrate={fireConfetti}/>;
+      if(scr==="goals")return<WeeklyGoals toast={showToast} onCelebrate={fireConfetti} setScr={setScr}/>;
       if(scr==="skills")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Skills</h1><p className="text-[14px] text-[#6B7280] mt-1">Track your skill development</p></div><Skills emp={maker} ro/></div>;
       if(scr==="contributions")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Contributions</h1><p className="text-[14px] text-[#6B7280] mt-1">All submissions and review status</p></div><Contribs emp={maker}/></div>;
       if(scr==="ai-log")return<AILogForm emp={maker}/>;
@@ -2974,7 +3019,7 @@ const App=()=>{
       if(scr==="pulse")return<TeamPulse emps={leadE} toast={showToast} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="one-on-one")return<OneOnOne emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="alerts")return<AlertCenter emps={leadE} toast={showToast} onSel={id=>{setSelId(id);setScr("employee")}}/>;
-      if(scr==="onboard-setup")return<OnboardSetup emps={leadE} toast={showToast} setScr={setScr}/>;
+      if(scr==="onboard-setup")return<OnboardSetup emps={leadE} toast={showToast} setScr={setScr} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="analytics")return<TeamAnalytics emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       if(scr==="review")return<ReviewAssist emps={leadE}/>;
       if(scr==="reflections")return<Reflections emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
@@ -3055,7 +3100,7 @@ const App=()=>{
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode?"#94A3B8":"#6B7280"} strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
             {unread>0&&<div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ef4444] text-white text-[9px] font-bold flex items-center justify-center">{unread}</div>}
           </button>
-          {notifOpen&&<div style={{position:'fixed',inset:0,zIndex:50}} onClick={()=>setNotifOpen(false)}/>}
+          {notifOpen&&<div style={{position:'fixed',inset:0,zIndex:50}} onClick={()=>{setNotifs(p=>p.map(n=>({...n,read:true})));setNotifOpen(false)}}/>}
           {notifOpen&&<div onClick={e=>e.stopPropagation()} style={{position:'fixed',top:56,right:8,width:'min(320px, calc(100vw - 16px))',zIndex:51,background:darkMode?'#1e293b':'#fff',border:darkMode?'1px solid #475569':'1px solid #E5E7EB',borderRadius:14,boxShadow:darkMode?'0 10px 40px rgba(0,0,0,.5)':'0 10px 40px rgba(0,0,0,.12)',overflow:'hidden'}}>
             <div style={{padding:'12px 16px',borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
               <span style={{fontSize:13,fontWeight:600,color:darkMode?'#F1F5F9':'#1A1A2E'}}>Notifications</span>
@@ -3065,16 +3110,19 @@ const App=()=>{
               <span style={{marginTop:2,flexShrink:0}}><CI n={n.ic} sz={16}/></span>
               <div style={{flex:1,minWidth:0}}><p style={{fontSize:13,color:n.read?(darkMode?'#94A3B8':'#6B7280'):(darkMode?'#F1F5F9':'#1A1A2E'),fontWeight:n.read?400:500,margin:0}}>{n.tx}</p><p style={{fontSize:11,color:darkMode?'#64748B':'#9CA3AF',marginTop:3,margin:0}}>{n.ts}</p></div>
               {!n.read&&<div style={{width:8,height:8,borderRadius:'50%',background:'#FF0083',marginTop:6,flexShrink:0}}/>}
+              <span style={{fontSize:10,color:'#FF0083',fontWeight:600,flexShrink:0,marginTop:3}}>View →</span>
             </div>)}</div>
             <div style={{padding:'10px 16px',borderTop:darkMode?'1px solid #475569':'1px solid #E5E7EB',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <button onClick={()=>{setNotifs([]);setNotifOpen(false)}} style={{fontSize:11,color:darkMode?'#94A3B8':'#9CA3AF',fontWeight:500,background:'none',border:'none',cursor:'pointer'}}>Clear all</button>
-              <button onClick={()=>setNotifOpen(false)} style={{fontSize:11,color:'#FF0083',fontWeight:500,background:'none',border:'none',cursor:'pointer'}}>Close</button>
+              <button onClick={()=>{setNotifs(p=>p.map(n=>({...n,read:true})));setNotifOpen(false)}} style={{fontSize:11,color:'#FF0083',fontWeight:500,background:'none',border:'none',cursor:'pointer'}}>Close</button>
             </div>
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
-        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[200px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
-          <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
+        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[250px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
+          <optgroup label="Engineers">{es.filter(e=>e.rl==="Engineer").map(e=><option key={e.id} value={`maker:${e.id}`}>{e.nm} · Day {e.day}</option>)}</optgroup>
+          <optgroup label="Designers">{es.filter(e=>e.rl==="Designer").map(e=><option key={e.id} value={`maker:${e.id}`}>{e.nm} · Day {e.day}</option>)}</optgroup>
+          <optgroup label="PMs">{es.filter(e=>e.rl==="PM").map(e=><option key={e.id} value={`maker:${e.id}`}>{e.nm} · Day {e.day}</option>)}</optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
           <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
         </select>
@@ -3087,7 +3135,9 @@ const App=()=>{
       <div className={`tour-sidebar w-[220px] bg-[#F7F7F7] flex-shrink-0 flex flex-col overflow-y-auto border-r border-[#E5E7EB] fixed lg:static inset-y-0 left-0 z-[46] sidebar-drawer ${sidebarOpen?"translate-x-0":"-translate-x-full lg:translate-x-0"}`} style={{top:"56px"}}>
         <div className="px-5 pt-6 mb-3"><p className="text-[9px] font-semibold uppercase tracking-[.2em] text-[#D1D5DB]">{role==="maker"?"Maker View":role==="lead"?"Lead View":"Strategy View"}</p></div>
         {role==="maker"&&<div className="px-3 mb-3"><select value={makerSel} onChange={e=>{setMakerSel(e.target.value);setScr("home")}} className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm">
-          {es.map(e=><option key={e.id} value={e.id}>{e.nm} — {e.rl} · Day {e.day}</option>)}
+          <optgroup label="Engineers">{es.filter(e=>e.rl==="Engineer").map(e=><option key={e.id} value={e.id}>{e.nm} · Day {e.day}</option>)}</optgroup>
+          <optgroup label="Designers">{es.filter(e=>e.rl==="Designer").map(e=><option key={e.id} value={e.id}>{e.nm} · Day {e.day}</option>)}</optgroup>
+          <optgroup label="PMs">{es.filter(e=>e.rl==="PM").map(e=><option key={e.id} value={e.id}>{e.nm} · Day {e.day}</option>)}</optgroup>
         </select></div>}
         {role==="lead"&&<div className="px-3 mb-3"><select value={leadSel} onChange={e=>setLeadSel(e.target.value)} className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-[13px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm">
           {Object.keys(LEADS).map(k=><option key={k} value={k}>{LEADS[k].nm} — {LEADS[k].rl}</option>)}
@@ -3106,11 +3156,11 @@ const App=()=>{
         </div>
       </div>
       {/* MAIN */}
-      <div id="main-content" role="main" aria-label="Page content" className="flex-1 overflow-y-auto p-4 lg:p-7 bg-[#FAFAFA] relative" onClick={()=>{setNotifOpen(false);setSearchOpen(false)}}>
+      <div id="main-content" role="main" aria-label="Page content" className="flex-1 overflow-y-auto p-4 lg:p-7 bg-[#FAFAFA] relative" onClick={()=>{if(notifOpen){setNotifs(p=>p.map(n=>({...n,read:true})))};setNotifOpen(false);setSearchOpen(false)}}>
         <div key={scr+role} className="page-enter">
           {loading?<PageSkeleton/>:screen()}
         </div>
-        {!compOpen&&<button onClick={()=>setCompOpen(true)} aria-label="Open AI Assistant Lemi" className="tour-lemi fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all z-40 pulse-p" title="Ask Lemi">
+        {!compOpen&&<button onClick={()=>setCompOpen(true)} aria-label="Open AI Assistant Lemi" className="tour-lemi fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all z-30 pulse-p" title="Ask Lemi">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 2 5 5 5 9c0 2.5 1 4 3 6l-1 5 4-2 4 2-1-5c2-2 3-3.5 3-6 0-4-3-7-5-7z" fill="white" opacity=".9"/><circle cx="10" cy="9" r="1.2" fill="#FF0083"/><circle cx="14" cy="9" r="1.2" fill="#FF0083"/><path d="M9.5 12.5c0 0 1.5 1.5 5 0" stroke="#FF0083" strokeWidth="1.2" strokeLinecap="round"/></svg>
         </button>}
       </div>
