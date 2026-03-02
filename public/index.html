@@ -123,6 +123,25 @@
       /* Reduce large gaps on mobile */
       .gap-8{gap:16px!important}
       .gap-7{gap:14px!important}
+      .gap-6{gap:12px!important}
+      .gap-5{gap:10px!important}
+      /* Scale down large text */
+      .text-3xl{font-size:22px!important}
+      .text-2xl{font-size:18px!important}
+      .text-\[28px\]{font-size:22px!important}
+      .text-\[24px\]{font-size:20px!important}
+      .text-\[32px\]{font-size:24px!important}
+      /* Card padding reduction */
+      .p-6{padding:14px!important}
+      .p-5{padding:12px!important}
+      .p-10{padding:20px!important}
+      /* Margin reduction */
+      .mb-10{margin-bottom:24px!important}
+      .mb-8{margin-bottom:20px!important}
+      /* Companion panel full-width on mobile */
+      .tour-lemi{bottom:16px!important;right:16px!important;width:48px!important;height:48px!important}
+      /* Recharts: reduce chart height slightly */
+      .recharts-wrapper{max-height:200px!important}
     }
     @media(max-width:479px){
       /* Extra-small screen overrides */
@@ -131,6 +150,19 @@
       .p-6{padding:12px!important}
       .p-5{padding:10px!important}
       .px-5{padding-left:10px!important;padding-right:10px!important}
+      .px-8{padding-left:12px!important;padding-right:12px!important}
+      .py-6{padding-top:12px!important;padding-bottom:12px!important}
+      .p-10{padding:16px!important}
+      /* Further font reduction */
+      .text-\[28px\]{font-size:18px!important}
+      .text-\[24px\]{font-size:18px!important}
+      .text-\[22px\]{font-size:18px!important}
+      .text-3xl{font-size:20px!important}
+      .text-2xl{font-size:16px!important}
+      /* Reduce stat card number size */
+      .text-\[20px\]{font-size:16px!important}
+      /* Tables padding */
+      td,th{padding:8px 6px!important}
     }
   </style>
 </head>
@@ -772,7 +804,7 @@ const Journey=({emp})=>{
     </div>
     <div className="relative mb-10 overflow-x-auto pb-2">
       <div className="absolute top-[30px] left-[60px] right-[60px] h-[2px] hidden sm:block" style={{background:"linear-gradient(90deg,#FF0083,#E5E7EB)"}}/>
-      <div className="flex justify-between relative z-10 px-2 min-w-[500px] sm:min-w-0">
+      <div className="flex justify-between relative z-10 px-1 sm:px-2 min-w-[420px] sm:min-w-0">
         {PHASES.map((p,i)=>{const n=i+1,dn=n<cur,nw=n===cur,ft=n>cur;return(
           <button key={p.id} onClick={()=>setSel(p)} className="flex flex-col items-center gap-2 sm:gap-3 group cursor-pointer" style={{width:"23%"}}>
             <div className={`w-[48px] h-[48px] sm:w-[60px] sm:h-[60px] rounded-full flex items-center justify-center text-sm sm:text-base font-bold border-2 transition-all duration-300 group-hover:scale-110
@@ -848,8 +880,8 @@ const Contribs=({emp,showRev=false})=>{
   const[exp,setExp]=useState(null);
   return<div className="fi space-y-3">
     {emp.co.map(c=><div key={c.id} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm card-h overflow-hidden">
-      <button onClick={()=>setExp(exp===c.id?null:c.id)} className="w-full p-4 flex items-center justify-between text-left group">
-        <div className="flex items-center gap-3 flex-1 min-w-0"><TyB t={c.ty}/><span className="text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</span></div>
+      <button onClick={()=>setExp(exp===c.id?null:c.id)} className="w-full p-3 sm:p-4 flex items-center justify-between text-left group">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0"><TyB t={c.ty}/><span className="text-[13px] sm:text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</span></div>
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           <div className="hidden sm:flex items-center gap-2"><div className="w-14 h-1 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${c.ai}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div><span className="text-[11px] text-[#9CA3AF] w-7 text-right">{c.ai}%</span></div>
           <span className="text-[11px] text-[#9CA3AF] hidden sm:inline">{c.da}d</span>
@@ -1259,7 +1291,7 @@ const ContentIntel=()=>{
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Content Intelligence</h1><p className="text-[14px] text-[#6B7280] mt-1">What onboarding content resonates</p></div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 mb-5 shadow-sm">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Top Companion Queries <span className="text-[9px] font-normal normal-case">(click bar for details)</span></h3>
-      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:0}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:10}} width={100}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillQuery(data[idx])}/></BarChart></ResponsiveContainer>
+      <ResponsiveContainer width="100%" height={240}><BarChart data={data} layout="vertical" margin={{left:0}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis type="number" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis dataKey="topic" type="category" tick={{fill:"#6B7280",fontSize:9}} width={80}/><Tooltip contentStyle={ttS}/><Bar dataKey="queries" fill="#FF0083" radius={[0,6,6,0]} opacity={.9} cursor="pointer" onClick={(_,idx)=>setDrillQuery(data[idx])}/></BarChart></ResponsiveContainer>
       {drillQuery&&<div className="mt-3 p-4 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl fi"><div className="flex items-center justify-between mb-2"><h4 className="text-[13px] font-semibold text-[#1A1A2E]">{drillQuery.topic}</h4><button onClick={()=>setDrillQuery(null)} className="text-[#9CA3AF] hover:text-[#1A1A2E] text-xs">✕</button></div><div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3"><div className="p-2 rounded-lg bg-white border border-[#E5E7EB] text-center"><p className="text-[20px] font-bold text-[#FF0083]">{drillQuery.queries}</p><p className="text-[10px] text-[#9CA3AF]">Total Queries</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.roles}</p><p className="text-[10px] text-[#9CA3AF]">Role Split</p></div><div className="p-2 rounded-lg bg-white border border-[#E5E7EB]"><p className="text-[12px] font-medium text-[#1A1A2E]">{drillQuery.trend}</p><p className="text-[10px] text-[#9CA3AF]">Trend</p></div></div></div>}
       <div className="mt-4 space-y-1">{data.map((t,i)=><div key={i} className="flex items-center gap-3 text-[11px]"><span className="text-[#6B7280] font-medium w-36">{t.topic}</span><span className="text-[#D1D5DB]">— {t.ins}</span></div>)}</div>
     </div>
@@ -1324,10 +1356,10 @@ const AILogForm=({emp})=>{
       <div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm text-center"><p className="text-[24px] font-bold" style={{color:co}}>{v}</p><p className="text-[11px] text-[#9CA3AF] uppercase font-semibold">{lb}</p></div>
     )}</div>
     <div className="space-y-3">{sorted.map(c=><div key={c.id} className={`bg-white border rounded-[14px] shadow-sm overflow-hidden transition-all ${selC===c.id?"border-[#FF0083]":"border-[#E5E7EB]"}`}>
-      <button onClick={()=>setSelC(selC===c.id?null:c.id)} className="w-full p-4 flex items-center gap-3 text-left">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-[11px] font-bold" style={{background:`linear-gradient(135deg,#FF0083 ${c.ai}%,#10b981 ${c.ai}%)`}}>{c.ai}%</div>
-        <div className="flex-1 min-w-0"><p className="text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</p><p className="text-[11px] text-[#9CA3AF]">{c.ty} · {c.da}d ago · {c.st}</p></div>
-        <div className="flex items-center gap-3"><div className="w-20 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${c.ai}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
+      <button onClick={()=>setSelC(selC===c.id?null:c.id)} className="w-full p-3 sm:p-4 flex items-center gap-2 sm:gap-3 text-left">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white text-[10px] sm:text-[11px] font-bold flex-shrink-0" style={{background:`linear-gradient(135deg,#FF0083 ${c.ai}%,#10b981 ${c.ai}%)`}}>{c.ai}%</div>
+        <div className="flex-1 min-w-0"><p className="text-[13px] sm:text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</p><p className="text-[10px] sm:text-[11px] text-[#9CA3AF]">{c.ty} · {c.da}d ago · {c.st}</p></div>
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0"><div className="w-12 sm:w-20 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${c.ai}%`,background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/></div>
           <svg className={`w-4 h-4 text-[#9CA3AF] transition-transform ${selC===c.id?"rotate-180":""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
         </div>
       </button>
@@ -1465,15 +1497,16 @@ const Reflections=({emps})=>{
   ];
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Reflections</h1><p className="text-[14px] text-[#6B7280] mt-1">Weekly reflections and audit submissions from your reports</p></div>
-    <div className="space-y-4">{refs.map((r,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm fi">
-      <div className="flex items-start gap-4">
-        <Av e={r.emp} sz={44}/>
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2"><span className="text-[14px] font-semibold text-[#1A1A2E]">{r.emp.nm}</span><span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] font-medium">{r.type}</span></div>
-            <span className="text-[12px] text-[#9CA3AF]">{r.date}</span>
+    <div className="space-y-4">{refs.map((r,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm fi">
+      <div className="flex items-start gap-3">
+        <Av e={r.emp} sz={40}/>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+            <span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">{r.emp.nm}</span>
+            <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] font-medium">{r.type}</span>
+            <span className="text-[11px] sm:text-[12px] text-[#9CA3AF] ml-auto">{r.date}</span>
           </div>
-          <p className="text-[14px] text-[#6B7280] leading-relaxed">{r.text}</p>
+          <p className="text-[13px] sm:text-[14px] text-[#6B7280] leading-relaxed">{r.text}</p>
         </div>
       </div>
     </div>)}</div>
@@ -1561,7 +1594,7 @@ const MakerDash=({emp,setScr})=>{
       <div className="flex items-center gap-2 mb-2"><CI n={s.ic} sz={18} co={s.co}/><p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold">{s.lb}{s.isHealth&&<span className="text-[9px] font-normal ml-1 normal-case">(click)</span>}</p></div>
       <p className="text-[28px] font-bold tracking-tight" style={{color:s.co}}>{s.v}</p>
       <p className="text-[12px] text-[#6B7280] mt-1">{s.sub}</p>
-      {s.isHealth&&showHealthBD&&<div className="absolute z-50 left-0 top-full mt-2 bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-lg w-64 fi"><div className="flex items-center justify-between mb-3"><h4 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Breakdown</h4></div><div className="space-y-2.5">{computeHealthBreakdown(emp).map((f,j)=><div key={j}><div className="flex items-center justify-between mb-1"><span className="text-[12px] text-[#6B7280]">{f.lb}</span><span className="text-[12px] font-bold" style={{color:f.co}}>{f.v}%</span></div><div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${f.v}%`,background:f.co}}/></div></div>)}</div></div>}
+      {s.isHealth&&showHealthBD&&<div className="absolute z-50 left-0 sm:left-0 top-full mt-2 bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-lg w-[calc(100vw-80px)] sm:w-64 fi" style={{maxWidth:256}}><div className="flex items-center justify-between mb-3"><h4 className="text-[11px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Breakdown</h4></div><div className="space-y-2.5">{computeHealthBreakdown(emp).map((f,j)=><div key={j}><div className="flex items-center justify-between mb-1"><span className="text-[12px] text-[#6B7280]">{f.lb}</span><span className="text-[12px] font-bold" style={{color:f.co}}>{f.v}%</span></div><div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${f.v}%`,background:f.co}}/></div></div>)}</div></div>}
     </div>)}</div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
       <div>
@@ -1666,11 +1699,13 @@ const Calendar=({toast})=>{
     </div>}
     <div className="space-y-6">{groups.map((g,gi)=>g.items.length>0&&<div key={gi}>
       <h3 className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#9CA3AF] mb-3">{g.lb}</h3>
-      <div className="space-y-3">{g.items.map((s,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-4 card-h">
-        <div className="w-1.5 h-12 rounded-full flex-shrink-0" style={{background:s.co}}/>
-        <div className="flex-1"><p className="text-[14px] font-semibold text-[#1A1A2E]">{s.nm}</p><p className="text-[12px] text-[#6B7280]">{s.wi}</p></div>
-        <div className="text-right"><p className="text-[14px] font-medium text-[#1A1A2E]">{s.dt.split(" ")[1]||""}</p><span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{background:s.co+"18",color:s.co}}>{s.ty}</span></div>
-        <button className="text-[10px] text-[#6B7280] border border-[#E5E7EB] rounded-lg px-2 py-1 hover:border-[#FF0083] hover:text-[#FF0083] transition-all">Open in GCal ↗</button>
+      <div className="space-y-3">{g.items.map((s,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-3 sm:p-4 shadow-sm card-h">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-10 sm:h-12 rounded-full flex-shrink-0" style={{background:s.co}}/>
+          <div className="flex-1 min-w-0"><p className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E] truncate">{s.nm}</p><p className="text-[11px] sm:text-[12px] text-[#6B7280] truncate">{s.wi}</p></div>
+          <div className="text-right flex-shrink-0"><p className="text-[13px] sm:text-[14px] font-medium text-[#1A1A2E]">{s.dt.split(" ")[1]||""}</p><span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium" style={{background:s.co+"18",color:s.co}}>{s.ty}</span></div>
+        </div>
+        <div className="flex justify-end mt-2"><button className="text-[10px] text-[#6B7280] border border-[#E5E7EB] rounded-lg px-2 py-1 hover:border-[#FF0083] hover:text-[#FF0083] transition-all">Open in GCal ↗</button></div>
       </div>)}</div>
     </div>)}</div>
   </div>
@@ -1794,7 +1829,7 @@ const OneOnOne=({emps})=>{
     {emp&&<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div>
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-4">
-          <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{emp.nm}</h3><p className="text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="ml-auto"><HealthBreakdown emp={emp} sz={48}/></div></div>
+          <div className="flex items-center gap-3 mb-4"><Av e={emp} sz={44}/><div className="flex-1 min-w-0"><h3 className="text-[14px] font-semibold text-[#1A1A2E] truncate">{emp.nm}</h3><p className="text-[11px] sm:text-[12px] text-[#6B7280]">{emp.rl} · {emp.dp} · Day {emp.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={emp} sz={48}/></div></div>
           <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3 text-center">{[["Contributions",emp.co.length],["Verified",emp.sk.filter(s=>s.sr==="manager-verified").length],["Avg AI %",Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/(emp.co.length||1))+"%"]].map(([lb,v],i)=>
             <div key={i} className="bg-[#F7F7F7] rounded-xl p-2 sm:p-3 border border-[#E5E7EB]"><p className="text-[14px] sm:text-[16px] font-bold text-[#1A1A2E]">{v}</p><p className="text-[9px] sm:text-[10px] text-[#9CA3AF] uppercase font-medium">{lb}</p></div>
           )}</div>
@@ -1840,21 +1875,21 @@ const AlertCenter=({emps,toast})=>{
   const sevC={critical:{bg:"#fef2f2",bd:"#ef4444",tx:"#dc2626"},warning:{bg:"#fffbeb",bd:"#f59e0b",tx:"#d97706"},info:{bg:"#eff6ff",bd:"#3b82f6",tx:"#2563eb"}};
   return<div className="fi">
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Alert Center</h1><p className="text-[14px] text-[#6B7280] mt-1">At-risk indicators and recommended actions</p></div>
-    <div className="flex gap-3 mb-6">
-      {[["critical","Critical",ct.critical],["warning","Warning",ct.warning],["info","Info",ct.info]].map(([k,lb,n])=><div key={k} className="bg-white border border-[#E5E7EB] rounded-[14px] px-5 py-3 shadow-sm flex items-center gap-2">
-        <span className="w-3 h-3 rounded-full" style={{background:sevC[k].bd}}/><span className="text-[14px] font-bold" style={{color:sevC[k].tx}}>{n}</span><span className="text-[12px] text-[#9CA3AF]">{lb}</span>
+    <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
+      {[["critical","Critical",ct.critical],["warning","Warning",ct.warning],["info","Info",ct.info]].map(([k,lb,n])=><div key={k} className="bg-white border border-[#E5E7EB] rounded-[14px] px-3 sm:px-5 py-2 sm:py-3 shadow-sm flex items-center gap-2">
+        <span className="w-3 h-3 rounded-full" style={{background:sevC[k].bd}}/><span className="text-[13px] sm:text-[14px] font-bold" style={{color:sevC[k].tx}}>{n}</span><span className="text-[11px] sm:text-[12px] text-[#9CA3AF]">{lb}</span>
       </div>)}
     </div>
-    <div className="space-y-3">{active.map(a=>{const c=sevC[a.sev];return<div key={a.id} className="rounded-[14px] p-4 border-l-[3px] shadow-sm fi" style={{background:c.bg,borderLeftColor:c.bd}}>
+    <div className="space-y-3">{active.map(a=>{const c=sevC[a.sev];return<div key={a.id} className="rounded-[14px] p-3 sm:p-4 border-l-[3px] shadow-sm fi" style={{background:c.bg,borderLeftColor:c.bd}}>
       <div className="flex items-start gap-3">
         <Av e={a.emp} sz={36}/>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1"><span className="text-[14px] font-semibold text-[#1A1A2E]">{a.emp.nm}</span><span className="text-[11px] px-2 py-0.5 rounded-full font-medium capitalize" style={{background:c.bd+"20",color:c.tx}}>{a.sev}</span></div>
-          <p className="text-[14px] text-[#6B7280]">{a.tx}</p>
-          <p className="text-[12px] text-[#9CA3AF] mt-1">Recommended: {a.rec}</p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap"><span className="text-[13px] sm:text-[14px] font-semibold text-[#1A1A2E]">{a.emp.nm}</span><span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium capitalize" style={{background:c.bd+"20",color:c.tx}}>{a.sev}</span></div>
+          <p className="text-[13px] sm:text-[14px] text-[#6B7280]">{a.tx}</p>
+          <p className="text-[11px] sm:text-[12px] text-[#9CA3AF] mt-1">Recommended: {a.rec}</p>
         </div>
-        <button onClick={()=>{setAcked(p=>({...p,[a.id]:true}));toast("Alert acknowledged")}} className="text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium flex-shrink-0">Acknowledge</button>
       </div>
+      <div className="flex justify-end mt-2"><button onClick={()=>{setAcked(p=>({...p,[a.id]:true}));toast("Alert acknowledged")}} className="text-[11px] sm:text-[12px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium">Acknowledge</button></div>
     </div>})}</div>
     {active.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><EmptyIllustration type="alerts"/><div className="mb-2 flex justify-center mt-3"><CI n="party" sz={28} co="#FF0083"/></div><p className="text-[14px] text-[#6B7280]">All clear! No active alerts.</p></div>}
   </div>
@@ -1877,9 +1912,9 @@ const CompareView=({emp1,emp2,onClear})=>{
   const co1=(v1,v2,better)=>{if(v1===v2)return"#6B7280";return(better==="high"?v1>v2:v1<v2)?"#10b981":"#ef4444"};
   const barData=rows.slice(0,5).map(r=>({name:r.lb,[emp1.nm.split(" ")[0]]:r.v1,[emp2.nm.split(" ")[0]]:r.v2}));
   return<div className="fi">
-    <div className="mb-6 flex items-center justify-between">
-      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
-      <button onClick={onClear} className="text-[12px] px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all">Clear Comparison</button>
+    <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Employee Comparison</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">{emp1.nm} vs {emp2.nm}</p></div>
+      <button onClick={onClear} className="text-[12px] px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[#6B7280] hover:border-[#ef4444] hover:text-[#ef4444] transition-all w-fit">Clear Comparison</button>
     </div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       {[emp1,emp2].map((e,i)=><div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1889,8 +1924,8 @@ const CompareView=({emp1,emp2,onClear})=>{
     </div>
     <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
       <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Side-by-Side Metrics</h3>
-      <div className="space-y-3">{rows.map((r,i)=><div key={i} className="flex items-center gap-3">
-        <span className="w-20 sm:w-32 text-[11px] sm:text-[12px] text-[#9CA3AF] text-right flex-shrink-0">{r.lb}</span>
+      <div className="space-y-3">{rows.map((r,i)=><div key={i} className="flex items-center gap-2 sm:gap-3">
+        <span className="w-16 sm:w-32 text-[10px] sm:text-[12px] text-[#9CA3AF] text-right flex-shrink-0">{r.lb}</span>
         <div className="flex-1 flex items-center gap-2">
           <span className="text-[14px] font-bold w-12 text-right" style={{color:co1(r.v1,r.v2,r.better)}}>{r.v1}{r.lb==="Avg AI %"?"%":""}</span>
           <div className="flex-1 h-2 bg-[#F3F4F6] rounded-full overflow-hidden relative">
@@ -1959,8 +1994,8 @@ const TeamAnalytics=({emps,onSel})=>{
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Analytics</h1><p className="text-[14px] text-[#6B7280] mt-1">Performance insights for your {emps.length} reports</p></div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-3"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trend (per employee)</h3>
-          <div className="flex flex-wrap gap-1">{emps.map((e,i)=><button key={e.id} onClick={()=>setShowLines(p=>({...p,[e.id]:!p[e.id]}))} className="text-[10px] px-2 py-0.5 rounded-full border transition-all" style={showLines[e.id]?{borderColor:empColors[i%empColors.length],color:empColors[i%empColors.length],background:empColors[i%empColors.length]+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{e.nm.split(" ")[0]}</button>)}</div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF]">Health Trend (per employee)</h3>
+          <div className="flex flex-wrap gap-1">{emps.map((e,i)=><button key={e.id} onClick={()=>setShowLines(p=>({...p,[e.id]:!p[e.id]}))} className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full border transition-all" style={showLines[e.id]?{borderColor:empColors[i%empColors.length],color:empColors[i%empColors.length],background:empColors[i%empColors.length]+"10"}:{borderColor:"#E5E7EB",color:"#9CA3AF"}}>{e.nm.split(" ")[0]}</button>)}</div>
         </div>
         <ResponsiveContainer width="100%" height={200}><LineChart data={empHealth} onClick={(e)=>{if(e&&e.activeLabel)setDrillHealth(empHealth.find(d=>d.wk===e.activeLabel))}}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={.8}/><XAxis dataKey="wk" tick={{fill:"#9CA3AF",fontSize:10}}/><YAxis tick={{fill:"#9CA3AF",fontSize:10}} domain={[0,100]}/><Tooltip contentStyle={ttS}/>
           {emps.map((e,i)=>showLines[e.id]&&<Line key={e.id} type="monotone" dataKey={e.nm.split(" ")[0]} stroke={empColors[i%empColors.length]} strokeWidth={2} dot={{r:3}} cursor="pointer"/>)}
@@ -2016,10 +2051,10 @@ const BenchmarkView=()=>{
       const barW=Math.min(100,b.better==="lower"?(1-b.us/b.ind)*100+50:b.us/b.ind*50);
       return<div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <p className="text-[10px] text-[#9CA3AF] uppercase tracking-[.1em] font-semibold mb-4">{b.lb}</p>
-        <div className="flex items-end gap-4 mb-4">
-          <div><p className="text-[24px] sm:text-[32px] font-bold text-[#FF0083]"><BenchCounter target={b.us} loaded={loaded} suffix={b.un}/></p><p className="text-[12px] text-[#6B7280]">Lemonade</p></div>
-          <div><p className="text-[20px] font-bold text-[#9CA3AF]">{b.ind}{b.un&&<span className="text-[12px]">{b.un}</span>}</p><p className="text-[12px] text-[#9CA3AF]">Industry</p></div>
-          <span className="text-[14px] font-bold text-[#10b981] ml-auto">+{delta}% better</span>
+        <div className="flex flex-wrap items-end gap-3 sm:gap-4 mb-4">
+          <div><p className="text-[22px] sm:text-[32px] font-bold text-[#FF0083]"><BenchCounter target={b.us} loaded={loaded} suffix={b.un}/></p><p className="text-[11px] sm:text-[12px] text-[#6B7280]">Lemonade</p></div>
+          <div><p className="text-[18px] sm:text-[20px] font-bold text-[#9CA3AF]">{b.ind}{b.un&&<span className="text-[11px] sm:text-[12px]">{b.un}</span>}</p><p className="text-[11px] sm:text-[12px] text-[#9CA3AF]">Industry</p></div>
+          <span className="text-[12px] sm:text-[14px] font-bold text-[#10b981] sm:ml-auto">+{delta}% better</span>
         </div>
         <div className="flex gap-1 h-3 rounded-full overflow-hidden bg-[#F3F4F6]">
           <div className="h-full rounded-full bench-bar" style={{width:loaded?`${barW}%`:"0%",background:"linear-gradient(90deg,#FF0083,#ff4da6)"}}/>
@@ -2119,8 +2154,10 @@ const Welcome=({emp,setScr,onTour,tourDone})=>{
         </div>)}</div>
       </div>}
       <div className="text-center pb-6">
-        <button onClick={()=>setScr("home")} className="bg-[#FF0083] text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 text-[15px] sm:text-[16px] font-bold btn-p inline-flex items-center gap-2">Start Your Journey <span>→</span></button>
-        {onTour&&<button onClick={onTour} className="ml-3 border-2 border-[#FF0083] text-[#FF0083] rounded-full px-6 sm:px-8 py-3 sm:py-4 text-[15px] sm:text-[16px] font-bold hover:bg-[#FF008310] transition-colors inline-flex items-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 3c0 1.5-2 2-2 3"/><circle cx="12" cy="18" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="1"/></svg>{tourDone?"Retake Tour":"Take a Tour"}</button>}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button onClick={()=>setScr("home")} className="bg-[#FF0083] text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 text-[14px] sm:text-[16px] font-bold btn-p inline-flex items-center gap-2 w-full sm:w-auto justify-center">Start Your Journey <span>→</span></button>
+          {onTour&&<button onClick={onTour} className="border-2 border-[#FF0083] text-[#FF0083] rounded-full px-6 sm:px-8 py-3 sm:py-4 text-[14px] sm:text-[16px] font-bold hover:bg-[#FF008310] transition-colors inline-flex items-center gap-2 w-full sm:w-auto justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 3c0 1.5-2 2-2 3"/><circle cx="12" cy="18" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="1"/></svg>{tourDone?"Retake Tour":"Take a Tour"}</button>}
+        </div>
         <p className="text-[12px] text-[#9CA3AF] mt-3">You can always come back to this page from the sidebar</p>
       </div>
     </div>
@@ -2211,8 +2248,8 @@ const EmpProgress=({emps})=>{
       <select value={sid} onChange={e=>{setSid(e.target.value);setDrillEmpH(null);setDrillEmpC(null)}} className="bg-white border border-[#E5E7EB] rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-[13px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] shadow-sm w-full sm:w-auto"><option value="all">All Employees</option>{emps.map(e=><option key={e.id} value={e.id}>{e.nm}</option>)}</select>
     </div>
     {sel?<div className="fi">
-      <div className="flex items-center gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
-        <Av e={sel} sz={52}/><div className="flex-1"><h2 className="text-[18px] font-bold text-[#1A1A2E]">{sel.nm}</h2><p className="text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><HealthBreakdown emp={sel} sz={56}/>
+      <div className="flex items-center gap-3 sm:gap-4 mb-6 bg-white border border-[#E5E7EB] rounded-[14px] p-4 sm:p-5 shadow-sm">
+        <Av e={sel} sz={44}/><div className="flex-1 min-w-0"><h2 className="text-[16px] sm:text-[18px] font-bold text-[#1A1A2E] truncate">{sel.nm}</h2><p className="text-[12px] sm:text-[13px] text-[#6B7280]">{sel.rl} · {sel.dp} · Day {sel.day}</p></div><div className="flex-shrink-0"><HealthBreakdown emp={sel} sz={48}/></div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm"><h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Health Trend <span className="text-[9px] font-normal normal-case">(click point)</span></h3>
@@ -2226,8 +2263,8 @@ const EmpProgress=({emps})=>{
       </div>
       <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
         <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Skill Progress</h3>
-        <div className="space-y-2">{sel.sk.map((s,i)=>{const lv={learning:25,practicing:55,proficient:85,expert:100};return<div key={i} className="flex items-center gap-3">
-          <span className="text-[13px] text-[#6B7280] w-40 truncate">{s.nm}</span>
+        <div className="space-y-2">{sel.sk.map((s,i)=>{const lv={learning:25,practicing:55,proficient:85,expert:100};return<div key={i} className="flex items-center gap-2 sm:gap-3">
+          <span className="text-[12px] sm:text-[13px] text-[#6B7280] w-24 sm:w-40 truncate flex-shrink-0">{s.nm}</span>
           <div className="flex-1 h-2 bg-[#F3F4F6] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${lv[s.lv]||20}%`,background:s.sr==="manager-verified"?"#FF0083":"#3b82f6"}}/></div>
           <SkB sr={s.sr} lv={s.lv}/>
         </div>})}</div>
@@ -2251,14 +2288,17 @@ const TeamPulse=({emps,toast})=>{
         <span className="block mb-2"><CI n={ic} sz={28} co={co}/></span><span className="text-[24px] font-bold" style={{color:co}}>{n}</span><p className="text-[12px] text-[#6B7280]">{lb}</p>
       </div>
     )}</div>
-    <div className="space-y-3">{emps.map(e=>{const m=getMood(e);return<div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm flex items-center gap-4">
-      <Av e={e} sz={40}/>
-      <div className="flex-1"><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div>
-      <span className="text-2xl">{m.em}</span>
-      <span className="text-[12px] px-3 py-1 rounded-full font-medium" style={{background:m.co+"18",color:m.co}}>{m.lb}</span>
-      <HealthBreakdown emp={e} sz={40}/>
-      {checkedIn[e.id]?<span className="text-[11px] text-[#10b981] font-medium px-3 py-1.5 bg-[#f0fdf4] rounded-xl">✓ Checked in</span>
-      :<button onClick={()=>{setCheckedIn(p=>({...p,[e.id]:true}));toast(`Checked in with ${e.nm.split(" ")[0]}`)}} className="text-[11px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium">Check in</button>}
+    <div className="space-y-3">{emps.map(e=>{const m=getMood(e);return<div key={e.id} className="bg-white border border-[#E5E7EB] rounded-[14px] p-4 shadow-sm">
+      <div className="flex items-center gap-3">
+        <Av e={e} sz={40}/>
+        <div className="flex-1 min-w-0"><h3 className="text-[14px] font-semibold text-[#1A1A2E] truncate">{e.nm}</h3><p className="text-[11px] text-[#6B7280]">{e.rl} · Day {e.day}</p></div>
+        <span className="text-[12px] px-2 sm:px-3 py-1 rounded-full font-medium flex-shrink-0" style={{background:m.co+"18",color:m.co}}>{m.lb}</span>
+      </div>
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#E5E7EB]">
+        <HealthBreakdown emp={e} sz={40}/>
+        {checkedIn[e.id]?<span className="text-[11px] text-[#10b981] font-medium px-3 py-1.5 bg-[#f0fdf4] rounded-xl">✓ Checked in</span>
+        :<button onClick={()=>{setCheckedIn(p=>({...p,[e.id]:true}));toast(`Checked in with ${e.nm.split(" ")[0]}`)}} className="text-[11px] text-[#FF0083] border border-[#FF008325] rounded-xl px-3 py-1.5 hover:bg-[#FF008310] transition-all font-medium">Check in</button>}
+      </div>
     </div>})}</div>
   </div>
 };
@@ -2394,7 +2434,7 @@ const TourOverlay=({step,steps,onNext,onSkip})=>{
   if(pos===null)return null;
   const s=steps[step];
   const pad=8;
-  const tipW=300;
+  const tipW=Math.min(300,window.innerWidth-32);
   let tipStyle={};
   const maxTop=window.innerHeight-240;
   if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:pos.left+pos.width+pad+12};
@@ -2721,10 +2761,11 @@ const App=()=>{
         <button onClick={()=>setSidebarOpen(!sidebarOpen)} className="lg:hidden w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" aria-label="Toggle sidebar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <span style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
+        <span className="hidden sm:inline" style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
+        <span className="sm:hidden" style={{fontFamily:"'Pacifico',cursive",fontSize:"18px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
         <span className="hidden sm:inline text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
         {/* BACK BUTTON */}
         {scrHist.length>0&&<button onClick={goBack} className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" title="Go back" aria-label="Go back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>}
         {/* SEARCH */}
@@ -2738,8 +2779,8 @@ const App=()=>{
             </button>)}
           </div>}
         </div>
-        {/* DARK MODE TOGGLE */}
-        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="w-8 h-8 rounded-lg flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{background:darkMode?'#334155':'white',border:darkMode?'1px solid #475569':'1px solid #E5E7EB'}}>
+        {/* DARK MODE TOGGLE — hidden on small mobile */}
+        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{background:darkMode?'#334155':'white',border:darkMode?'1px solid #475569':'1px solid #E5E7EB'}}>
           {darkMode?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           :<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>}
         </button>
@@ -2773,7 +2814,7 @@ const App=()=>{
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
-        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-2 sm:px-3.5 py-1.5 text-[12px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-6 sm:pr-8 shadow-sm max-w-[120px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center"}}>
+        <select value={userVal} onChange={e=>chUser(e.target.value)} className="tour-role bg-white border border-[#E5E7EB] rounded-lg px-1.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-[14px] text-[#1A1A2E] focus:outline-none focus:border-[#FF0083] cursor-pointer appearance-none pr-5 sm:pr-8 shadow-sm max-w-[110px] sm:max-w-none truncate" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 6px center"}}>
           <optgroup label="Makers">{es.map(e=><option key={e.id} value={`maker:${e.id}`}>{e.rl} — {e.nm} · Day {e.day}</option>)}</optgroup>
           <optgroup label="Leads">{Object.entries(LEADS).map(([k,v])=><option key={k} value={`lead:${k}`}>Lead — {v.nm}</option>)}</optgroup>
           <optgroup label="Strategy"><option value="strategy">Strategy — L&D Team</option></optgroup>
@@ -2808,7 +2849,7 @@ const App=()=>{
         <div key={scr+role} className="page-enter">
           {loading?<PageSkeleton/>:screen()}
         </div>
-        {!compOpen&&<button onClick={()=>setCompOpen(true)} aria-label="Open AI Assistant Lemi" className="tour-lemi fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all z-40 pulse-p" title="Ask Lemi">
+        {!compOpen&&<button onClick={()=>setCompOpen(true)} aria-label="Open AI Assistant Lemi" className="tour-lemi fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[#FF0083] to-[#e6007a] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all z-40 pulse-p" title="Ask Lemi">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 2 5 5 5 9c0 2.5 1 4 3 6l-1 5 4-2 4 2-1-5c2-2 3-3.5 3-6 0-4-3-7-5-7z" fill="white" opacity=".9"/><circle cx="10" cy="9" r="1.2" fill="#FF0083"/><circle cx="14" cy="9" r="1.2" fill="#FF0083"/><path d="M9.5 12.5c0 0 1.5 1.5 5 0" stroke="#FF0083" strokeWidth="1.2" strokeLinecap="round"/></svg>
         </button>}
       </div>
