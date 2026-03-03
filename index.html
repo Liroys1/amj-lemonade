@@ -2400,75 +2400,107 @@ const REAL_TIME_NOTIFS=[
 
 // ───────────────── TOUR OVERLAY ─────────────────
 const TOUR_MAKER=[
-  {title:"Sidebar Navigation",desc:"Your home base — navigate between dashboard, journey, skills, contributions, and resources. Use number keys 1-9 for quick access.",selector:".tour-sidebar",pos:"right",topic:"Navigation"},
-  {title:"Search Everything",desc:"Find employees, skills, contributions, events, and resources instantly. Press Cmd+K for the command palette with fuzzy search.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
-  {title:"Role Switcher",desc:"Switch between Maker, Lead, and Strategy views. Each role has different screens and capabilities.",selector:".tour-role",pos:"bottom",topic:"Navigation"},
-  {title:"Notifications",desc:"Stay updated with PR reviews, skill verifications, team events, and more. Click a notification to jump to the relevant screen.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
-  {title:"Your Dashboard",desc:"Your onboarding snapshot — health score, contributions, AI usage, schedule, and smart nudges. Click any stat card to dive deeper.",selector:".tour-sidebar",pos:"right",topic:"Core Features"},
-  {title:"My Tasks",desc:"See all your assigned tickets from GitHub, Jira, Figma, and Monday in one kanban board. Move tasks between columns and open them in the source system.",selector:".tour-sidebar",pos:"right",topic:"Core Features"},
-  {title:"Skills & Contributions",desc:"Track your skill development and log every contribution with AI transparency. Get skills verified by your lead to level up.",selector:".tour-sidebar",pos:"right",topic:"Growth"},
-  {title:"AI Usage Tracking",desc:"Monitor how you use AI in your work. The sweet spot is 30-50% AI usage. Log every contribution honestly — there's no penalty for high AI use.",selector:".tour-sidebar",pos:"right",topic:"Growth"},
-  {title:"Knowledge Base",desc:"23 articles covering everything from insurance products to engineering architecture. Search, browse by category, and track your learning.",selector:".tour-sidebar",pos:"right",topic:"Resources"},
-  {title:"Meet Lemi",desc:"Your AI onboarding companion. Ask about your journey, Lemonade culture, tools, career growth, and more. Lemi learns from your conversation context.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
+  {title:"Sidebar Navigation",desc:"Your home base — navigate between dashboard, journey, skills, contributions, and resources. Use number keys 1-9 for quick access.",selector:".tour-sidebar",pos:"right",topic:"Navigation",scr:"home"},
+  {title:"Search Everything",desc:"Find employees, skills, contributions, events, and resources instantly. Press Cmd+K for the command palette with fuzzy search.",selector:".tour-search",pos:"bottom",topic:"Navigation",scr:"home"},
+  {title:"Role Switcher",desc:"Switch between Maker, Lead, and Strategy views. Each role has different screens and capabilities.",selector:".tour-role",pos:"bottom",topic:"Navigation",scr:"home"},
+  {title:"Your Dashboard",desc:"Your onboarding snapshot — health score, contributions, AI usage, schedule, and smart nudges. Click any stat card to dive deeper.",selector:"#main-content",pos:"bottom",topic:"Core Features",scr:"home"},
+  {title:"My Tasks",desc:"See all your assigned tickets from GitHub, Jira, Figma, and Monday in one kanban board. Move tasks between columns and open them in the source system.",selector:"#main-content",pos:"bottom",topic:"Core Features",scr:"integrations"},
+  {title:"Skills & Contributions",desc:"Track your skill development and log every contribution with AI transparency. Get skills verified by your lead to level up.",selector:"#main-content",pos:"bottom",topic:"Growth",scr:"skills"},
+  {title:"AI Usage Tracking",desc:"Monitor how you use AI in your work. The sweet spot is 30-50% AI usage. Log every contribution honestly — there's no penalty for high AI use.",selector:"#main-content",pos:"bottom",topic:"Growth",scr:"ai-usage"},
+  {title:"Knowledge Base",desc:"23 articles covering everything from insurance products to engineering architecture. Search, browse by category, and track your learning.",selector:"#main-content",pos:"bottom",topic:"Resources",scr:"resources"},
+  {title:"Meet Lemi",desc:"Your AI onboarding companion. Ask about your journey, Lemonade culture, tools, career growth, and more. Lemi learns from your conversation context.",selector:".tour-lemi",pos:"left",topic:"AI Assistant",scr:"home"}
 ];
 const TOUR_LEAD=[
-  {title:"Sidebar Navigation",desc:"Navigate between team dashboard, employee progress, analytics, alerts, and 1:1 prep tools.",selector:".tour-sidebar",pos:"right",topic:"Navigation"},
-  {title:"Search & Command Palette",desc:"Find any employee, skill, or contribution instantly. Cmd+K opens the command palette for quick navigation.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
-  {title:"Team Dashboard",desc:"Monitor all your direct reports at a glance — health scores, phases, contributions. Filter by status and compare employees side-by-side.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
-  {title:"Employee Profiles",desc:"Click any employee card to see their full profile — skills, contributions, AI logs, and progress timeline. Update skills and verify competencies.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
-  {title:"Alert Center",desc:"Critical alerts surface when employees are at risk — low health scores, stalled progress, high AI reliance. Early intervention improves retention by 40%.",selector:".tour-sidebar",pos:"right",topic:"Team Management"},
-  {title:"Team Analytics",desc:"Deep performance insights — health trends, contribution charts, AI reliance distribution, activity heatmap, and sortable employee table.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"1:1 Preparation",desc:"Structured templates for 1:1 meetings based on each employee's data — talking points, skill gaps, and action items auto-generated.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"Review Assistant",desc:"AI-powered review suggestions based on employee contributions and growth trajectory. Ensure consistent and fair feedback.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"Notifications",desc:"Real-time updates on team activity — PRs submitted, skills verified, milestones reached. Click to navigate to the relevant screen.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
-  {title:"Lemi for Leads",desc:"Ask Lemi about team insights, coaching strategies, and onboarding best practices. Lemi provides contextual tips based on the screen you're viewing.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
+  {title:"Sidebar Navigation",desc:"Navigate between team dashboard, employee progress, analytics, alerts, and 1:1 prep tools.",selector:".tour-sidebar",pos:"right",topic:"Navigation",scr:"team"},
+  {title:"Search & Command Palette",desc:"Find any employee, skill, or contribution instantly. Cmd+K opens the command palette for quick navigation.",selector:".tour-search",pos:"bottom",topic:"Navigation",scr:"team"},
+  {title:"Team Dashboard",desc:"Monitor all your direct reports at a glance — health scores, phases, contributions. Filter by status and compare employees side-by-side.",selector:"#main-content",pos:"bottom",topic:"Team Management",scr:"team"},
+  {title:"Employee Progress",desc:"Click any employee card to see their full profile — skills, contributions, AI logs, and progress timeline. Track individual growth trajectories.",selector:"#main-content",pos:"bottom",topic:"Team Management",scr:"progress"},
+  {title:"Alert Center",desc:"Critical alerts surface when employees are at risk — low health scores, stalled progress, high AI reliance. Early intervention improves retention by 40%.",selector:"#main-content",pos:"bottom",topic:"Team Management",scr:"alerts"},
+  {title:"Team Analytics",desc:"Deep performance insights — health trends, contribution charts, AI reliance distribution, activity heatmap, and sortable employee table.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"analytics"},
+  {title:"1:1 Preparation",desc:"Structured templates for 1:1 meetings based on each employee's data — talking points, skill gaps, and action items auto-generated.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"one-on-one"},
+  {title:"Review Assistant",desc:"AI-powered review suggestions based on employee contributions and growth trajectory. Ensure consistent and fair feedback.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"review"},
+  {title:"Lemi for Leads",desc:"Ask Lemi about team insights, coaching strategies, and onboarding best practices. Lemi provides contextual tips based on the screen you're viewing.",selector:".tour-lemi",pos:"left",topic:"AI Assistant",scr:"team"}
 ];
 const TOUR_STRAT=[
-  {title:"Strategy Overview",desc:"Organization-wide onboarding metrics at a glance — health scores, contribution rates, verification rates, AI reliance, and completion status.",selector:".tour-sidebar",pos:"right",topic:"Overview"},
-  {title:"Search & Navigation",desc:"Find any employee or metric quickly. Use Cmd+K for the command palette. Number keys 1-7 navigate sidebar items.",selector:".tour-search",pos:"bottom",topic:"Navigation"},
-  {title:"Cohort Analytics",desc:"Compare cohort performance with interactive charts. Click any data point for detailed breakdowns. Track health trajectory across the full 30-day journey.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"Skill Gap Map",desc:"Identify skill gaps across roles and categories. Click any cell to see individual employee skills. Spot organization-wide training needs.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"Benchmarks",desc:"Compare your program against industry standards — time to first contribution, time to productivity, retention rate, and NPS.",selector:".tour-sidebar",pos:"right",topic:"Analytics"},
-  {title:"Attrition Risk",desc:"AI-powered risk assessment identifies employees who may be struggling. Risk factors include low health, stalled contributions, and high AI reliance.",selector:".tour-sidebar",pos:"right",topic:"Risk"},
-  {title:"Content Intelligence",desc:"See which resources are most queried, by which roles, and trending topics. Use this to improve onboarding content and fill knowledge gaps.",selector:".tour-sidebar",pos:"right",topic:"Risk"},
-  {title:"Notifications",desc:"Organization-wide activity feed — track onboarding progress across all cohorts and teams in real-time.",selector:".tour-notif",pos:"bottom",topic:"Navigation"},
-  {title:"Lemi for Strategy",desc:"Ask Lemi about program metrics, best practices, cohort comparisons, and organizational insights. Get data-driven recommendations.",selector:".tour-lemi",pos:"left",topic:"AI Assistant"}
+  {title:"Strategy Overview",desc:"Organization-wide onboarding metrics at a glance — health scores, contribution rates, verification rates, AI reliance, and completion status.",selector:"#main-content",pos:"bottom",topic:"Overview",scr:"overview"},
+  {title:"Search & Navigation",desc:"Find any employee or metric quickly. Use Cmd+K for the command palette. Number keys 1-7 navigate sidebar items.",selector:".tour-search",pos:"bottom",topic:"Navigation",scr:"overview"},
+  {title:"Cohort Analytics",desc:"Compare cohort performance with interactive charts. Click any data point for detailed breakdowns. Track health trajectory across the full 30-day journey.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"cohorts"},
+  {title:"Skill Gap Map",desc:"Identify skill gaps across roles and categories. Click any cell to see individual employee skills. Spot organization-wide training needs.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"skill-gaps"},
+  {title:"Benchmarks",desc:"Compare your program against industry standards — time to first contribution, time to productivity, retention rate, and NPS.",selector:"#main-content",pos:"bottom",topic:"Analytics",scr:"benchmarks"},
+  {title:"Attrition Risk",desc:"AI-powered risk assessment identifies employees who may be struggling. Risk factors include low health, stalled contributions, and high AI reliance.",selector:"#main-content",pos:"bottom",topic:"Risk",scr:"attrition"},
+  {title:"Content Intelligence",desc:"See which resources are most queried, by which roles, and trending topics. Use this to improve onboarding content and fill knowledge gaps.",selector:"#main-content",pos:"bottom",topic:"Risk",scr:"content"},
+  {title:"Lemi for Strategy",desc:"Ask Lemi about program metrics, best practices, cohort comparisons, and organizational insights. Get data-driven recommendations.",selector:".tour-lemi",pos:"left",topic:"AI Assistant",scr:"overview"}
 ];
 const TOUR_STEPS_BY_ROLE={maker:TOUR_MAKER,lead:TOUR_LEAD,strategy:TOUR_STRAT};
 
-const TourOverlay=({step,steps,onNext,onSkip})=>{
+const TourOverlay=({step,steps,onNext,onSkip,onNav})=>{
   const[pos,setPos]=useState(null);
+  const isMobile=window.innerWidth<768;
+  // Navigate to the correct screen for this step
   useEffect(()=>{
-    const el=document.querySelector(steps[step].selector);
-    if(el){const r=el.getBoundingClientRect();setPos({top:r.top,left:r.left,width:r.width,height:r.height})}
+    const s=steps[step];
+    if(s.scr&&onNav)onNav(s.scr);
+  },[step]);
+  // Position the highlight after a brief delay to let screen render
+  useEffect(()=>{
+    const timer=setTimeout(()=>{
+      const el=document.querySelector(steps[step].selector);
+      if(el){const r=el.getBoundingClientRect();setPos({top:r.top,left:r.left,width:r.width,height:r.height})}
+    },isMobile?100:50);
+    return()=>clearTimeout(timer);
   },[step,steps]);
-  if(pos===null)return null;
   const s=steps[step];
+  // On mobile, use a fixed bottom card layout instead of positioned tooltip
+  if(isMobile){
+    return<div style={{position:"fixed",inset:0,zIndex:200}}>
+      <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)"}} onClick={onSkip}/>
+      <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:201,borderRadius:"20px 20px 0 0",background:"white",padding:"24px 20px env(safe-area-inset-bottom, 16px)",boxShadow:"0 -4px 30px rgba(0,0,0,0.15)"}}>
+        <div className="flex items-center gap-2 mb-2">
+          {s.topic&&<span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083]">{s.topic}</span>}
+          <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider ml-auto">Step {step+1}/{steps.length}</span>
+        </div>
+        <h3 className="text-[17px] font-bold text-[#1A1A2E] mb-1">{s.title}</h3>
+        <p className="text-[14px] text-[#6B7280] leading-relaxed mb-5">{s.desc}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex gap-1.5">{steps.map((_,i)=><div key={i} style={{width:i===step?16:6,height:6,borderRadius:3,background:i===step?"#FF0083":i<step?"#FF008350":"#E5E7EB",transition:"all .2s"}}/>)}</div>
+          <div className="flex gap-3">
+            <button onClick={onSkip} className="text-[13px] text-[#9CA3AF] font-medium py-2 px-3">Skip</button>
+            <button onClick={onNext} className="bg-[#FF0083] text-white text-[13px] font-bold px-6 py-2.5 rounded-xl btn-p">{step===steps.length-1?"Finish":"Next →"}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  // Desktop: positioned tooltip
+  if(pos===null)return null;
   const pad=8;
-  const tipW=Math.min(300,window.innerWidth-32);
+  const tipW=Math.min(320,window.innerWidth-32);
   let tipStyle={};
-  const maxTop=window.innerHeight-240;
+  const maxTop=window.innerHeight-260;
   const maxLeft=window.innerWidth-tipW-16;
   if(s.pos==="right")tipStyle={top:Math.min(pos.top,maxTop),left:Math.min(pos.left+pos.width+pad+12,maxLeft)};
-  else if(s.pos==="bottom")tipStyle={top:pos.top+pos.height+pad+12,left:Math.max(8,Math.min(pos.left+pos.width/2-tipW/2,maxLeft))};
+  else if(s.pos==="bottom")tipStyle={top:Math.min(pos.top+pos.height+pad+12,maxTop),left:Math.max(8,Math.min(pos.left+pos.width/2-tipW/2,maxLeft))};
   else if(s.pos==="left")tipStyle={top:Math.min(pos.top,maxTop),left:Math.max(8,pos.left-tipW-pad-12)};
   else tipStyle={top:pos.top-160,left:Math.max(8,Math.min(pos.left+pos.width/2-tipW/2,maxLeft))};
+  if(tipStyle.top<8)tipStyle.top=8;
   if(tipStyle.top>maxTop)tipStyle.top=maxTop;
   if(tipStyle.left<8)tipStyle.left=8;
   if(tipStyle.left>maxLeft)tipStyle.left=maxLeft;
   return<div style={{position:"fixed",inset:0,zIndex:200}}>
-    <div style={{position:"absolute",inset:0,background:"transparent",boxShadow:`0 0 0 ${pos.top-pad}px rgba(0,0,0,0.5) inset`,clipPath:`polygon(0 0,100% 0,100% 100%,0 100%,0 ${pos.top-pad}px,${pos.left-pad}px ${pos.top-pad}px,${pos.left-pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top+pos.height+pad}px,${pos.left+pos.width+pad}px ${pos.top-pad}px,0 ${pos.top-pad}px)`}} onClick={onSkip}/>
-    <div style={{position:"absolute",top:pos.top-pad,left:pos.left-pad,width:pos.width+pad*2,height:pos.height+pad*2,border:"2px solid #FF0083",borderRadius:12,pointerEvents:"none",boxShadow:"0 0 0 9999px rgba(0,0,0,0.5)"}}/>
-    <div style={{position:"absolute",...tipStyle,width:tipW,maxWidth:"calc(100vw - 32px)",overflow:"hidden"}} className="bg-white rounded-2xl shadow-2xl p-5 border border-[#E5E7EB]">
-      {s.topic&&<span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083] mb-2 inline-block">{s.topic}</span>}
-      <div className="flex items-center gap-2 mb-1"><span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">Step {step+1} of {steps.length}</span></div>
+    <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)"}} onClick={onSkip}/>
+    {pos&&<div style={{position:"absolute",top:pos.top-pad,left:pos.left-pad,width:pos.width+pad*2,height:pos.height+pad*2,border:"2px solid #FF0083",borderRadius:12,pointerEvents:"none",background:"transparent",boxShadow:"0 0 20px rgba(255,0,131,0.3)"}}/>}
+    <div key={step} style={{position:"absolute",...tipStyle,width:tipW,maxWidth:"calc(100vw - 32px)"}} className="bg-white rounded-2xl shadow-2xl p-5 border border-[#E5E7EB]">
+      <div className="flex items-center gap-2 mb-1.5">
+        {s.topic&&<span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF008310] text-[#FF0083]">{s.topic}</span>}
+        <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider ml-auto">Step {step+1} of {steps.length}</span>
+      </div>
       <h3 className="text-[16px] font-bold text-[#1A1A2E] mb-1.5">{s.title}</h3>
       <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4">{s.desc}</p>
       <div className="flex items-center justify-between">
-        <div className="flex gap-1">{steps.map((_,i)=><div key={i} className="w-1.5 h-1.5 rounded-full" style={{background:i===step?"#FF0083":i<step?"#FF008350":"#E5E7EB"}}/>)}</div>
+        <div className="flex gap-1">{steps.map((_,i)=><div key={i} style={{width:i===step?14:6,height:6,borderRadius:3,background:i===step?"#FF0083":i<step?"#FF008350":"#E5E7EB",transition:"all .2s"}}/>)}</div>
         <div className="flex gap-2">
-          <button onClick={onSkip} className="text-[12px] text-[#9CA3AF] font-medium hover:text-[#6B7280]">Skip</button>
-          <button onClick={onNext} className="bg-[#FF0083] text-white text-[12px] font-bold px-4 py-1.5 rounded-lg btn-p">{step===steps.length-1?"Finish":"Next"}</button>
+          <button onClick={onSkip} className="text-[12px] text-[#9CA3AF] font-medium hover:text-[#6B7280] py-1 px-2">Skip</button>
+          <button onClick={onNext} className="bg-[#FF0083] text-white text-[12px] font-bold px-5 py-2 rounded-lg btn-p">{step===steps.length-1?"Finish":"Next →"}</button>
         </div>
       </div>
     </div>
@@ -2869,7 +2901,7 @@ const App=()=>{
       </div>
       <CompanionPanel open={compOpen} onClose={()=>setCompOpen(false)} scr={scr} setScr={setScr} role={role} emp={maker} personality={lemiPersonality}/>
     </div>
-    {tourStep!==null&&(()=>{const ts=TOUR_STEPS_BY_ROLE[role]||TOUR_MAKER;return<TourOverlay step={tourStep} steps={ts} onNext={()=>{if(tourStep>=ts.length-1){setTourStep(null);setTourDone(true)}else setTourStep(tourStep+1)}} onSkip={()=>{setTourStep(null);setTourDone(true)}}/>})()}
+    {tourStep!==null&&(()=>{const ts=TOUR_STEPS_BY_ROLE[role]||TOUR_MAKER;return<TourOverlay step={tourStep} steps={ts} onNav={s=>{setScr(s);setSidebarOpen(false)}} onNext={()=>{if(tourStep>=ts.length-1){setTourStep(null);setTourDone(true)}else setTourStep(tourStep+1)}} onSkip={()=>{setTourStep(null);setTourDone(true)}}/>})()}
   </div>
 };
 
