@@ -1,16 +1,67 @@
 import React from 'react';
-import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Video, staticFile} from 'remotion';
+import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, staticFile} from 'remotion';
 import {C, headingFont} from '../components/styles';
+
+/**
+ * LeadView — 300 frames (10s @ 30fps)
+ * Showcases the Lead (Manager) view with 3 screenshot features,
+ * cross-fading between them with Ken Burns zoom and text callout cards.
+ */
+
+interface Feature {
+  startFrame: number;
+  screenshot: string;
+  title: string;
+  subtitle: string;
+  zoomOrigin: string;
+  zoomTx: number;
+  zoomTy: number;
+}
+
+const FEATURES: Feature[] = [
+  {
+    startFrame: 0,
+    screenshot: 'screens/lead-team.png',
+    title: 'Team Health Dashboard',
+    subtitle: 'Every maker\u2019s progress at a glance',
+    zoomOrigin: 'center center',
+    zoomTx: 0,
+    zoomTy: 0,
+  },
+  {
+    startFrame: 100,
+    screenshot: 'screens/lead-1on1.png',
+    title: '1:1 Coaching Prep',
+    subtitle: 'AI-generated talking points',
+    zoomOrigin: 'left center',
+    zoomTx: 2,
+    zoomTy: 0,
+  },
+  {
+    startFrame: 200,
+    screenshot: 'screens/lead-alerts.png',
+    title: 'Smart Alert Center',
+    subtitle: 'Early warnings before problems escalate',
+    zoomOrigin: 'center center',
+    zoomTx: 0,
+    zoomTy: -1,
+  },
+];
+
+const FEATURE_DURATION = 100;
+const FADE_IN_FRAMES = 15;
+const FADE_OUT_FRAMES = 15;
+const CALLOUT_DELAY = 20;
 
 export const LeadView: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps, durationInFrames} = useVideoConfig();
 
-  // Title fade-in with spring
+  // --- Title fade-in ---
   const titleOpacity = spring({frame, fps, config: {damping: 200}});
   const titleY = interpolate(titleOpacity, [0, 1], [-20, 0]);
 
-  // Exit fade in last 30 frames
+  // --- Exit fade (last 30 frames) ---
   const exitOpacity = interpolate(
     frame,
     [durationInFrames - 30, durationInFrames],
@@ -18,37 +69,10 @@ export const LeadView: React.FC = () => {
     {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
   );
 
-  // Browser frame entrance
+  // --- Browser frame entrance ---
   const frameEntry = spring({frame: frame - 5, fps, config: {damping: 30, stiffness: 80}});
   const frameScale = interpolate(frameEntry, [0, 1], [0.92, 1]);
   const frameOpacity = interpolate(frameEntry, [0, 1], [0, 1], {extrapolateRight: 'clamp'});
-
-  // --- Zoom/Pan keyframes ---
-  // Phase 1: 0-90 frames (0-3s) — full view at scale 1.0
-  // Phase 2: 90-180 frames (3-6s) — zoom to 1.2x, focus on team cards (translate toward center)
-  // Phase 3: 180-240 frames (6-8s) — pan down-left to sidebar nav
-  // Phase 4: 240-300 frames (8-10s) — zoom back out to full view
-
-  const zoomIn = spring({frame: frame - 90, fps, config: {damping: 40, stiffness: 60}});
-  const panSidebar = spring({frame: frame - 180, fps, config: {damping: 40, stiffness: 60}});
-  const zoomOut = spring({frame: frame - 240, fps, config: {damping: 35, stiffness: 50}});
-
-  // Scale: 1.0 -> 1.2 (zoom in) -> 1.2 (hold during pan) -> 1.0 (zoom out)
-  const scaleZoomIn = interpolate(zoomIn, [0, 1], [1.0, 1.2]);
-  const scaleZoomOut = interpolate(zoomOut, [0, 1], [0, -0.2]);
-  const scale = scaleZoomIn + scaleZoomOut;
-
-  // TranslateX: 0 -> -30px (zoom to cards) -> -80px (pan to sidebar) -> 0 (reset)
-  const txZoomIn = interpolate(zoomIn, [0, 1], [0, -30]);
-  const txPan = interpolate(panSidebar, [0, 1], [0, -50]);
-  const txReset = interpolate(zoomOut, [0, 1], [0, 80]);
-  const translateX = txZoomIn + txPan + txReset;
-
-  // TranslateY: 0 -> -20px (zoom to cards) -> 40px (pan down to sidebar) -> 0 (reset)
-  const tyZoomIn = interpolate(zoomIn, [0, 1], [0, -20]);
-  const tyPan = interpolate(panSidebar, [0, 1], [0, 60]);
-  const tyReset = interpolate(zoomOut, [0, 1], [0, -40]);
-  const translateY = tyZoomIn + tyPan + tyReset;
 
   return (
     <AbsoluteFill style={{
@@ -83,10 +107,10 @@ export const LeadView: React.FC = () => {
         </span>
       </div>
 
-      {/* Browser frame with video */}
+      {/* Browser frame */}
       <div style={{
-        width: 920,
-        height: 560,
+        width: 980,
+        height: 580,
         borderRadius: 18,
         overflow: 'hidden',
         boxShadow: '0 8px 40px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.06)',
@@ -96,8 +120,9 @@ export const LeadView: React.FC = () => {
         opacity: frameOpacity,
         display: 'flex',
         flexDirection: 'column' as const,
+        position: 'relative' as const,
       }}>
-        {/* Browser toolbar */}
+        {/* macOS browser toolbar */}
         <div style={{
           height: 38,
           background: C.headerBg,
@@ -122,36 +147,182 @@ export const LeadView: React.FC = () => {
             alignItems: 'center',
             paddingLeft: 10,
           }}>
-            <span style={{fontSize: 11, color: C.textTer, fontFamily: 'monospace'}}>
-              app.lemonade.com/lead/dashboard
+            <span style={{fontSize: 11, color: C.textTer, fontWeight: 500}}>
+              app.lemonade.com/lead
             </span>
           </div>
         </div>
 
-        {/* Video viewport with zoom/pan */}
+        {/* Screenshot viewport */}
         <div style={{
           flex: 1,
           overflow: 'hidden',
           position: 'relative' as const,
           background: '#f8f8f8',
         }}>
-          <div style={{
-            width: '100%',
-            height: '100%',
-            transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
-            transformOrigin: 'center center',
-          }}>
-            <Video
-              src={staticFile('screens/lead-recording.webm')}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover' as const,
-              }}
-            />
-          </div>
+          {FEATURES.map((feature, idx) => {
+            const localFrame = frame - feature.startFrame;
+
+            // Image opacity: fade in first 15 frames, fade out last 15 frames
+            const fadeIn = interpolate(
+              localFrame,
+              [0, FADE_IN_FRAMES],
+              [0, 1],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+            const fadeOut = interpolate(
+              localFrame,
+              [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION],
+              [1, 0],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+            // Last feature: don't fade out (the exit fade handles it)
+            const imgOpacity = idx === FEATURES.length - 1
+              ? fadeIn
+              : Math.min(fadeIn, fadeOut);
+
+            // Ken Burns: scale 1.0 -> 1.08 over the feature duration
+            const kenBurnsScale = interpolate(
+              localFrame,
+              [0, FEATURE_DURATION],
+              [1.0, 1.08],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+
+            // Subtle translate drift toward feature area
+            const kenBurnsTx = interpolate(
+              localFrame,
+              [0, FEATURE_DURATION],
+              [0, feature.zoomTx],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+            const kenBurnsTy = interpolate(
+              localFrame,
+              [0, FEATURE_DURATION],
+              [0, feature.zoomTy],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+
+            // Only render when approximately visible
+            if (localFrame < -5 || localFrame > FEATURE_DURATION + 5) return null;
+
+            return (
+              <div
+                key={idx}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: imgOpacity,
+                }}
+              >
+                <img
+                  src={staticFile(feature.screenshot)}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover' as const,
+                    transform: `scale(${kenBurnsScale}) translate(${kenBurnsTx}%, ${kenBurnsTy}%)`,
+                    transformOrigin: feature.zoomOrigin,
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Text callout cards */}
+      {FEATURES.map((feature, idx) => {
+        const localFrame = frame - feature.startFrame;
+
+        // Callout appears with a spring ~20 frames after the image fades in
+        const calloutSpring = spring({
+          frame: localFrame - CALLOUT_DELAY,
+          fps,
+          config: {damping: 18, stiffness: 120, mass: 0.8},
+        });
+        const calloutOpacity = interpolate(calloutSpring, [0, 1], [0, 1], {extrapolateRight: 'clamp'});
+        const calloutY = interpolate(calloutSpring, [0, 1], [20, 0]);
+
+        // Callout fades out with the image (last 15 frames of the feature)
+        const calloutFadeOut = idx === FEATURES.length - 1
+          ? 1 // last feature: exit fade handles it
+          : interpolate(
+              localFrame,
+              [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION],
+              [1, 0],
+              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+            );
+
+        const finalOpacity = Math.min(calloutOpacity, calloutFadeOut);
+
+        // Only render when approximately visible
+        if (localFrame < CALLOUT_DELAY - 5 || localFrame > FEATURE_DURATION + 5) return null;
+
+        return (
+          <div
+            key={`callout-${idx}`}
+            style={{
+              position: 'absolute',
+              bottom: 52,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              zIndex: 20,
+              opacity: finalOpacity,
+              transform: `translateY(${calloutY}px)`,
+              pointerEvents: 'none' as const,
+            }}
+          >
+            <div style={{
+              background: 'rgba(255,255,255,0.92)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderRadius: 16,
+              padding: '16px 24px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04)',
+              border: `1px solid rgba(255,255,255,0.6)`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              maxWidth: 420,
+            }}>
+              {/* Pink accent dot */}
+              <div style={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                background: C.pink,
+                flexShrink: 0,
+                boxShadow: `0 0 8px ${C.pink}40`,
+              }} />
+              <div>
+                <div style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: C.dark,
+                  fontFamily: headingFont,
+                  lineHeight: 1.3,
+                }}>
+                  {feature.title}
+                </div>
+                <div style={{
+                  fontSize: 13,
+                  color: C.textSec,
+                  marginTop: 2,
+                  lineHeight: 1.4,
+                }}>
+                  {feature.subtitle}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </AbsoluteFill>
   );
 };
