@@ -682,8 +682,8 @@ const CI=({n,sz=16,co="#6B7280"})=>{const p={
 
 const NAV={
   maker:[{section:"GETTING STARTED"},{id:"welcome",lb:"Onboarding",ic:"lemon"},{id:"checklist",lb:"Day 1 Tasks",ic:"check"},{id:"first-impressions",lb:"First Impressions",ic:"eye"},{id:"journey",lb:"My Journey",ic:"map"},{section:"DAILY WORK"},{id:"home",lb:"Dashboard",ic:"home"},{id:"goals",lb:"Weekly Goals",ic:"target"},{id:"integrations",lb:"My Tasks",ic:"link"},{section:"SKILLS & GROWTH"},{id:"skills",lb:"My Skills",ic:"skill"},{id:"contributions",lb:"Contributions",ic:"doc"},{id:"review-prep",lb:"Review Prep",ic:"clipboard"},{id:"ai-log",lb:"AI Log",ic:"clip"},{id:"ai-usage",lb:"AI Usage",ic:"ai"},{section:"EXPERIENCES"},{id:"crisis",lb:"Crisis Sim",ic:"bolt"},{id:"demo-day",lb:"Demo Day",ic:"star-fill",minDay:22},{id:"ai-review",lb:"30-Day AI Review",ic:"medal",minDay:22},{section:"RESOURCES"},{id:"calendar",lb:"Calendar",ic:"cal"},{id:"resources",lb:"Knowledge Base",ic:"book"},{id:"faq",lb:"FAQs & Links",ic:"faq"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
-  lead:[{section:"TEAM OVERVIEW"},{id:"onboard-setup",lb:"Onboarding Setup",ic:"home"},{id:"team",lb:"Team Dashboard",ic:"team"},{id:"progress",lb:"Employee Progress",ic:"trend"},{section:"COACHING"},{id:"pulse",lb:"Team Pulse",ic:"heart"},{id:"one-on-one",lb:"1:1 Prep",ic:"hand"},{id:"review",lb:"Review Assistant",ic:"clip"},{section:"ANALYSIS"},{id:"alerts",lb:"Alert Center",ic:"alert"},{id:"analytics",lb:"Team Analytics",ic:"chart"},{id:"reflections",lb:"Reflections",ic:"think"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
-  strategy:[{section:"OVERVIEW"},{id:"overview",lb:"Overview",ic:"chart"},{id:"cohorts",lb:"Cohort Analytics",ic:"trend"},{section:"INSIGHTS"},{id:"skill-gaps",lb:"Skill Gap Map",ic:"puzzle"},{id:"benchmarks",lb:"Benchmarks",ic:"trophy"},{id:"attrition",lb:"Attrition Risk",ic:"alert"},{id:"content",lb:"Content Intelligence",ic:"search"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}]
+  lead:[{section:"TEAM OVERVIEW"},{id:"onboard-setup",lb:"Onboarding",ic:"lemon"},{id:"team",lb:"Team Dashboard",ic:"team"},{id:"progress",lb:"Employee Progress",ic:"trend"},{section:"COACHING"},{id:"pulse",lb:"Team Pulse",ic:"heart"},{id:"one-on-one",lb:"1:1 Prep",ic:"hand"},{id:"review",lb:"Review Assistant",ic:"clip"},{section:"ANALYSIS"},{id:"alerts",lb:"Alert Center",ic:"alert"},{id:"analytics",lb:"Team Analytics",ic:"chart"},{id:"reflections",lb:"Reflections",ic:"think"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
+  strategy:[{section:"OVERVIEW"},{id:"strat-welcome",lb:"Onboarding",ic:"lemon"},{id:"overview",lb:"Overview",ic:"chart"},{id:"cohorts",lb:"Cohort Analytics",ic:"trend"},{section:"INSIGHTS"},{id:"skill-gaps",lb:"Skill Gap Map",ic:"puzzle"},{id:"benchmarks",lb:"Benchmarks",ic:"trophy"},{id:"attrition",lb:"Attrition Risk",ic:"alert"},{id:"content",lb:"Content Intelligence",ic:"search"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}]
 };
 
 // ───────────────── CHAT LOGIC ─────────────────
@@ -1290,6 +1290,31 @@ const ReviewAssist=({emps})=>{
       {ssk.length>0&&<p className="text-[14px] text-[#10b981] mt-2">Verified: {ssk.join(", ")}</p>}
       <button onClick={()=>setDn(false)} className="mt-5 text-[14px] text-[#FF0083] hover:underline">Review another</button>
     </div>}
+  </div>
+};
+
+// ───────────────── STRATEGY WELCOME ─────────────────
+const StrategyWelcome=({setScr})=>{
+  return<div className="fi">
+    <div className="text-center mb-8 pt-6"><LemonIll w={80} h={80}/><h1 className="h-serif text-[24px] sm:text-[32px] font-bold text-[#1A1A2E] mt-4 mb-3">Welcome to AMJ Strategy</h1><p className="text-[14px] sm:text-[16px] text-[#6B7280] leading-relaxed max-w-xl mx-auto">Your cross-team intelligence layer — see how onboarding performs across all teams and cohorts</p></div>
+    <div className="max-w-2xl mx-auto">
+      <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-sm mb-6">
+        <h3 className="text-[10px] font-semibold uppercase tracking-[.15em] text-[#9CA3AF] mb-4">What you can do</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{[
+          ["Track cohort health","Compare onboarding performance across teams, roles, and time periods","trend"],
+          ["Map skill gaps","Identify which skills are underdeveloped across the organization","puzzle"],
+          ["Monitor attrition risk","Catch early warning signs — low health, slow progress, disengagement","alert"],
+          ["Content intelligence","See which learning resources drive real skill development","search"]
+        ].map(([ti,ds,ic],i)=><div key={i} className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-4 flex items-start gap-3">
+          <span className="flex-shrink-0 mt-0.5"><NI n={ic}/></span>
+          <div><p className="text-[14px] font-semibold text-[#1A1A2E] mb-1">{ti}</p><p className="text-[12px] text-[#6B7280] leading-relaxed">{ds}</p></div>
+        </div>)}</div>
+      </div>
+      <div className="bg-gradient-to-r from-[#10b98112] to-transparent border border-[#10b98125] rounded-[14px] p-5 mb-6">
+        <p className="text-[14px] text-[#6B7280] leading-relaxed"><strong className="text-[#1A1A2E]">How Strategy view works:</strong> You see aggregated data across all 10 simulated employees, 3 teams, and 3 roles. Every metric is computed in real-time from individual maker data — health scores, skill progression, contribution patterns, and AI usage trends.</p>
+      </div>
+      <div className="text-center pb-6"><button onClick={()=>setScr("overview")} className="bg-[#FF0083] text-white rounded-full px-8 py-3 text-[15px] font-bold btn-p">Go to Dashboard →</button></div>
+    </div>
   </div>
 };
 
@@ -3177,7 +3202,7 @@ const App=()=>{
   // Combined user selector value: "maker:e1", "lead:Ran", "strategy"
   const userVal=role==="maker"?`maker:${makerSel}`:role==="lead"?`lead:${leadSel}`:"strategy";
   const chUser=v=>{if(v==="strategy"){setRole("strategy");setSelId(null);setScr("overview")}else if(v.startsWith("lead:")){const ld=v.split(":")[1];setRole("lead");setLeadSel(ld);setSelId(null);setScr("team")}else{const eid=v.split(":")[1];setRole("maker");setMakerSel(eid);setSelId(null);setScr("welcome")}};
-  const chRoleTab=r=>{setSelId(null);if(r==="maker"){setRole("maker");setScr("welcome")}else if(r==="lead"){setRole("lead");setScr("team")}else{setRole("strategy");setScr("overview")}};
+  const chRoleTab=r=>{setSelId(null);if(r==="maker"){setRole("maker");setScr("welcome")}else if(r==="lead"){setRole("lead");setScr("onboard-setup")}else{setRole("strategy");setScr("strat-welcome")}};
   const unread=notifs.filter(n=>!n.read).length;
 
   const searchResults=useMemo(()=>{if(!searchQ.trim())return[];const q=searchQ.toLowerCase();
@@ -3238,6 +3263,7 @@ const App=()=>{
       if(scr==="reflections")return<Reflections emps={leadE} onSel={id=>{setSelId(id);setScr("employee")}}/>;
       return<TeamDash emps={leadE} leadNm={leadSel} onSel={id=>{setSelId(id);setScr("employee")}} compareIds={compareIds} onCompare={setCompareIds} onShowCompare={()=>setScr("compare")}/>;
     }
+    if(scr==="strat-welcome")return<StrategyWelcome setScr={setScr}/>;
     if(scr==="cohorts")return<Cohorts/>;
     if(scr==="skill-gaps")return<SkillGap/>;
     if(scr==="benchmarks")return<BenchmarkView/>;
@@ -3267,8 +3293,8 @@ const App=()=>{
 
   if(scr==="landing") return <LandingPage onEnter={(r)=>{
     if(r==="maker"){setRole("maker");setScr("welcome")}
-    else if(r==="lead"){setRole("lead");setScr("team")}
-    else{setRole("strategy");setScr("overview")}
+    else if(r==="lead"){setRole("lead");setScr("onboard-setup")}
+    else{setRole("strategy");setScr("strat-welcome")}
   }}/>;
 
   return<div className="h-screen flex flex-col">
