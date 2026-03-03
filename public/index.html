@@ -20,7 +20,7 @@
   </script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Lato',system-ui,sans-serif;background:#FFFFFF;color:#1A1A2E;overflow:hidden;padding-top:env(safe-area-inset-top,0);padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
+    body{font-family:'Lato',system-ui,sans-serif;background:#FFFFFF;color:#1A1A2E;overflow-x:hidden;padding-top:env(safe-area-inset-top,0);padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
     ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:10px}
     select option{background:#FFFFFF;color:#1A1A2E}
     @keyframes pr{0%{box-shadow:0 0 0 0 rgba(255,0,131,.4)}70%{box-shadow:0 0 0 12px rgba(255,0,131,0)}100%{box-shadow:0 0 0 0 rgba(255,0,131,0)}}
@@ -115,9 +115,11 @@
       /* Scrolling momentum for horizontal scroll areas */
       .overflow-x-auto{-webkit-overflow-scrolling:touch}
       table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
-      /* Allow vertical scrolling on mobile */
-      body{overflow-x:hidden;overflow-y:auto!important;-webkit-overflow-scrolling:touch}
+      /* Mobile scroll & containment */
       #root{overflow-x:hidden;max-width:100vw;min-height:100vh;min-height:100dvh}
+      .app-shell{overflow:auto!important;-webkit-overflow-scrolling:touch}
+      .app-shell .flex-row-shell{min-height:0!important}
+      .app-shell #main-content{min-height:0!important;-webkit-overflow-scrolling:touch}
       /* Ensure select dropdowns don't overflow */
       select{max-width:100%!important}
       /* Reduce large gaps on mobile */
@@ -177,7 +179,6 @@
     }
     /* ── LANDSCAPE MOBILE ── */
     @media(orientation:landscape) and (max-height:500px){
-      body{overflow-y:auto!important;-webkit-overflow-scrolling:touch}
       /* Reduce header height */
       .top-bar-h{height:42px!important;min-height:42px!important;max-height:42px!important}
       .top-bar-h .h-\[56px\]{height:42px!important}
@@ -3153,19 +3154,23 @@ const SpotlightCard=({emps,onSel})=>{
 const VideoIntro=({onDone})=>{
   const iframeRef=useRef(null);
   const[showCta,setShowCta]=useState(false);
+  const isMobile=typeof window!=='undefined'&&window.innerWidth<768;
   useEffect(()=>{
-    // Show CTA after video ends (~128s) or after 10s as skip option
-    const skipTimer=setTimeout(()=>setShowCta(true),8000);
+    const skipTimer=setTimeout(()=>setShowCta(true),isMobile?3000:8000);
     return()=>clearTimeout(skipTimer);
   },[]);
-  // Listen for video progress via postMessage (or just show skip)
-  return<div style={{position:'fixed',inset:0,zIndex:9999,background:'#FAFAFA',display:'flex',flexDirection:'column'}}>
-    <iframe ref={iframeRef} src="amj-video.html" style={{flex:1,border:'none',width:'100%',height:'100%'}} title="AMJ Showcase Video"/>
-    <div style={{position:'fixed',bottom:80,left:'50%',transform:'translateX(-50%)',display:'flex',gap:16,alignItems:'center',zIndex:10000}}>
-      {showCta&&<button onClick={()=>{localStorage.setItem('amj-video-seen','1');onDone()}} style={{padding:'14px 36px',borderRadius:14,background:'#FF0083',color:'white',border:'none',fontSize:18,fontWeight:800,cursor:'pointer',boxShadow:'0 8px 32px rgba(255,0,131,.3)',transition:'all .2s',fontFamily:'Lato,sans-serif'}}>
+  const skip=()=>{localStorage.setItem('amj-video-seen','1');onDone()};
+  return<div style={{position:'fixed',inset:0,zIndex:9999,background:'#FAFAFA',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+    {/* Video area */}
+    <div style={{flex:1,position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',background:'#FAFAFA'}}>
+      <iframe ref={iframeRef} src="amj-video.html" style={{border:'none',width:isMobile?'100%':'100%',height:isMobile?'100%':'100%',maxWidth:'100vw',maxHeight:isMobile?'calc(100vh - 80px)':'calc(100vh - 80px)'}} title="AMJ Showcase Video" allow="autoplay"/>
+    </div>
+    {/* Buttons bar — fixed at bottom, above safe area */}
+    <div style={{flexShrink:0,display:'flex',gap:12,alignItems:'center',justifyContent:'center',padding:'12px 16px',paddingBottom:'max(12px, env(safe-area-inset-bottom))',background:'#FAFAFA',borderTop:'1px solid #E5E7EB',zIndex:10000}}>
+      {showCta&&<button onClick={skip} style={{padding:'12px 28px',borderRadius:12,background:'#FF0083',color:'white',border:'none',fontSize:isMobile?15:18,fontWeight:800,cursor:'pointer',boxShadow:'0 4px 16px rgba(255,0,131,.25)',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
         Enter the App →
       </button>}
-      <button onClick={()=>{localStorage.setItem('amj-video-seen','1');onDone()}} style={{padding:'10px 20px',borderRadius:10,background:'rgba(0,0,0,.04)',color:'#9CA3AF',border:'1px solid #E5E7EB',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Lato,sans-serif'}}>
+      <button onClick={skip} style={{padding:'10px 18px',borderRadius:10,background:'rgba(0,0,0,.04)',color:'#9CA3AF',border:'1px solid #E5E7EB',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
         Skip Video
       </button>
     </div>
@@ -3362,7 +3367,7 @@ const App=()=>{
     else{setRole("strategy");setScr("strat-welcome")}
   }}/>;
 
-  return<div className="h-screen flex flex-col" style={{height:'100vh',height:'100dvh'}}>
+  return<div className="app-shell h-screen flex flex-col" style={{height:'100vh',height:'100dvh',overflow:'hidden'}}>
     <a href="#main-content" className="sr-only" style={{position:'absolute',top:'-40px',left:0,zIndex:300}} onFocus={e=>{e.target.style.position='static';e.target.style.background='#FF0083';e.target.style.color='white';e.target.style.padding='8px 16px';e.target.style.borderRadius='8px';e.target.style.fontSize='14px';e.target.style.fontWeight='600'}} onBlur={e=>{e.target.style.position='absolute';e.target.style.top='-40px'}}>Skip to content</a>
     <CmdPalette open={cmdOpen} onClose={()=>setCmdOpen(false)} query={cmdQ} setQuery={setCmdQ} results={cmdResults} idx={cmdIdx} setIdx={setCmdIdx} onSelect={r=>{r.act();setCmdOpen(false);setCmdQ("")}}/>
     <ShortcutsOverlay open={shortcutsOpen} onClose={()=>setShortcutsOpen(false)}/>
@@ -3379,7 +3384,7 @@ const App=()=>{
         <span onClick={()=>setScr("landing")} className="sm:hidden cursor-pointer hover:opacity-80 transition-opacity" style={{fontFamily:"'Pacifico',cursive",fontSize:"18px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
         <span className="hidden sm:inline ls-hide text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
-      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+      <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 min-w-0">
         {/* BACK BUTTON */}
         {scrHist.length>0&&<button onClick={goBack} className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" title="Go back" aria-label="Go back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>}
         {/* SEARCH */}
@@ -3429,13 +3434,13 @@ const App=()=>{
           </div>}
         </div>
         <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block ls-hide"/>
-        <div className="tour-role flex items-center bg-[#F3F4F6] rounded-lg p-0.5 gap-0.5">
+        <div className="tour-role flex items-center bg-[#F3F4F6] rounded-lg p-0.5 gap-0.5 flex-shrink-0">
           {[["maker","Maker","lemon"],["lead","Lead","people"],["strategy","Strategy","chart"]].map(([r,lb])=>
-            <button key={r} onClick={()=>chRoleTab(r)} className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-[13px] font-medium transition-all ${role===r?"bg-white shadow-sm text-[#1A1A2E]":"text-[#9CA3AF] hover:text-[#6B7280]"}`} style={role===r?{borderBottom:"2px solid #FF0083"}:{}}>{lb}</button>
+            <button key={r} onClick={()=>chRoleTab(r)} className={`px-1.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md text-[10px] sm:text-[13px] font-medium transition-all whitespace-nowrap ${role===r?"bg-white shadow-sm text-[#1A1A2E]":"text-[#9CA3AF] hover:text-[#6B7280]"}`} style={role===r?{borderBottom:"2px solid #FF0083"}:{}}>{lb}</button>
           )}</div>
       </div>
     </div>
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex-row-shell flex flex-1 overflow-hidden min-h-0">
       {/* SIDEBAR OVERLAY (mobile) */}
       {sidebarOpen&&<div className="sidebar-overlay lg:hidden" onClick={()=>setSidebarOpen(false)}/>}
       {/* SIDEBAR */}
@@ -3463,7 +3468,7 @@ const App=()=>{
         </div>
       </div>
       {/* MAIN */}
-      <div id="main-content" role="main" aria-label="Page content" className="flex-1 overflow-y-auto p-4 lg:p-7 bg-[#FAFAFA] relative" onClick={()=>{if(notifOpen){setNotifs(p=>p.map(n=>({...n,read:true})))};setNotifOpen(false);setSearchOpen(false)}}>
+      <div id="main-content" role="main" aria-label="Page content" className="flex-1 min-h-0 overflow-y-auto p-4 lg:p-7 bg-[#FAFAFA] relative" style={{WebkitOverflowScrolling:'touch'}} onClick={()=>{if(notifOpen){setNotifs(p=>p.map(n=>({...n,read:true})))};setNotifOpen(false);setSearchOpen(false)}}>
         <div key={scr+role} className="page-enter">
           {loading?<PageSkeleton/>:screen()}
         </div>

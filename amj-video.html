@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=1920"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>AMJ — Showcase Video</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Pacifico&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
+html,body{width:100%;height:100%;background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
+#stage-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#FAFAFA}
 #stage{width:1920px;height:1080px;position:relative;overflow:hidden;background:#FAFAFA;transform-origin:top left}
 
 .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;will-change:transform,opacity}
@@ -85,8 +86,9 @@ body{background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
 .click-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:3px solid var(--pk);pointer-events:none;z-index:99}
 
 /* ─── CONTROLS ─── */
-#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;display:flex;gap:12px;background:rgba(255,255,255,.95);border:1px solid var(--g3);border-radius:16px;padding:12px 24px;backdrop-filter:blur(20px);align-items:center;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-#controls button{padding:8px 20px;border-radius:10px;border:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;transition:all .2s}
+#controls{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:999;display:flex;gap:8px;background:rgba(255,255,255,.95);border:1px solid var(--g3);border-radius:12px;padding:8px 12px;backdrop-filter:blur(20px);align-items:center;box-shadow:0 4px 24px rgba(0,0,0,.08);max-width:calc(100vw - 16px);flex-wrap:wrap;justify-content:center}
+#controls button{padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;transition:all .2s}
+@media(min-width:768px){#controls{bottom:20px;gap:12px;padding:12px 24px;border-radius:16px}#controls button{padding:8px 20px;font-size:14px;border-radius:10px}}
 .btn-play{background:var(--pk);color:white}
 .btn-play:hover{background:var(--pk2);transform:translateY(-1px)}
 .btn-sec{background:var(--g2);color:var(--g5);border:1px solid var(--g3)!important}
@@ -141,6 +143,7 @@ body{background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
 </head>
 <body>
 <div id="progressWrap"><div id="progressBar"></div></div>
+<div id="stage-wrap">
 <div id="stage">
 
 <!-- ═══ S1: LOGO (0–5s) ═══ -->
@@ -581,6 +584,7 @@ body{background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
 </div>
 
 </div><!-- /stage -->
+</div><!-- /stage-wrap -->
 
 <!-- Controls -->
 <div id="controls">
@@ -599,6 +603,23 @@ body{background:#FAFAFA;overflow:hidden;font-family:'Lato',sans-serif}
 
 const FPS=30, TOTAL=128, FRAMES=TOTAL*FPS;
 const W=1920,H=1080;
+
+// ─── RESPONSIVE SCALING ───
+function scaleStage(){
+  const stage=document.getElementById('stage');
+  const wrap=document.getElementById('stage-wrap');
+  if(!stage||!wrap)return;
+  const wW=wrap.clientWidth||window.innerWidth;
+  const wH=wrap.clientHeight||window.innerHeight;
+  const s=Math.min(wW/W,wH/H);
+  stage.style.transform=`scale(${s})`;
+  stage.style.transformOrigin='top left';
+  stage.style.marginLeft=((wW-W*s)/2)+'px';
+  stage.style.marginTop=((wH-H*s)/2)+'px';
+}
+scaleStage();
+window.addEventListener('resize',scaleStage);
+window.addEventListener('orientationchange',()=>setTimeout(scaleStage,200));
 
 // Scene definitions: [id, startSec, endSec, enterTransition, exitTransition, label]
 const SCENES=[
