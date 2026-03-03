@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>AMJ — Autonomous Maker Journey | Lemonade Internal</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Pacifico&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,7 @@
   </script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Lato',system-ui,sans-serif;background:#FFFFFF;color:#1A1A2E;overflow:hidden}
+    body{font-family:'Lato',system-ui,sans-serif;background:#FFFFFF;color:#1A1A2E;overflow:hidden;padding-top:env(safe-area-inset-top,0);padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
     ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:10px}
     select option{background:#FFFFFF;color:#1A1A2E}
     @keyframes pr{0%{box-shadow:0 0 0 0 rgba(255,0,131,.4)}70%{box-shadow:0 0 0 12px rgba(255,0,131,0)}100%{box-shadow:0 0 0 0 rgba(255,0,131,0)}}
@@ -115,9 +115,9 @@
       /* Scrolling momentum for horizontal scroll areas */
       .overflow-x-auto{-webkit-overflow-scrolling:touch}
       table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
-      /* Prevent horizontal overflow on body/root */
-      body{overflow-x:hidden}
-      #root{overflow-x:hidden;max-width:100vw}
+      /* Allow vertical scrolling on mobile */
+      body{overflow-x:hidden;overflow-y:auto!important;-webkit-overflow-scrolling:touch}
+      #root{overflow-x:hidden;max-width:100vw;min-height:100vh;min-height:100dvh}
       /* Ensure select dropdowns don't overflow */
       select{max-width:100%!important}
       /* Reduce large gaps on mobile */
@@ -175,6 +175,45 @@
       /* Tables padding */
       td,th{padding:8px 6px!important}
     }
+    /* ── LANDSCAPE MOBILE ── */
+    @media(orientation:landscape) and (max-height:500px){
+      body{overflow-y:auto!important;-webkit-overflow-scrolling:touch}
+      /* Reduce header height */
+      .top-bar-h{height:42px!important;min-height:42px!important;max-height:42px!important}
+      .top-bar-h .h-\[56px\]{height:42px!important}
+      /* Landing page */
+      .landing-scroll{overflow-x:hidden!important}
+      .landing-inner{justify-content:flex-start!important;padding-top:12px!important;padding-bottom:24px!important;overflow-x:hidden!important}
+      .landing-grid{grid-template-columns:repeat(3,1fr)!important;max-width:100%!important;padding:0 8px!important}
+      .landing-header{margin-bottom:12px!important}
+      .landing-header h1{font-size:20px!important}
+      .landing-header p{font-size:12px!important}
+      /* Typography scaling for app screens */
+      .h-serif{font-size:clamp(16px,3vw,22px)!important}
+      .text-\[28px\],.text-\[32px\]{font-size:20px!important}
+      .text-\[24px\]{font-size:18px!important}
+      .text-\[22px\]{font-size:16px!important}
+      /* Main content area */
+      #main-content{padding:6px 12px!important}
+      /* Sidebar adjustments */
+      .sidebar-drawer{top:42px!important}
+      /* Reduce card padding */
+      .p-6{padding:10px!important}
+      .p-5{padding:8px!important}
+      .p-10{padding:14px!important}
+      .mb-10,.mb-8{margin-bottom:10px!important}
+      .mb-6{margin-bottom:8px!important}
+      .gap-6,.gap-5{gap:8px!important}
+      .py-12{padding-top:8px!important;padding-bottom:8px!important}
+      /* Hide less essential header items in landscape */
+      .ls-hide{display:none!important}
+    }
+    /* ── MEDIUM SCREENS ── */
+    @media(max-width:900px){
+      .landing-grid{max-width:100%!important}
+    }
+    /* ── LANDING PAGE SCROLL FIX ── */
+    .landing-scroll{overflow-y:auto!important;-webkit-overflow-scrolling:touch;min-height:100vh;min-height:100dvh}
   </style>
 </head>
 <body>
@@ -3111,26 +3150,48 @@ const SpotlightCard=({emps,onSel})=>{
   </div>
 };
 
+const VideoIntro=({onDone})=>{
+  const iframeRef=useRef(null);
+  const[showCta,setShowCta]=useState(false);
+  useEffect(()=>{
+    // Show CTA after video ends (~128s) or after 10s as skip option
+    const skipTimer=setTimeout(()=>setShowCta(true),8000);
+    return()=>clearTimeout(skipTimer);
+  },[]);
+  // Listen for video progress via postMessage (or just show skip)
+  return<div style={{position:'fixed',inset:0,zIndex:9999,background:'#FAFAFA',display:'flex',flexDirection:'column'}}>
+    <iframe ref={iframeRef} src="amj-video.html" style={{flex:1,border:'none',width:'100%',height:'100%'}} title="AMJ Showcase Video"/>
+    <div style={{position:'fixed',bottom:80,left:'50%',transform:'translateX(-50%)',display:'flex',gap:16,alignItems:'center',zIndex:10000}}>
+      {showCta&&<button onClick={()=>{localStorage.setItem('amj-video-seen','1');onDone()}} style={{padding:'14px 36px',borderRadius:14,background:'#FF0083',color:'white',border:'none',fontSize:18,fontWeight:800,cursor:'pointer',boxShadow:'0 8px 32px rgba(255,0,131,.3)',transition:'all .2s',fontFamily:'Lato,sans-serif'}}>
+        Enter the App →
+      </button>}
+      <button onClick={()=>{localStorage.setItem('amj-video-seen','1');onDone()}} style={{padding:'10px 20px',borderRadius:10,background:'rgba(0,0,0,.04)',color:'#9CA3AF',border:'1px solid #E5E7EB',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Lato,sans-serif'}}>
+        Skip Video
+      </button>
+    </div>
+  </div>
+};
+
 const LandingPage=({onEnter})=>{
   const roles=[
     {id:"maker",title:"New Employee",sub:"Maker View",desc:"Experience onboarding from Day 1–30. Track skills, log contributions, complete the review ritual, and connect with your buddy.",ic:"lemon",color:"#FF0083",bg:"linear-gradient(135deg,#FF008312,#FF008306)"},
     {id:"lead",title:"Team Lead",sub:"Manager View",desc:"Monitor your team's progress, prep 1:1 coaching sessions, verify skills, and catch early warning signs before they become problems.",ic:"people",color:"#6366f1",bg:"linear-gradient(135deg,#6366f112,#6366f106)"},
     {id:"strategy",title:"L&D Strategy",sub:"Strategy View",desc:"See the big picture: cohort analytics, skill gaps, attrition risk, and content intelligence across all teams.",ic:"chart",color:"#10b981",bg:"linear-gradient(135deg,#10b98112,#10b98106)"}
   ];
-  return<div className="min-h-screen bg-[#FAFAFA] flex flex-col">
-    <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16">
-      <div className="text-center mb-10 sm:mb-14">
+  return<div className="landing-scroll bg-[#FAFAFA] flex flex-col" style={{minHeight:'100vh',minHeight:'100dvh',overflowY:'auto',overflowX:'hidden',maxWidth:'100vw',width:'100%'}}>
+    <div className="landing-inner flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-16" style={{justifyContent:'safe center',overflowX:'hidden',maxWidth:'100vw',width:'100%'}}>
+      <div className="landing-header text-center mb-10 sm:mb-14">
         <div className="flex items-center justify-center gap-3 mb-6">
           <span style={{fontFamily:"'Pacifico',cursive",fontSize:"32px",color:"#FF0083"}}>Lemonade</span>
           <span className="text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
         </div>
-        <h1 className="text-[28px] sm:text-[36px] font-bold text-[#1A1A2E] mb-3" style={{fontFamily:"'Merriweather',serif"}}>AMJ — Autonomous Maker Journey</h1>
+        <h1 className="text-[22px] sm:text-[28px] lg:text-[36px] font-bold text-[#1A1A2E] mb-3" style={{fontFamily:"'Merriweather',serif"}}>AMJ — Autonomous Maker Journey</h1>
         <p className="text-[15px] sm:text-[17px] text-[#6B7280] max-w-xl mx-auto leading-relaxed mb-4">A smart onboarding platform that guides new hires through their first 30 days — with role-specific tasks, skill tracking, buddy connections, AI-native workflows, and manager oversight.</p>
         <div className="inline-flex items-center gap-2 bg-[#FEF9C3] border border-[#FDE68A] rounded-xl px-4 py-2 text-[13px] text-[#92400E]">
           <span>📋</span><span>Built as a companion to the take-home design document — this is a working interactive prototype</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 max-w-4xl w-full mb-12">
+      <div className="landing-grid grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 w-full mb-12" style={{maxWidth:'min(56rem, calc(100vw - 32px))'}}>
         {roles.map(r=><button key={r.id} onClick={()=>onEnter(r.id)} className="text-left bg-white border border-[#E5E7EB] rounded-[18px] p-6 shadow-sm hover:shadow-lg hover:border-transparent hover:scale-[1.02] transition-all group" style={{borderTop:`3px solid ${r.color}`}}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:r.bg}}><CI n={r.ic} sz={20} co={r.color}/></div>
@@ -3146,8 +3207,9 @@ const LandingPage=({onEnter})=>{
 };
 
 const App=()=>{
+  const[videoSeen,setVideoSeen]=useState(()=>localStorage.getItem('amj-video-seen')==='1');
   const[appReady,setAppReady]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)},[]);
+  useEffect(()=>{if(videoSeen){const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)}else{setAppReady(true)}},[videoSeen]);
   const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=useState("landing");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
   const setScr=useCallback((s)=>{_setScr(prev=>{setScrHist(h=>[...h.slice(-19),prev]);return s})},[_setScr]);
   const goBack=useCallback(()=>{if(scrHist.length>0){const prev=scrHist[scrHist.length-1];setScrHist(h=>h.slice(0,-1));_setScr(prev)}},[scrHist,_setScr]);
@@ -3272,7 +3334,10 @@ const App=()=>{
     return<StratOver setScr={setScr} onSel={id=>{setRole("lead");setSelId(id);setScr("employee")}}/>;
   };
 
-  if(!appReady) return <div className="h-screen bg-white flex flex-col items-center justify-center gap-6">
+  // Show video intro on first visit
+  if(!videoSeen) return <VideoIntro onDone={()=>setVideoSeen(true)}/>;
+
+  if(!appReady) return <div className="h-screen bg-white flex flex-col items-center justify-center gap-6" style={{height:'100vh',height:'100dvh'}}>
   <div className="splash-scale" style={{animationDelay:'.1s',animationFillMode:'both'}}>
     <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
       <ellipse cx="50" cy="52" rx="28" ry="32" className="line-art"/>
@@ -3297,14 +3362,14 @@ const App=()=>{
     else{setRole("strategy");setScr("strat-welcome")}
   }}/>;
 
-  return<div className="h-screen flex flex-col">
+  return<div className="h-screen flex flex-col" style={{height:'100vh',height:'100dvh'}}>
     <a href="#main-content" className="sr-only" style={{position:'absolute',top:'-40px',left:0,zIndex:300}} onFocus={e=>{e.target.style.position='static';e.target.style.background='#FF0083';e.target.style.color='white';e.target.style.padding='8px 16px';e.target.style.borderRadius='8px';e.target.style.fontSize='14px';e.target.style.fontWeight='600'}} onBlur={e=>{e.target.style.position='absolute';e.target.style.top='-40px'}}>Skip to content</a>
     <CmdPalette open={cmdOpen} onClose={()=>setCmdOpen(false)} query={cmdQ} setQuery={setCmdQ} results={cmdResults} idx={cmdIdx} setIdx={setCmdIdx} onSelect={r=>{r.act();setCmdOpen(false);setCmdQ("")}}/>
     <ShortcutsOverlay open={shortcutsOpen} onClose={()=>setShortcutsOpen(false)}/>
     {toast&&<Toast msg={toast.msg||toast} type={toast.type||'success'} onDone={()=>setToast(null)}/>}
     <Confetti show={confetti}/>
     {/* TOP BAR */}
-    <div className="h-[56px] bg-[#F7F7F7] border-b border-[#E5E7EB] flex items-center justify-between px-3 lg:px-5 flex-shrink-0" role="banner">
+    <div className="top-bar-h h-[56px] bg-[#F7F7F7] border-b border-[#E5E7EB] flex items-center justify-between px-3 lg:px-5 flex-shrink-0" role="banner">
       <div className="flex items-center gap-2 lg:gap-3.5">
         {/* HAMBURGER — visible on mobile */}
         <button onClick={()=>setSidebarOpen(!sidebarOpen)} className="lg:hidden w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" aria-label="Toggle sidebar">
@@ -3312,13 +3377,13 @@ const App=()=>{
         </button>
         <span onClick={()=>setScr("landing")} className="hidden sm:inline cursor-pointer hover:opacity-80 transition-opacity" style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
         <span onClick={()=>setScr("landing")} className="sm:hidden cursor-pointer hover:opacity-80 transition-opacity" style={{fontFamily:"'Pacifico',cursive",fontSize:"18px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
-        <span className="hidden sm:inline text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
+        <span className="hidden sm:inline ls-hide text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
       <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
         {/* BACK BUTTON */}
         {scrHist.length>0&&<button onClick={goBack} className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" title="Go back" aria-label="Go back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>}
         {/* SEARCH */}
-        <div className="relative tour-search hidden sm:block">
+        <div className="relative tour-search hidden sm:block ls-hide">
           <input value={searchQ} onChange={e=>{setSearchQ(e.target.value);setSearchOpen(true)}} onFocus={()=>setSearchOpen(true)} onBlur={()=>setTimeout(()=>setSearchOpen(false),200)}
             className="w-36 lg:w-48 bg-white border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[13px] text-[#1A1A2E] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FF0083] focus:w-64 transition-all shadow-sm" placeholder="Search... ⌘K"/>
           {searchOpen&&searchResults.length>0&&<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-[#E5E7EB] rounded-[14px] shadow-lg overflow-hidden z-50">
@@ -3329,14 +3394,14 @@ const App=()=>{
           </div>}
         </div>
         {/* DARK MODE TOGGLE — hidden on small mobile */}
-        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{background:darkMode?'#334155':'white',border:darkMode?'1px solid #475569':'1px solid #E5E7EB'}}>
+        <button onClick={()=>setDarkMode(!darkMode)} aria-label="Toggle dark mode" className="hidden sm:flex ls-hide w-8 h-8 rounded-lg items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" style={{background:darkMode?'#334155':'white',border:darkMode?'1px solid #475569':'1px solid #E5E7EB'}}>
           {darkMode?<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           :<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>}
         </button>
         {/* TOUR BUTTON */}
-        <button onClick={()=>{setTourStep(0);setTourDone(false)}} aria-label="Take a tour" title="Take a tour" className="hidden sm:flex items-center gap-1.5 h-8 rounded-lg bg-white border border-[#E5E7EB] px-2.5 hover:border-[#FF0083] transition-colors shadow-sm text-[12px] font-medium text-[#9CA3AF] hover:text-[#FF0083]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Tour</button>
+        <button onClick={()=>{setTourStep(0);setTourDone(false)}} aria-label="Take a tour" title="Take a tour" className="hidden sm:flex ls-hide items-center gap-1.5 h-8 rounded-lg bg-white border border-[#E5E7EB] px-2.5 hover:border-[#FF0083] transition-colors shadow-sm text-[12px] font-medium text-[#9CA3AF] hover:text-[#FF0083]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Tour</button>
         {/* SHORTCUTS BUTTON */}
-        <button onClick={()=>setShortcutsOpen(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" className="hidden sm:flex w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm text-[13px] font-mono text-[#9CA3AF] hover:text-[#FF0083]">?</button>
+        <button onClick={()=>setShortcutsOpen(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" className="hidden sm:flex ls-hide w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm text-[13px] font-mono text-[#9CA3AF] hover:text-[#FF0083]">?</button>
         {role==="maker"&&<div className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full pl-1.5 pr-3 py-1"><ProgressRing pct={Math.round(maker.day/30*100)} sz={28}/><span className="text-[12px] text-[#FF0083] font-bold">Day {maker.day}/30</span></div>}
         {role==="lead"&&<button onClick={()=>setScr("team")} className="hidden sm:flex items-center gap-2 bg-[#FF008310] rounded-full px-3 py-1 hover:bg-[#FF008325] transition-colors cursor-pointer"><span className="text-[12px] text-[#FF0083] font-bold">{leadE.length} reports</span></button>}
         {/* NOTIFICATIONS */}
@@ -3363,7 +3428,7 @@ const App=()=>{
             </div>
           </div>}
         </div>
-        <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block"/>
+        <div className="h-5 w-px bg-[#E5E7EB] hidden sm:block ls-hide"/>
         <div className="tour-role flex items-center bg-[#F3F4F6] rounded-lg p-0.5 gap-0.5">
           {[["maker","Maker","lemon"],["lead","Lead","people"],["strategy","Strategy","chart"]].map(([r,lb])=>
             <button key={r} onClick={()=>chRoleTab(r)} className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-[13px] font-medium transition-all ${role===r?"bg-white shadow-sm text-[#1A1A2E]":"text-[#9CA3AF] hover:text-[#6B7280]"}`} style={role===r?{borderBottom:"2px solid #FF0083"}:{}}>{lb}</button>
