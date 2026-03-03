@@ -573,7 +573,7 @@ const LEADS={
   Dana:{id:"l-dana",nm:"Dana Shapira",rl:"Product Lead",dp:"Insurance AI & Product Core",av:"DS",ph:"https://i.pravatar.cc/150?img=47",day:0,hp:0,sk:[],co:[]}
 };
 const BUDDIES={e1:"e10",e2:"e5",e3:"e6",e4:"e7",e5:"e2",e6:"e3",e7:"e4",e8:"e3",e9:"e5",e10:"e1"};
-const BUDDY_SESSIONS=[{day:2,tx:"Coffee chat — learn about the team",ic:"bubble"},{day:5,tx:"Shadow your buddy on a task",ic:"eye"},{day:10,tx:"Pair-code/design on your first contribution",ic:"people"}];
+const BUDDY_SESSIONS=[{day:1,tx:"Intro meeting — get to know each other (30 min)",ic:"handshake",wk:1},{day:3,tx:"Mid-week async check-in — share first observations",ic:"bubble",wk:1},{day:5,tx:"End-of-week debrief — reflect on Week 1 (30 min)",ic:"people",wk:1},{day:8,tx:"Pair on your first real contribution",ic:"pencil",wk:2},{day:10,tx:"Mid-week live debrief — review progress (30 min)",ic:"eye",wk:2}];
 const STRAT_USER={id:"l-ld",nm:"L&D Team",rl:"People & Culture",dp:"Strategy",av:"LD",ph:"",day:0,hp:0,sk:[],co:[]};
 const TEAMS=[
   {nm:"Product Core",ld:"Ran",co:"#FF0083",ids:E.filter(e=>e.dp==="Product Core").map(e=>e.id)},
@@ -681,7 +681,7 @@ const CI=({n,sz=16,co="#6B7280"})=>{const p={
 };return p[n]||<svg width={sz} height={sz} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={co} strokeWidth="1.5"/></svg>};
 
 const NAV={
-  maker:[{section:"GETTING STARTED"},{id:"welcome",lb:"Onboarding",ic:"lemon"},{id:"checklist",lb:"Day 1 Tasks",ic:"check"},{id:"journey",lb:"My Journey",ic:"map"},{section:"DAILY WORK"},{id:"home",lb:"Dashboard",ic:"home"},{id:"goals",lb:"Weekly Goals",ic:"target"},{id:"integrations",lb:"My Tasks",ic:"link"},{section:"SKILLS & GROWTH"},{id:"skills",lb:"My Skills",ic:"skill"},{id:"contributions",lb:"Contributions",ic:"doc"},{id:"ai-log",lb:"AI Log",ic:"clip"},{id:"ai-usage",lb:"AI Usage",ic:"ai"},{section:"EXPERIENCES"},{id:"crisis",lb:"Crisis Sim",ic:"bolt"},{id:"demo-day",lb:"Demo Day",ic:"star-fill",minDay:22},{id:"ai-review",lb:"30-Day AI Review",ic:"medal",minDay:22},{section:"RESOURCES"},{id:"calendar",lb:"Calendar",ic:"cal"},{id:"resources",lb:"Knowledge Base",ic:"book"},{id:"faq",lb:"FAQs & Links",ic:"faq"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
+  maker:[{section:"GETTING STARTED"},{id:"welcome",lb:"Onboarding",ic:"lemon"},{id:"checklist",lb:"Day 1 Tasks",ic:"check"},{id:"first-impressions",lb:"First Impressions",ic:"eye"},{id:"journey",lb:"My Journey",ic:"map"},{section:"DAILY WORK"},{id:"home",lb:"Dashboard",ic:"home"},{id:"goals",lb:"Weekly Goals",ic:"target"},{id:"integrations",lb:"My Tasks",ic:"link"},{section:"SKILLS & GROWTH"},{id:"skills",lb:"My Skills",ic:"skill"},{id:"contributions",lb:"Contributions",ic:"doc"},{id:"review-prep",lb:"Review Prep",ic:"clipboard"},{id:"ai-log",lb:"AI Log",ic:"clip"},{id:"ai-usage",lb:"AI Usage",ic:"ai"},{section:"EXPERIENCES"},{id:"crisis",lb:"Crisis Sim",ic:"bolt"},{id:"demo-day",lb:"Demo Day",ic:"star-fill",minDay:22},{id:"ai-review",lb:"30-Day AI Review",ic:"medal",minDay:22},{section:"RESOURCES"},{id:"calendar",lb:"Calendar",ic:"cal"},{id:"resources",lb:"Knowledge Base",ic:"book"},{id:"faq",lb:"FAQs & Links",ic:"faq"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
   lead:[{section:"TEAM OVERVIEW"},{id:"onboard-setup",lb:"Onboarding Setup",ic:"home"},{id:"team",lb:"Team Dashboard",ic:"team"},{id:"progress",lb:"Employee Progress",ic:"trend"},{section:"COACHING"},{id:"pulse",lb:"Team Pulse",ic:"heart"},{id:"one-on-one",lb:"1:1 Prep",ic:"hand"},{id:"review",lb:"Review Assistant",ic:"clip"},{section:"ANALYSIS"},{id:"alerts",lb:"Alert Center",ic:"alert"},{id:"analytics",lb:"Team Analytics",ic:"chart"},{id:"reflections",lb:"Reflections",ic:"think"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}],
   strategy:[{section:"OVERVIEW"},{id:"overview",lb:"Overview",ic:"chart"},{id:"cohorts",lb:"Cohort Analytics",ic:"trend"},{section:"INSIGHTS"},{id:"skill-gaps",lb:"Skill Gap Map",ic:"puzzle"},{id:"benchmarks",lb:"Benchmarks",ic:"trophy"},{id:"attrition",lb:"Attrition Risk",ic:"alert"},{id:"content",lb:"Content Intelligence",ic:"search"},{section:""},{id:"settings",lb:"Settings",ic:"gear"}]
 };
@@ -871,6 +871,8 @@ const RoleBadge=({rl})=>{const m={Engineer:{co:"#2563eb",ic:"dot-blue"},Designer
 
 const Journey=({emp})=>{
   const[sel,setSel]=useState(null);const cur=pDay(emp.day);
+  const bId=BUDDIES[emp.id];const buddy=bId?E.find(e=>e.id===bId):null;
+  const[budChecks]=usePersistedState('bud-chk-'+emp.id,{});const[budNotes]=usePersistedState('bud-notes-'+emp.id,{});
   return<div className="fi">
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
       <div><div className="flex items-center gap-3 mb-1 flex-wrap"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Journey</h1><RoleBadge rl={emp.rl}/></div><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Your 30-day path to ownership</p></div>
@@ -916,6 +918,17 @@ const Journey=({emp})=>{
         </div>
       </div>
     </div>:<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><p className="text-[#9CA3AF] text-[14px]">Click a phase above to explore</p></div>}
+    {buddy&&<div className="mt-8 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+        <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Your Buddy Journey</h3>
+        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#E5E7EB]"><Av e={buddy} sz={32}/><div><p className="text-[13px] font-semibold text-[#1A1A2E]">{buddy.nm}</p><p className="text-[10px] text-[#9CA3AF]">{buddy.rl} · {buddy.dp}</p></div></div>
+        <div className="relative pl-6">{BUDDY_SESSIONS.map((s,i)=>{const done=budChecks[s.day];const available=emp.day>=s.day;return<div key={i} className="relative pb-4 last:pb-0">
+          <div className="absolute left-[-18px] top-1 w-3 h-3 rounded-full border-2" style={{borderColor:done?"#10b981":available?"#FF0083":"#D1D5DB",background:done?"#10b981":"transparent"}}/>
+          {i<BUDDY_SESSIONS.length-1&&<div className="absolute left-[-13px] top-4 w-0.5 h-full" style={{background:done?"#10b981":"#E5E7EB"}}/>}
+          <div className="flex items-center gap-2"><span className="text-[10px] font-semibold text-[#9CA3AF]">Week {s.wk} · Day {s.day}</span>{done&&<span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#10b98115] text-[#10b981] font-semibold">Done</span>}</div>
+          <p className={`text-[13px] mt-0.5 ${done?"text-[#6B7280]":available?"text-[#1A1A2E] font-medium":"text-[#D1D5DB]"}`}>{s.tx}</p>
+          {budNotes[s.day]&&<p className="text-[11px] text-[#6B7280] mt-1 italic bg-[#F7F7F7] rounded-lg p-2">"{budNotes[s.day]}"</p>}
+        </div>})}</div>
+      </div>}
   </div>
 };
 
@@ -1424,7 +1437,7 @@ const ContentIntel=()=>{
 };
 
 // ───────────────── NEW: CHECKLIST ─────────────────
-const Checklist=({emp,onCelebrate})=>{
+const Checklist=({emp,onCelebrate,setScr})=>{
   const[checks,setChecks]=usePersistedState('cl-'+emp.id,{});const[sub,setSub]=usePersistedState('cl-sub-'+emp.id,false);
   const ph=pDay(emp.day);
   const roleTools={Engineer:[
@@ -1452,7 +1465,7 @@ const Checklist=({emp,onCelebrate})=>{
       {id:1,tx:"Download the Lemonade app and get a quote",ic:"phone",link:"https://lemonade.com/app",linkTx:"Open App Store"},
       {id:2,tx:"Run a full quote flow as a customer",ic:"bubble",link:null},
       {id:3,tx:"File a test claim in the app",ic:"shield",link:null},
-      {id:4,tx:"Write your first impressions (3+ observations)",ic:"pencil",link:null},
+      {id:4,tx:"Write your first impressions (3+ observations)",ic:"pencil",link:"first-impressions",linkTx:"Open Form"},
       {id:5,tx:"Complete the Customer Experience Review",ic:"clipboard",link:null}
     ]},
     {cat:`Set Up Your ${emp.rl} Workspace`,ic:"laptop",desc:`Get your ${emp.rl.toLowerCase()}-specific tools and environment ready`,items:[
@@ -1493,7 +1506,7 @@ const Checklist=({emp,onCelebrate})=>{
             </div>
             {it.logo?<img src={it.logo} alt="" className="w-4 h-4 flex-shrink-0" loading="lazy"/>:<span className="flex-shrink-0"><CI n={it.ic} sz={16}/></span>}
             <span className={`text-[13px] font-medium flex-1 ${checks[it.id]?"text-[#6B7280] line-through":"text-[#1A1A2E]"}`}>{it.tx}</span>
-            {it.link&&<a href={it.link} target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold text-[#FF0083] border border-[#FF008330] rounded-lg px-2.5 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0 no-underline">{it.linkTx||"Open"} →</a>}
+            {it.link&&(it.link.startsWith("http")||it.link.startsWith("slack:")?<a href={it.link} target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold text-[#FF0083] border border-[#FF008330] rounded-lg px-2.5 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0 no-underline">{it.linkTx||"Open"} →</a>:<button onClick={()=>setScr&&setScr(it.link)} className="text-[11px] font-semibold text-[#FF0083] border border-[#FF008330] rounded-lg px-2.5 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0">{it.linkTx||"Open"} →</button>)}
             {it.navTo&&<button onClick={()=>window.__setScr&&window.__setScr(it.navTo)} className="text-[11px] text-[#FF0083] border border-[#FF008330] rounded-lg px-2 py-1 hover:bg-[#FF008310] transition-all flex-shrink-0">View →</button>}
           </div>)}
         </div>
@@ -1597,6 +1610,75 @@ const CrisisSim=()=>{
         {!revealed&&<button onClick={()=>setRevealed(true)} className="mt-5 w-full bg-[#FF0083] text-white rounded-[14px] py-3 text-[14px] font-semibold btn-p">Check Answers</button>}
       </div>
     </div>
+  </div>
+};
+
+// ───────────────── NEW: FIRST IMPRESSIONS ─────────────────
+const FirstImpressions=({emp,setScr})=>{
+  const[fi,setFi]=usePersistedState('fi-'+emp.id,{magical:'',broken:'',confused:'',tags:[],savedDay:null});
+  const TAGS=["Quote Flow","Claims UX","Pricing Display","App Navigation","Notifications","Onboarding Flow","Chat Support","Policy Docs","Mobile Experience","Payment Flow"];
+  const toggleTag=t=>setFi(p=>({...p,tags:p.tags.includes(t)?p.tags.filter(x=>x!==t):[...p.tags,t]}));
+  const save=()=>setFi(p=>({...p,savedDay:emp.day}));
+  const hasFilled=fi.magical||fi.broken||fi.confused;
+  return<div className="fi">
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">First Impressions</h1><p className="text-[14px] text-[#6B7280] mt-1">Your customer lens — these observations fuel your Week 3 Fresh Eyes Audit</p></div>
+    {emp.day>=11&&hasFilled&&<div className="bg-[#f0fdf4] border border-[#10b98130] rounded-[14px] p-4 mb-6 flex items-center justify-between"><div className="flex items-center gap-3"><CI n="bulb" sz={20} co="#10b981"/><div><p className="text-[14px] font-semibold text-[#059669]">Ready for your Fresh Eyes Audit</p><p className="text-[12px] text-[#6B7280]">Your Day {fi.savedDay} impressions are waiting to be turned into a formal audit</p></div></div><button onClick={()=>setScr("contributions")} className="px-4 py-2 rounded-xl text-[13px] font-semibold text-white shadow-sm" style={{background:"linear-gradient(135deg,#FF0083,#e6007a)"}}>Start Audit →</button></div>}
+    {fi.savedDay&&<div className="mb-4 px-3 py-2 bg-[#F7F7F7] rounded-xl border border-[#E5E7EB] text-[12px] text-[#6B7280] flex items-center gap-2"><CI n="check-round" sz={14} co="#10b981"/>Saved on Day {fi.savedDay} — will resurface on Day 11 for your Fresh Eyes Audit</div>}
+    <div className="space-y-5">
+      {[["magical","What felt magical?","Moments that delighted you as a customer — the 'wow' moments","#10b981"],["broken","What felt broken?","Friction points, confusion, bugs, or moments that frustrated you","#ef4444"],["confused","What confused you?","Things that weren't intuitive, unclear language, or unexpected behavior","#f59e0b"]].map(([key,label,desc,co])=>
+        <div key={key} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-2"><CI n={key==="magical"?"sparkle":key==="broken"?"tool":"bulb"} sz={16} co={co}/><h3 className="text-[14px] font-semibold text-[#1A1A2E]">{label}</h3></div>
+          <p className="text-[12px] text-[#9CA3AF] mb-3">{desc}</p>
+          <textarea value={fi[key]} onChange={e=>setFi(p=>({...p,[key]:e.target.value}))} placeholder="Write your observations here..." className="w-full bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-3 text-[14px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] min-h-[80px] resize-y" rows={3}/>
+        </div>
+      )}
+    </div>
+    <div className="mt-6 bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
+      <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Quick Observation Tags</h3>
+      <div className="flex flex-wrap gap-2">{TAGS.map(t=><button key={t} onClick={()=>toggleTag(t)} className={`px-3 py-1.5 rounded-full text-[12px] font-medium border transition-all ${fi.tags.includes(t)?"bg-[#FF0083] text-white border-[#FF0083]":"bg-[#F7F7F7] text-[#6B7280] border-[#E5E7EB] hover:border-[#FF0083]"}`}>{t}</button>)}</div>
+    </div>
+    <div className="mt-6 flex justify-end"><button onClick={save} className="px-6 py-2.5 rounded-xl text-[14px] font-semibold text-white shadow-sm" style={{background:"linear-gradient(135deg,#FF0083,#e6007a)"}}>Save Impressions</button></div>
+  </div>
+};
+
+// ───────────────── NEW: REVIEW PREP ─────────────────
+const ReviewPrep=({emp})=>{
+  const[briefs,setBriefs]=usePersistedState('rv-briefs-'+emp.id,{});
+  const[during,setDuring]=usePersistedState('rv-during-'+emp.id,{});
+  const[notes,setNotes]=usePersistedState('rv-notes-'+emp.id,{});
+  const[exp,setExp]=useState(null);
+  const complete=emp.co.filter(c=>{const b=briefs[c.id];const n=notes[c.id];return b&&(b.context||b.aiUsage)&&n&&(n.learned||n.different)}).length;
+  const BRIEF_FIELDS=[["context","Context","My approach and key decisions"],["aiUsage","AI Usage","How I used AI and what I refined"],["uncertainties","Uncertainties","What I'm not confident about"],["learnGoal","Learning Goal","What I want to learn from this review"],["feedbackReq","Feedback Request","What specific feedback I want"]];
+  const DURING_FIELDS=[["craftQ","Reviewer's Craft Question","The key question your reviewer asked during the live review"],["improved","What We Improved Together","Changes made during the review session — the live learning moment"]];
+  const NOTE_FIELDS=[["learned","What I Learned","Key takeaway from this review"],["different","What I'd Do Differently","How this changes my approach going forward"],["skills","Skills Developed","Which skills did this review help build?"]];
+  const updateBrief=(cid,field,val)=>setBriefs(p=>({...p,[cid]:{...(p[cid]||{}),[field]:val}}));
+  const updateDuring=(cid,field,val)=>setDuring(p=>({...p,[cid]:{...(p[cid]||{}),[field]:val}}));
+  const updateNote=(cid,field,val)=>setNotes(p=>({...p,[cid]:{...(p[cid]||{}),[field]:val}}));
+  return<div className="fi">
+    <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Review Prep</h1><p className="text-[14px] text-[#6B7280] mt-1">The contribution review ritual — Before, During, and After</p></div>
+    <div className="bg-[#F7F7F7] border border-[#E5E7EB] rounded-[14px] p-4 mb-6 flex items-center justify-between">
+      <div className="flex items-center gap-3"><CI n="check-round" sz={18} co="#FF0083"/><span className="text-[14px] text-[#1A1A2E]"><strong>{complete}</strong> of <strong>{emp.co.length}</strong> contributions have complete review cycles</span></div>
+      <div className="w-24 h-2 bg-[#E5E7EB] rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${emp.co.length?Math.round(complete/emp.co.length*100):0}%`,background:"linear-gradient(90deg,#FF0083,#e6007a)"}}/></div>
+    </div>
+    {emp.co.length===0&&<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-10 text-center shadow-sm"><p className="text-[14px] text-[#9CA3AF]">No contributions yet. Submit your first PR, design, or brief to start the review ritual.</p></div>}
+    <div className="space-y-3">{emp.co.map(c=>{const b=briefs[c.id]||{};const d=during[c.id]||{};const n=notes[c.id]||{};const isReviewed=c.st==="merged"||c.st==="shipped";const isDraft=c.st==="draft";const isInReview=c.st==="in-review";return<div key={c.id} className="bg-white border border-[#E5E7EB] rounded-[14px] shadow-sm overflow-hidden">
+      <button onClick={()=>setExp(exp===c.id?null:c.id)} className="w-full p-4 flex items-center justify-between text-left">
+        <div className="flex items-center gap-3 flex-1 min-w-0"><TyB t={c.ty}/><span className="text-[14px] font-medium text-[#1A1A2E] truncate">{c.ti}</span></div>
+        <div className="flex items-center gap-3 flex-shrink-0"><StP s={c.st}/>{isDraft&&<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FF008315] text-[#FF0083] font-semibold">Prep Brief</span>}{isInReview&&(b.context?<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b98115] text-[#10b981] font-semibold">Brief Ready</span>:<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f59e0b15] text-[#d97706] font-semibold">No Brief</span>)}{isReviewed&&<span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3b82f615] text-[#3b82f6] font-semibold">{n.learned?"Complete":"Add Notes"}</span>}<svg className={`w-4 h-4 text-[#9CA3AF] transition-transform ${exp===c.id?"rotate-180":""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg></div>
+      </button>
+      {exp===c.id&&<div className="px-4 pb-5 border-t border-[#E5E7EB] pt-4 space-y-5">
+        <div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#FF0083] mb-3">Before — Pre-Review Brief</h4>
+          <div className="space-y-2">{BRIEF_FIELDS.map(([k,lb,ph])=><div key={k}><label className="text-[11px] font-semibold text-[#9CA3AF]">{lb}</label>{isDraft?<textarea value={b[k]||""} onChange={e=>updateBrief(c.id,k,e.target.value)} placeholder={ph} className="w-full mt-1 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-2.5 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] resize-none" rows={2}/>:<div className="mt-1 bg-[#F7F7F7] rounded-xl p-2.5 border border-[#E5E7EB] text-[13px] text-[#6B7280] min-h-[32px]">{b[k]||<span className="text-[#D1D5DB] italic">Not filled</span>}</div>}</div>)}</div>
+        </div>
+        {(isReviewed||isInReview)&&<div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#f59e0b] mb-3">During — The Live Review Moment</h4>
+          {isInReview?<div className="bg-[#f59e0b10] border border-[#f59e0b30] rounded-xl p-4 text-center"><span className="text-[13px] text-[#d97706]">Awaiting review — fill in the craft question and improvements after your live review session</span></div>
+          :<div className="space-y-2">{DURING_FIELDS.map(([k,lb,ph])=><div key={k}><label className="text-[11px] font-semibold text-[#9CA3AF]">{lb}</label><textarea value={d[k]||""} onChange={e=>updateDuring(c.id,k,e.target.value)} placeholder={ph} className="w-full mt-1 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-2.5 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] resize-none" rows={2}/></div>)}</div>}
+        </div>}
+        {isReviewed&&<div><h4 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#10b981] mb-3">After — Post-Review Learning Note</h4>
+          <div className="space-y-2">{NOTE_FIELDS.map(([k,lb,ph])=><div key={k}><label className="text-[11px] font-semibold text-[#9CA3AF]">{lb}</label><textarea value={n[k]||""} onChange={e=>updateNote(c.id,k,e.target.value)} placeholder={ph} className="w-full mt-1 bg-[#F7F7F7] border border-[#E5E7EB] rounded-xl p-2.5 text-[13px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] resize-none" rows={2}/></div>)}</div>
+        </div>}
+      </div>}
+    </div>})}</div>
   </div>
 };
 
@@ -1729,8 +1811,8 @@ const computeNudges=(emp)=>{
   const nextPhase=emp.day<=5?6:emp.day<=10?11:emp.day<=18?19:31;
   const daysToNext=nextPhase-emp.day;
   if(daysToNext>0&&daysToNext<=3){const nextPh=pInfo(nextPhase<=30?nextPhase:30);nudges.push({tx:`Phase transition in ${daysToNext} day${daysToNext>1?"s":""}! Prepare for "${nextPh.nm}" — check the journey map`,ic:"rocket",priority:1,type:"phase-transition",scr:"journey"})}
-  // No audit yet and past day 10
-  if(emp.day>10&&!emp.co.some(c=>c.ty==="Audit")){nudges.push({tx:"You haven't submitted a Fresh Eyes Audit yet — this is a key milestone for Week 3",ic:"eye",priority:3,type:"missing-audit",scr:"contributions"})}
+  // First Impressions → Fresh Eyes Audit nudge
+  if(emp.day>=11&&!emp.co.some(c=>c.ty==="Audit")){const fi=JSON.parse(localStorage.getItem('amj-fi-'+emp.id)||'{}');if(fi.magical||fi.broken||fi.confused){nudges.push({tx:`Your first impressions from Day ${fi.savedDay||'1'} are ready — time to turn them into a Fresh Eyes Audit`,ic:"eye",priority:2,type:"fi-to-audit",scr:"first-impressions"})}else{nudges.push({tx:"You haven't submitted a Fresh Eyes Audit yet — this is a key milestone for Week 3",ic:"eye",priority:3,type:"missing-audit",scr:"contributions"})}}
   // Draft items sitting too long
   emp.co.filter(c=>c.st==="draft"&&c.da>5).forEach(c=>{nudges.push({tx:`"${c.ti}" is still a draft after ${c.da} days — consider finalizing it`,ic:"pencil",priority:3,type:"stale-draft",scr:"contributions"})});
   // Sort by priority
@@ -1887,13 +1969,20 @@ const MakerDash=({emp,setScr})=>{
           </div>)}</div>
           <button onClick={()=>setScr("calendar")} className="mt-4 text-[12px] text-[#FF0083] font-medium hover:underline">View full calendar →</button>
         </div>
-        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
-          <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Your Buddy</h3>
-          {(()=>{const bId=BUDDIES[emp.id];const buddy=bId?E.find(e=>e.id===bId):null;return buddy?<div>
+        {(()=>{const bId=BUDDIES[emp.id];const buddy=bId?E.find(e=>e.id===bId):null;if(!buddy)return<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5"><p className="text-[12px] text-[#9CA3AF]">Buddy not assigned yet</p></div>;
+          const[budChecks,setBudChecks]=usePersistedState('bud-chk-'+emp.id,{});const[budNotes,setBudNotes]=usePersistedState('bud-notes-'+emp.id,{});const[noteExp,setNoteExp]=useState(null);
+          const nextSession=BUDDY_SESSIONS.find(s=>!budChecks[s.day]&&emp.day>=s.day)||BUDDY_SESSIONS.find(s=>emp.day<s.day);
+          const roleTips={Engineer:"codebase patterns and dev workflows",Designer:"design system conventions and review culture",PM:"product planning tools and stakeholder dynamics"};
+          return<div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm mb-5">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-3">Your Buddy</h3>
             <div className="flex items-center gap-3 mb-3"><Av e={buddy} sz={36}/><div><p className="text-[13px] font-semibold text-[#1A1A2E]">{buddy.nm}</p><p className="text-[10px] text-[#9CA3AF]">{buddy.rl} · {buddy.dp}</p></div></div>
-            <div className="space-y-1.5">{BUDDY_SESSIONS.map((s,i)=><div key={i} className="flex items-center gap-2 text-[11px]"><CI n={s.ic} sz={12} co={emp.day>=s.day?"#10b981":"#D1D5DB"}/><span className={emp.day>=s.day?"text-[#6B7280] line-through":"text-[#1A1A2E]"}>Day {s.day}: {s.tx}</span></div>)}</div>
-          </div>:<p className="text-[12px] text-[#9CA3AF]">Buddy not assigned yet</p>})()}
-        </div>
+            {nextSession&&<div className="bg-[#FF008308] border border-[#FF008320] rounded-xl p-2.5 mb-3 flex items-center gap-2"><CI n="clock" sz={12} co="#FF0083"/><span className="text-[11px] text-[#FF0083] font-medium">Next: Day {nextSession.day} — {nextSession.tx.split("—")[0].trim()}</span></div>}
+            <div className="space-y-1.5 mb-3">{BUDDY_SESSIONS.map((s,i)=>{const done=budChecks[s.day];const available=emp.day>=s.day;return<div key={i}><div className="flex items-center gap-2 text-[11px]">{available?<input type="checkbox" checked={!!done} onChange={()=>setBudChecks(p=>({...p,[s.day]:!p[s.day]}))} className="accent-[#FF0083] w-3.5 h-3.5 cursor-pointer"/>:<CI n={s.ic} sz={12} co="#D1D5DB"/>}<span className={done?"text-[#6B7280] line-through":available?"text-[#1A1A2E]":"text-[#D1D5DB]"}>Day {s.day}: {s.tx}</span>{done&&<button onClick={()=>setNoteExp(noteExp===s.day?null:s.day)} className="text-[9px] text-[#FF0083] ml-1">{budNotes[s.day]?"edit":"+ note"}</button>}</div>
+              {noteExp===s.day&&<textarea value={budNotes[s.day]||""} onChange={e=>setBudNotes(p=>({...p,[s.day]:e.target.value}))} placeholder="How did it go?" className="w-full mt-1 ml-5 bg-[#F7F7F7] border border-[#E5E7EB] rounded-lg p-2 text-[11px] text-[#1A1A2E] placeholder-[#D1D5DB] focus:outline-none focus:border-[#FF0083] resize-none" rows={2}/>}
+            </div>})}</div>
+            <p className="text-[10px] text-[#9CA3AF] italic mb-2">As a {buddy.rl}, {buddy.nm.split(" ")[0]} can help with {roleTips[buddy.rl]||"onboarding patterns"}</p>
+            <button onClick={()=>setScr("calendar")} className="text-[11px] text-[#FF0083] font-medium hover:underline">Schedule next check-in →</button>
+          </div>})()}
         <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
           <h3 className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#9CA3AF] mb-4">Quick Actions</h3>
           <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">{[["checklist","Checklist","check-round"],["ai-log","AI Log","clipboard"],["companion","Ask Lemi","bubble"]].map(([id,lb,ic])=>
@@ -3071,12 +3160,14 @@ const App=()=>{
       if(scr==="home")return<MakerDash emp={maker} setScr={setScr}/>;
       if(scr==="welcome")return<Welcome emp={maker} setScr={setScr} onTour={()=>setTourStep(0)} tourDone={tourDone} onSelEmp={id=>{setRole("lead");setSelId(id);setScr("employee")}}/>;
       if(scr==="journey")return<Journey emp={maker}/>;
-      if(scr==="checklist")return<Checklist emp={maker} onCelebrate={fireConfetti}/>;
+      if(scr==="checklist")return<Checklist emp={maker} onCelebrate={fireConfetti} setScr={setScr}/>;
       if(scr==="goals")return<WeeklyGoals toast={showToast} onCelebrate={fireConfetti} setScr={setScr}/>;
       if(scr==="skills")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Skills</h1><p className="text-[14px] text-[#6B7280] mt-1">Track your skill development</p></div><Skills emp={maker} ro/></div>;
       if(scr==="contributions")return<div className="fi"><div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">My Contributions</h1><p className="text-[14px] text-[#6B7280] mt-1">All submissions and review status</p></div><Contribs emp={maker}/></div>;
       if(scr==="ai-log")return<AILogForm emp={maker}/>;
       if(scr==="ai-usage")return<AIU emp={maker}/>;
+      if(scr==="first-impressions")return<FirstImpressions emp={maker} setScr={setScr}/>;
+      if(scr==="review-prep")return<ReviewPrep emp={maker}/>;
       if(scr==="crisis")return<CrisisSim/>;
       if(scr==="demo-day")return<DemoDay emp={maker} onCelebrate={fireConfetti}/>;
       if(scr==="ai-review")return<AIReview emp={maker}/>;
