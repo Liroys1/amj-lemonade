@@ -329,51 +329,51 @@ const TIMELINE=[
 // ── Role + Profession-specific notifications ──
 const NOTIFS_MAKER={
   Engineer:[
-    {id:"n1",tx:"Your PR 'Unit tests for notification service' is awaiting review",ts:"2h ago",read:false,ic:"pencil",scr:"contribs"},
+    {id:"n1",tx:"Your PR 'Unit tests for notification service' is awaiting review",ts:"2h ago",read:false,ic:"pencil",scr:"contributions"},
     {id:"n2",tx:"Sprint planning tomorrow at 10:00 AM",ts:"3h ago",read:false,ic:"calendar-sm",scr:"calendar"},
     {id:"n3",tx:"{lead} verified your AI Contribution Logging skill",ts:"4h ago",read:false,ic:"medal",scr:"skills"},
-    {id:"n4",tx:"New comment on your Fresh Eyes Audit",ts:"6h ago",read:true,ic:"comment",scr:"contribs"},
-    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"aiu"},
-    {id:"n6",tx:"CI pipeline passed — your last commit is green",ts:"1d ago",read:true,ic:"check-round",scr:"contribs"},
+    {id:"n4",tx:"New comment on your Fresh Eyes Audit",ts:"6h ago",read:true,ic:"comment",scr:"contributions"},
+    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"ai-usage"},
+    {id:"n6",tx:"CI pipeline passed — your last commit is green",ts:"1d ago",read:true,ic:"check-round",scr:"contributions"},
     {id:"n7",tx:"New resource: Lemonade Architecture Deep Dive",ts:"2d ago",read:true,ic:"books",scr:"resources"},
-    {id:"n8",tx:"Your contribution streak is 5 days!",ts:"2d ago",read:true,ic:"fire",scr:"contribs"}
+    {id:"n8",tx:"Your contribution streak is 5 days!",ts:"2d ago",read:true,ic:"fire",scr:"contributions"}
   ],
   Designer:[
-    {id:"n1",tx:"Your design 'Claims Status Page' is awaiting review",ts:"2h ago",read:false,ic:"paint",scr:"contribs"},
+    {id:"n1",tx:"Your design 'Claims Status Page' is awaiting review",ts:"2h ago",read:false,ic:"paint",scr:"contributions"},
     {id:"n2",tx:"Design critique session tomorrow at 11:00 AM",ts:"3h ago",read:false,ic:"calendar-sm",scr:"calendar"},
     {id:"n3",tx:"{lead} verified your Accessibility Standards skill",ts:"4h ago",read:false,ic:"medal",scr:"skills"},
-    {id:"n4",tx:"Feedback on your Mobile Navigation patterns",ts:"6h ago",read:true,ic:"comment",scr:"contribs"},
-    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"aiu"},
+    {id:"n4",tx:"Feedback on your Mobile Navigation patterns",ts:"6h ago",read:true,ic:"comment",scr:"contributions"},
+    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"ai-usage"},
     {id:"n6",tx:"Design System tokens updated — review changes",ts:"1d ago",read:true,ic:"paint",scr:"resources"},
     {id:"n7",tx:"New resource: Lemonade Brand Guidelines v3",ts:"2d ago",read:true,ic:"books",scr:"resources"},
-    {id:"n8",tx:"Your contribution streak is 3 days!",ts:"2d ago",read:true,ic:"fire",scr:"contribs"}
+    {id:"n8",tx:"Your contribution streak is 3 days!",ts:"2d ago",read:true,ic:"fire",scr:"contributions"}
   ],
   PM:[
-    {id:"n1",tx:"Your brief 'Q2 OKR Alignment' has new comments",ts:"2h ago",read:false,ic:"doc",scr:"contribs"},
+    {id:"n1",tx:"Your brief 'Q2 OKR Alignment' has new comments",ts:"2h ago",read:false,ic:"doc",scr:"contributions"},
     {id:"n2",tx:"Stakeholder sync tomorrow at 10:00 AM",ts:"3h ago",read:false,ic:"calendar-sm",scr:"calendar"},
     {id:"n3",tx:"{lead} verified your OKR Planning skill",ts:"4h ago",read:false,ic:"medal",scr:"skills"},
-    {id:"n4",tx:"New data on your User Research analysis",ts:"6h ago",read:true,ic:"comment",scr:"contribs"},
-    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"aiu"},
-    {id:"n6",tx:"Product metrics dashboard refreshed with latest data",ts:"1d ago",read:true,ic:"chart-up",scr:"contribs"},
+    {id:"n4",tx:"New data on your User Research analysis",ts:"6h ago",read:true,ic:"comment",scr:"contributions"},
+    {id:"n5",tx:"Weekly reflection due by Friday",ts:"1d ago",read:true,ic:"pencil",scr:"ai-usage"},
+    {id:"n6",tx:"Product metrics dashboard refreshed with latest data",ts:"1d ago",read:true,ic:"chart-up",scr:"home"},
     {id:"n7",tx:"New resource: Lemonade Product Strategy Playbook",ts:"2d ago",read:true,ic:"books",scr:"resources"},
-    {id:"n8",tx:"Your contribution streak is 4 days!",ts:"2d ago",read:true,ic:"fire",scr:"contribs"}
+    {id:"n8",tx:"Your contribution streak is 4 days!",ts:"2d ago",read:true,ic:"fire",scr:"contributions"}
   ]
 };
 const NOTIFS_LEAD=[
-  {id:"nl1",tx:"{low_hp} health score dropped below 60 — needs attention",ts:"1h ago",read:false,ic:"bolt",scr:"team"},
-  {id:"nl2",tx:"{maker1} submitted a new PR for review",ts:"2h ago",read:false,ic:"pencil",scr:"contribs"},
-  {id:"nl3",tx:"1:1 prep ready for {maker2} — review talking points",ts:"3h ago",read:false,ic:"people",scr:"1on1"},
-  {id:"nl4",tx:"{maker3} completed the Sandbox phase — congrats!",ts:"5h ago",read:true,ic:"party",scr:"team"},
+  {id:"nl1",tx:"{low_hp} health score dropped below 60 — needs attention",ts:"1h ago",read:false,ic:"bolt",scr:"progress",emp:"{low_hp_id}"},
+  {id:"nl2",tx:"{maker1} submitted a new PR for review",ts:"2h ago",read:false,ic:"pencil",scr:"progress",emp:"{maker1_id}"},
+  {id:"nl3",tx:"1:1 prep ready for {maker2} — review talking points",ts:"3h ago",read:false,ic:"people",scr:"one-on-one"},
+  {id:"nl4",tx:"{maker3} completed the Sandbox phase — congrats!",ts:"5h ago",read:true,ic:"party",scr:"progress",emp:"{maker3_id}"},
   {id:"nl5",tx:"Team pulse check: 2 makers at risk this week",ts:"1d ago",read:true,ic:"chart-up",scr:"pulse"},
-  {id:"nl6",tx:"{maker4} AI usage is above 60% — coaching opportunity",ts:"1d ago",read:true,ic:"robot",scr:"team"},
+  {id:"nl6",tx:"{maker4} AI usage is above 60% — coaching opportunity",ts:"1d ago",read:true,ic:"robot",scr:"progress",emp:"{maker4_id}"},
   {id:"nl7",tx:"Weekly team report is ready to review",ts:"2d ago",read:true,ic:"doc",scr:"analytics"},
-  {id:"nl8",tx:"{maker5} earned the AI-Native badge",ts:"2d ago",read:true,ic:"medal",scr:"skills"}
+  {id:"nl8",tx:"{maker5} earned the AI-Native badge",ts:"2d ago",read:true,ic:"medal",scr:"progress",emp:"{maker5_id}"}
 ];
 const NOTIFS_STRATEGY=[
-  {id:"ns1",tx:"Cohort 2026-Q1 completion rate dropped to 72%",ts:"1h ago",read:false,ic:"chart-up",scr:"cohort"},
+  {id:"ns1",tx:"Cohort 2026-Q1 completion rate dropped to 72%",ts:"1h ago",read:false,ic:"chart-up",scr:"cohorts"},
   {id:"ns2",tx:"Attrition risk alert: 3 makers flagged this week",ts:"2h ago",read:false,ic:"bolt",scr:"attrition"},
-  {id:"ns3",tx:"Skill gap report updated — AI-Native skills lagging",ts:"4h ago",read:false,ic:"target-sm",scr:"skillgap"},
-  {id:"ns4",tx:"New benchmark data available: Industry comparison Q1",ts:"6h ago",read:true,ic:"doc",scr:"benchmark"},
+  {id:"ns3",tx:"Skill gap report updated — AI-Native skills lagging",ts:"4h ago",read:false,ic:"target-sm",scr:"skill-gaps"},
+  {id:"ns4",tx:"New benchmark data available: Industry comparison Q1",ts:"6h ago",read:true,ic:"doc",scr:"benchmarks"},
   {id:"ns5",tx:"Content performance: 'Architecture Guide' most viewed",ts:"1d ago",read:true,ic:"books",scr:"content"},
   {id:"ns6",tx:"Program NPS this month: 78 (+5 from last month)",ts:"1d ago",read:true,ic:"sparkle",scr:"overview"},
   {id:"ns7",tx:"2 leads requested additional coaching resources",ts:"2d ago",read:true,ic:"people",scr:"overview"},
@@ -387,10 +387,14 @@ const getInitialNotifs=(role,prof,employees,leadName)=>{
     const makers=team.slice(0,5);
     return NOTIFS_LEAD.map(n=>{
       let tx=n.tx;
-      if(low) tx=tx.replace("{low_hp}",low.nm);
-      else tx=tx.replace("{low_hp} health score dropped below 60 — needs attention","Team health looks good — all makers above 65");
-      for(let i=0;i<5;i++) tx=tx.replace(`{maker${i+1}}`,makers[i]?makers[i].nm:"A maker");
-      return {...n,tx};
+      let emp=n.emp||null;
+      if(low){tx=tx.replace("{low_hp}",low.nm);if(emp)emp=emp.replace("{low_hp_id}",low.id);}
+      else{tx=tx.replace("{low_hp} health score dropped below 60 — needs attention","Team health looks good — all makers above 65");emp=null;}
+      for(let i=0;i<5;i++){
+        tx=tx.replace(`{maker${i+1}}`,makers[i]?makers[i].nm:"A maker");
+        if(emp&&makers[i])emp=emp.replace(`{maker${i+1}_id}`,makers[i].id);
+      }
+      return {...n,tx,emp};
     });
   }
   const notifsByProf=NOTIFS_MAKER[prof]||NOTIFS_MAKER.Engineer;
@@ -2960,42 +2964,42 @@ const CmdPalette=({open,onClose,query,setQuery,results,idx,setIdx,onSelect})=>{
 
 // ───────────────── ROLE-SPECIFIC REAL-TIME NOTIFICATION TEMPLATES ─────────────────
 const REAL_TIME_NOTIFS_MAKER=[
-  {tx:"Your squad mate {nm} submitted a PR — check it out",ic:"pencil",scr:"contribs"},
-  {tx:"{nm} paired with you for code review",ic:"people",scr:"contribs"},
-  {tx:"Your lead commented on your latest contribution",ic:"comment",scr:"contribs"},
+  {tx:"Your squad mate {nm} submitted a PR — check it out",ic:"pencil",scr:"contributions"},
+  {tx:"{nm} paired with you for code review",ic:"people",scr:"contributions"},
+  {tx:"Your lead commented on your latest contribution",ic:"comment",scr:"contributions"},
   {tx:"New skill unlocked: {nm} verified your work",ic:"medal",scr:"skills"},
-  {tx:"AI usage tip: try reducing AI to under 40% on your next PR",ic:"robot",scr:"ailog"},
+  {tx:"AI usage tip: try reducing AI to under 40% on your next PR",ic:"robot",scr:"ai-log"},
   {tx:"Sprint planning starts in 15 minutes",ic:"calendar-sm",scr:"calendar"},
   {tx:"Your health score improved by 3 points this week",ic:"chart-up",scr:"home"},
-  {tx:"Weekly reflection reminder — share what you learned",ic:"sparkle",scr:"aiu"},
+  {tx:"Weekly reflection reminder — share what you learned",ic:"sparkle",scr:"ai-usage"},
   {tx:"New resource added to your onboarding path",ic:"books",scr:"resources"},
-  {tx:"Your Fresh Eyes Audit got positive feedback!",ic:"bulb",scr:"contribs"},
+  {tx:"Your Fresh Eyes Audit got positive feedback!",ic:"bulb",scr:"contributions"},
   {tx:"Day {day} milestone reached — keep going!",ic:"flag",scr:"journey"},
   {tx:"Crisis Simulation is now available for your squad",ic:"bolt",scr:"crisis"}
 ];
 const REAL_TIME_NOTIFS_LEAD=[
-  {tx:"{nm} submitted a new PR for review",ic:"pencil",scr:"contribs"},
-  {tx:"{nm}'s health score dropped to {hp} — check in",ic:"bolt",scr:"team"},
-  {tx:"{nm}'s health score improved to {hp}",ic:"chart-up",scr:"team"},
-  {tx:"{nm} completed a skill verification",ic:"medal",scr:"skills"},
-  {tx:"{nm} finished their Fresh Eyes Audit",ic:"bulb",scr:"contribs"},
-  {tx:"{nm}'s AI usage is trending high ({hp}%) this week",ic:"robot",scr:"team"},
-  {tx:"{nm} has been quiet for 2 days — consider a check-in",ic:"people",scr:"1on1"},
-  {tx:"1:1 with {nm} scheduled for tomorrow",ic:"calendar-sm",scr:"1on1"},
+  {tx:"{nm} submitted a new PR for review",ic:"pencil",scr:"progress"},
+  {tx:"{nm}'s health score dropped to {hp} — check in",ic:"bolt",scr:"progress"},
+  {tx:"{nm}'s health score improved to {hp}",ic:"chart-up",scr:"progress"},
+  {tx:"{nm} completed a skill verification",ic:"medal",scr:"progress"},
+  {tx:"{nm} finished their Fresh Eyes Audit",ic:"bulb",scr:"progress"},
+  {tx:"{nm}'s AI usage is trending high ({hp}%) this week",ic:"robot",scr:"progress"},
+  {tx:"{nm} has been quiet for 2 days — consider a check-in",ic:"people",scr:"one-on-one"},
+  {tx:"1:1 with {nm} scheduled for tomorrow",ic:"calendar-sm",scr:"one-on-one"},
   {tx:"{nm} reached Day {day} milestone",ic:"flag",scr:"team"},
-  {tx:"{nm} earned the AI-Native badge",ic:"medal",scr:"skills"},
+  {tx:"{nm} earned the AI-Native badge",ic:"medal",scr:"progress"},
   {tx:"Team pulse: your squad's avg health is {hp}",ic:"chart-up",scr:"pulse"},
-  {tx:"{nm}'s PR was merged successfully",ic:"check-round",scr:"contribs"}
+  {tx:"{nm}'s PR was merged successfully",ic:"check-round",scr:"progress"}
 ];
 const REAL_TIME_NOTIFS_STRATEGY=[
-  {tx:"Cohort completion rate changed: now {hp}%",ic:"chart-up",scr:"cohort"},
+  {tx:"Cohort completion rate changed: now {hp}%",ic:"chart-up",scr:"cohorts"},
   {tx:"{nm} flagged as attrition risk — low engagement",ic:"bolt",scr:"attrition"},
-  {tx:"Skill gap widening: AI-Native across {day} employees",ic:"target-sm",scr:"skillgap"},
-  {tx:"New benchmark data: your program vs industry avg",ic:"doc",scr:"benchmark"},
+  {tx:"Skill gap widening: AI-Native across {day} employees",ic:"target-sm",scr:"skill-gaps"},
+  {tx:"New benchmark data: your program vs industry avg",ic:"doc",scr:"benchmarks"},
   {tx:"Content '{nm}' resource most accessed this week",ic:"books",scr:"content"},
   {tx:"Program NPS update: score now {hp}",ic:"sparkle",scr:"overview"},
   {tx:"Lead {nm} requested additional coaching materials",ic:"people",scr:"overview"},
-  {tx:"{day} new employees starting next cohort",ic:"flag",scr:"cohort"},
+  {tx:"{day} new employees starting next cohort",ic:"flag",scr:"cohorts"},
   {tx:"Monthly program review reminder — data refreshed",ic:"calendar-sm",scr:"overview"},
   {tx:"Attrition risk reduced: {nm} health improving",ic:"chart-up",scr:"attrition"}
 ];
@@ -3545,7 +3549,7 @@ const App=()=>{
               <span style={{fontSize:13,fontWeight:600,color:darkMode?'#F1F5F9':'#1A1A2E'}}>Notifications<span style={{fontSize:10,fontWeight:400,color:darkMode?'#64748B':'#9CA3AF',marginLeft:6}}>{role==="maker"?maker.rl:role==="lead"?"Lead":"Strategy"}</span></span>
               <button onClick={()=>{setNotifs(p=>p.map(n=>({...n,read:true})));showToast({msg:"All marked as read",type:"success"})}} style={{fontSize:11,color:'#FF0083',fontWeight:500,background:'none',border:'none',cursor:'pointer'}}>Mark all read</button>
             </div>
-            <div style={{maxHeight:320,overflowY:'auto'}}>{notifs.length===0?<div style={{padding:'24px 16px',textAlign:'center',color:darkMode?'#64748B':'#9CA3AF',fontSize:13}}>No notifications</div>:notifs.map(n=><div key={n.id} onClick={()=>{setNotifs(p=>p.map(x=>x.id===n.id?{...x,read:true}:x));if(n.scr){setScr(n.scr)};setNotifOpen(false)}} style={{padding:'12px 16px',display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',background:!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent',transition:'background .15s'}} onMouseEnter={e=>e.currentTarget.style.background=darkMode?'rgba(255,0,131,.18)':'rgba(255,0,131,.08)'} onMouseLeave={e=>e.currentTarget.style.background=!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}>
+            <div style={{maxHeight:320,overflowY:'auto'}}>{notifs.length===0?<div style={{padding:'24px 16px',textAlign:'center',color:darkMode?'#64748B':'#9CA3AF',fontSize:13}}>No notifications</div>:notifs.map(n=><div key={n.id} onClick={()=>{setNotifs(p=>p.map(x=>x.id===n.id?{...x,read:true}:x));if(n.emp){setSelId(n.emp)};if(n.scr){setScr(n.scr)};setNotifOpen(false)}} style={{padding:'12px 16px',display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer',borderBottom:darkMode?'1px solid #475569':'1px solid #E5E7EB',background:!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent',transition:'background .15s'}} onMouseEnter={e=>e.currentTarget.style.background=darkMode?'rgba(255,0,131,.18)':'rgba(255,0,131,.08)'} onMouseLeave={e=>e.currentTarget.style.background=!n.read?(darkMode?'rgba(255,0,131,.08)':'rgba(255,0,131,.03)'):'transparent'}>
               <span style={{marginTop:2,flexShrink:0}}><CI n={n.ic} sz={16}/></span>
               <div style={{flex:1,minWidth:0}}><p style={{fontSize:13,color:n.read?(darkMode?'#94A3B8':'#6B7280'):(darkMode?'#F1F5F9':'#1A1A2E'),fontWeight:n.read?400:500,margin:0}}>{n.tx}</p><p style={{fontSize:11,color:darkMode?'#64748B':'#9CA3AF',marginTop:3,margin:0}}>{n.ts}</p></div>
               {!n.read&&<div style={{width:8,height:8,borderRadius:'50%',background:'#FF0083',marginTop:6,flexShrink:0}}/>}
