@@ -45,7 +45,8 @@ export const AMJShowcase: React.FC = () => {
   return (
     <AbsoluteFill style={BG}>
       {/* Background music - ambient corporate, low volume */}
-      <Audio src={staticFile('music.mp3')} volume={musicVolume} loop />
+      {/* @ts-ignore - Remotion 4 type issue with React 18 */}
+      <Audio src={staticFile('music.mp3')} volume={musicVolume} loop={true} />
 
       <Sequence from={SCENES.logo.from} durationInFrames={SCENES.logo.dur} name="Logo Reveal">
         <LogoReveal />

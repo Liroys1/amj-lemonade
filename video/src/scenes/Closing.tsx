@@ -2,12 +2,13 @@ import React from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Sequence} from 'remotion';
 import {C, headingFont, scriptFont} from '../components/styles';
 import {LemonIcon} from '../components/LemonIcon';
+import {CompassIcon, RobotIcon, TargetIcon, CycleIcon} from '../components/Icons';
 
 const differentiators = [
-  {icon: '🧭', title: 'Self-Directed', desc: 'No hand-holding. Makers own their journey from day one.'},
-  {icon: '🤖', title: 'AI-Native', desc: 'AI woven into every layer — not bolted on as an afterthought.'},
-  {icon: '🎯', title: 'Role-Based Intelligence', desc: 'Three distinct views. One unified system. Zero wasted motion.'},
-  {icon: '🔄', title: 'Continuous Feedback', desc: 'Every contribution tracked, every signal visible, every gap addressed.'},
+  {Icon: CompassIcon, title: 'Self-Directed', desc: 'No hand-holding. Makers own their journey from day one.'},
+  {Icon: RobotIcon, title: 'AI-Native', desc: 'AI woven into every layer — not bolted on as an afterthought.'},
+  {Icon: TargetIcon, title: 'Role-Based Intelligence', desc: 'Three distinct views. One unified system. Zero wasted motion.'},
+  {Icon: CycleIcon, title: 'Continuous Feedback', desc: 'Every contribution tracked, every signal visible, every gap addressed.'},
 ];
 
 const KeyDifferentiators: React.FC = () => {
@@ -57,7 +58,7 @@ const KeyDifferentiators: React.FC = () => {
                 justifyContent: 'center',
                 fontSize: 28,
                 flexShrink: 0,
-              }}>{d.icon}</div>
+              }}><d.Icon size={28} /></div>
               <div>
                 <h3 style={{fontSize: 19, fontWeight: 700, color: C.dark, marginBottom: 6}}>{d.title}</h3>
                 <p style={{fontSize: 14, color: C.textSec, lineHeight: 1.5}}>{d.desc}</p>
@@ -112,8 +113,8 @@ const PersonalStatement: React.FC = () => {
         opacity: nameEnter,
         textAlign: 'center',
       }}>
-        <p style={{fontSize: 18, fontWeight: 600, color: C.dark}}>Liran Shulman</p>
-        <p style={{fontSize: 14, color: C.textSec, marginTop: 4}}>L&D Designer</p>
+        <p style={{fontSize: 18, fontWeight: 600, color: C.dark}}>Liran Shaked</p>
+        <p style={{fontSize: 14, color: C.textSec, marginTop: 4}}>L&D</p>
       </div>
     </AbsoluteFill>
   );
@@ -174,7 +175,7 @@ const FinalFrame: React.FC = () => {
           Built with 🍋 for Lemonade
         </p>
         <p style={{fontSize: 13, color: C.textTer, marginTop: 8, opacity: 0.7}}>
-          liran shulman — 2025
+          liran shaked — 2026
         </p>
       </div>
     </AbsoluteFill>

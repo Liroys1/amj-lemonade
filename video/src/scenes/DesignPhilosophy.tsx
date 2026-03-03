@@ -1,12 +1,13 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate} from 'remotion';
 import {C, headingFont} from '../components/styles';
+import {SeedlingIcon, FlaskIcon, PeopleIcon, TrophyIcon} from '../components/Icons';
 
 const phases = [
-  {week: 'Week 1', name: 'Ground Yourself', desc: 'Absorb culture, meet your squad, set up tools', color: '#10b981', icon: '🌱'},
-  {week: 'Week 2', name: 'The Sandbox', desc: 'Make small, safe first contributions', color: '#3b82f6', icon: '🧪'},
-  {week: 'Week 3', name: 'Squad Experience', desc: 'Own a task end-to-end, present Fresh Eyes Audit', color: '#9333ea', icon: '🤝'},
-  {week: 'Week 4', name: 'Ownership', desc: 'Lead a feature, solidify your craft identity', color: '#FF0083', icon: '🚀'},
+  {week: 'Week 1', name: 'Ground Yourself', desc: 'Absorb culture, meet your squad, set up tools', color: '#10b981', Icon: SeedlingIcon},
+  {week: 'Week 2', name: 'The Sandbox', desc: 'Make small, safe first contributions', color: '#3b82f6', Icon: FlaskIcon},
+  {week: 'Week 3', name: 'Squad Experience', desc: 'Own a task end-to-end, present Fresh Eyes Audit', color: '#9333ea', Icon: PeopleIcon},
+  {week: 'Week 4', name: 'Ownership', desc: 'Lead a feature, solidify your craft identity', color: '#FF0083', Icon: TrophyIcon},
 ];
 
 export const DesignPhilosophy: React.FC = () => {
@@ -72,7 +73,7 @@ export const DesignPhilosophy: React.FC = () => {
                 margin: '0 auto 16px',
                 fontSize: 32,
                 boxShadow: `0 4px 20px ${phase.color}30`,
-              }}>{phase.icon}</div>
+              }}><phase.Icon size={32} /></div>
 
               <p style={{fontSize: 11, fontWeight: 700, color: phase.color, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6}}>{phase.week}</p>
               <h3 style={{fontSize: 22, fontWeight: 700, color: C.dark, marginBottom: 8}}>{phase.name}</h3>

@@ -1,12 +1,13 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate} from 'remotion';
 import {C, headingFont} from '../components/styles';
+import {RobotIcon, ChartIcon, DocumentIcon, TargetIcon} from '../components/Icons';
 
 const features = [
-  {icon: '🤖', title: 'Lemi — AI Companion', desc: 'Context-aware assistant that knows your role, phase, and progress. Ask anything about your onboarding.'},
-  {icon: '📊', title: 'AI Usage Tracking', desc: 'Every contribution logs its AI percentage. Not to judge — to learn. Healthy balance around 20-40%.'},
-  {icon: '📝', title: 'Contribution Logging', desc: 'Every PR, design, brief, and audit is tracked with quality signals and AI disclosure.'},
-  {icon: '🎯', title: 'Smart Nudges', desc: 'Context-aware alerts when something needs attention — stuck work, skill gaps, or low engagement.'},
+  {Icon: RobotIcon, title: 'Lemi — AI Companion', desc: 'Context-aware assistant that knows your role, phase, and progress. Ask anything about your onboarding.'},
+  {Icon: ChartIcon, title: 'AI Usage Tracking', desc: 'Every contribution logs its AI percentage. Not to judge — to learn. Healthy balance around 20-40%.'},
+  {Icon: DocumentIcon, title: 'Contribution Logging', desc: 'Every PR, design, brief, and audit is tracked with quality signals and AI disclosure.'},
+  {Icon: TargetIcon, title: 'Smart Nudges', desc: 'Context-aware alerts when something needs attention — stuck work, skill gaps, or low engagement.'},
 ];
 
 export const AIIntegration: React.FC = () => {
@@ -59,7 +60,7 @@ export const AIIntegration: React.FC = () => {
                 justifyContent: 'center',
                 fontSize: 30,
                 flexShrink: 0,
-              }}>{feat.icon}</div>
+              }}><feat.Icon size={30} /></div>
               <div>
                 <h3 style={{fontSize: 20, fontWeight: 700, color: C.dark, marginBottom: 8}}>{feat.title}</h3>
                 <p style={{fontSize: 15, color: C.textSec, lineHeight: 1.5}}>{feat.desc}</p>

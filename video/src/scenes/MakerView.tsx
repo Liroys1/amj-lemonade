@@ -1,148 +1,233 @@
 import React from 'react';
-import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate} from 'remotion';
-import {MockScreen} from '../components/MockScreen';
-import {LemonIcon} from '../components/LemonIcon';
+import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Video, staticFile} from 'remotion';
 import {C, headingFont} from '../components/styles';
-
-// Two sub-screens: Welcome (first half) and Dashboard (second half)
-const WelcomeContent: React.FC = () => (
-  <div style={{textAlign: 'center', paddingTop: 8}}>
-    <LemonIcon size={80}/>
-    <h2 style={{fontFamily: headingFont, fontSize: 32, color: C.dark, margin: '12px 0 8px', fontWeight: 700}}>Welcome to Lemonade, Maya!</h2>
-    <p style={{fontSize: 15, color: C.textSec, marginBottom: 20}}>You're joining ~1,300 Lemonade Makers on a mission to turn insurance into a social good.</p>
-    <div style={{display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 20}}>
-      {[
-        {title: 'Be a Maker', desc: 'Think like a founder, ship like a startup', color: C.pink},
-        {title: 'Giveback', desc: '$2.1M to 45 nonprofits in 2025', color: '#f472b6'},
-        {title: 'AI-Native', desc: 'AI isn\'t a tool — it\'s how we think', color: '#ec4899'},
-      ].map((card, i) => (
-        <div key={i} style={{width: 200, background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: '20px 16px', textAlign: 'center'}}>
-          <h4 style={{fontSize: 16, fontWeight: 700, color: C.dark, marginBottom: 6}}>{card.title}</h4>
-          <p style={{fontSize: 12, color: C.textSec}}>{card.desc}</p>
-        </div>
-      ))}
-    </div>
-    <div style={{display: 'flex', gap: 12, justifyContent: 'center'}}>
-      {['Ground Yourself', 'Sandbox', 'Squad Experience', 'Ownership'].map((p, i) => (
-        <div key={i} style={{background: i === 0 ? `${C.pink}15` : C.white, border: `1px solid ${i === 0 ? C.pink : C.border}`, borderRadius: 10, padding: '8px 14px', fontSize: 12, fontWeight: 600, color: i === 0 ? C.pink : C.textSec}}>
-          W{i+1}: {p}
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const DashboardContent: React.FC = () => (
-  <div>
-    <div style={{display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20}}>
-      <LemonIcon size={40}/>
-      <div>
-        <h2 style={{fontSize: 24, fontWeight: 700, color: C.dark}}>Good morning, Maya!</h2>
-        <p style={{fontSize: 13, color: C.textSec}}>Here's your onboarding snapshot</p>
-      </div>
-    </div>
-    {/* Stat cards */}
-    <div style={{display: 'flex', gap: 14, marginBottom: 20}}>
-      {[
-        {label: 'Day', value: '8/30', sub: 'Phase 2: Sandbox', color: C.pink},
-        {label: 'Health', value: '82', sub: 'On track', color: C.green},
-        {label: 'Contributions', value: '5', sub: '3 shipped', color: C.blue},
-        {label: 'Avg AI %', value: '34%', sub: 'Good balance', color: C.green},
-      ].map((stat, i) => (
-        <div key={i} style={{flex: 1, background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: '16px 14px'}}>
-          <p style={{fontSize: 11, color: C.textTer, fontWeight: 600, marginBottom: 4}}>{stat.label}</p>
-          <p style={{fontSize: 28, fontWeight: 800, color: stat.color}}>{stat.value}</p>
-          <p style={{fontSize: 11, color: C.textSec}}>{stat.sub}</p>
-        </div>
-      ))}
-    </div>
-    {/* Cards row */}
-    <div style={{display: 'flex', gap: 14}}>
-      <div style={{flex: 1, background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16}}>
-        <h4 style={{fontSize: 14, fontWeight: 700, color: C.dark, marginBottom: 10}}>Today's Schedule</h4>
-        {['9:00 — Squad Standup', '11:00 — Buddy Check-in', '14:00 — Culture Workshop'].map((item, i) => (
-          <p key={i} style={{fontSize: 12, color: C.textSec, padding: '6px 0', borderBottom: i < 2 ? `1px solid ${C.border}` : 'none'}}>{item}</p>
-        ))}
-      </div>
-      <div style={{flex: 1, background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16}}>
-        <h4 style={{fontSize: 14, fontWeight: 700, color: C.dark, marginBottom: 10}}>Open Work</h4>
-        {[{title: 'PR: Fix checkout flow', status: 'In Review', color: C.amber}, {title: 'Audit: Search UX', status: 'Draft', color: C.textTer}].map((item, i) => (
-          <div key={i} style={{display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < 1 ? `1px solid ${C.border}` : 'none'}}>
-            <span style={{fontSize: 12, color: C.dark}}>{item.title}</span>
-            <span style={{fontSize: 10, fontWeight: 600, color: item.color}}>{item.status}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{flex: 1, background: C.white, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16}}>
-        <h4 style={{fontSize: 14, fontWeight: 700, color: C.dark, marginBottom: 10}}>Recent Activity</h4>
-        {['Shipped PR #142', 'Completed Culture Quiz', 'Logged AI usage (28%)'].map((item, i) => (
-          <p key={i} style={{fontSize: 12, color: C.textSec, padding: '6px 0', borderBottom: i < 2 ? `1px solid ${C.border}` : 'none'}}>{item}</p>
-        ))}
-      </div>
-    </div>
-  </div>
-);
 
 export const MakerView: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps, durationInFrames} = useVideoConfig();
 
+  // --- Title fade-in ---
   const titleOpacity = spring({frame, fps, config: {damping: 200}});
-  const showDash = frame > durationInFrames / 2;
-  const crossfade = showDash ? spring({frame: frame - durationInFrames / 2, fps, config: {damping: 200}, durationInFrames: 30}) : 0;
-  const exitOpacity = frame > durationInFrames - 20 ? interpolate(frame, [durationInFrames - 20, durationInFrames], [1, 0], {extrapolateRight: 'clamp'}) : 1;
+  const titleY = interpolate(titleOpacity, [0, 1], [12, 0]);
+
+  // --- Exit fade (last 30 frames) ---
+  const exitOpacity = interpolate(
+    frame,
+    [durationInFrames - 30, durationInFrames],
+    [1, 0],
+    {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
+  );
+
+  // --- Browser frame entrance ---
+  const frameEntrance = spring({frame: frame - 8, fps, config: {damping: 30, stiffness: 80}});
+  const frameScale = interpolate(frameEntrance, [0, 1], [0.92, 1]);
+  const frameOpacity = interpolate(frameEntrance, [0, 1], [0, 1], {extrapolateRight: 'clamp'});
+
+  // --- Zoom / pan keyframes ---
+  // Phase 1 (frames 0–89, ~0–3s): full view, slightly zoomed out
+  // Phase 2 (frames 90–179, ~3–6s): zoom into left sidebar
+  // Phase 3 (frames 180–269, ~6–9s): pan to center-right content
+  // Phase 4 (frames 270–359, ~9–12s): zoom back out to full view
+  // Phase 5 (frames 360–420, ~12–14s): hold + exit fade
+
+  // Scale transitions
+  const scalePhase1to2 = spring({
+    frame: frame - 90,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const scalePhase2to3 = spring({
+    frame: frame - 180,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const scalePhase3to4 = spring({
+    frame: frame - 270,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+
+  // Scale: 0.95 -> 1.15 -> 1.15 -> 0.95
+  const s1 = interpolate(scalePhase1to2, [0, 1], [0.95, 1.15], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const s2 = interpolate(scalePhase2to3, [0, 1], [s1, 1.15], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const s3 = interpolate(scalePhase3to4, [0, 1], [s2, 0.95], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const videoScale = s3;
+
+  // Translate X transitions (percentage-based)
+  const txPhase1to2 = spring({
+    frame: frame - 90,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const txPhase2to3 = spring({
+    frame: frame - 180,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const txPhase3to4 = spring({
+    frame: frame - 270,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+
+  // TX: 0% -> +12% (show left sidebar) -> -8% (pan to right content) -> 0%
+  const tx1 = interpolate(txPhase1to2, [0, 1], [0, 12], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const tx2 = interpolate(txPhase2to3, [0, 1], [tx1, -8], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const tx3 = interpolate(txPhase3to4, [0, 1], [tx2, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const videoTx = tx3;
+
+  // Translate Y transitions (subtle vertical movement)
+  const tyPhase1to2 = spring({
+    frame: frame - 90,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const tyPhase2to3 = spring({
+    frame: frame - 180,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+  const tyPhase3to4 = spring({
+    frame: frame - 270,
+    fps,
+    config: {damping: 40, stiffness: 60},
+    durationInFrames: 45,
+  });
+
+  // TY: 0% -> +5% (slight down for sidebar focus) -> -3% (up for content) -> 0%
+  const ty1 = interpolate(tyPhase1to2, [0, 1], [0, 5], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const ty2 = interpolate(tyPhase2to3, [0, 1], [ty1, -3], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const ty3 = interpolate(tyPhase3to4, [0, 1], [ty2, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const videoTy = ty3;
 
   return (
-    <AbsoluteFill style={{
-      background: 'linear-gradient(135deg, #FAFAFA 0%, #FFF5F9 100%)',
-      justifyContent: 'center',
-      alignItems: 'center',
-      opacity: exitOpacity,
-    }}>
-      {/* Label */}
-      <div style={{
-        position: 'absolute',
-        top: 40,
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        opacity: titleOpacity,
-      }}>
-        <span style={{
-          fontSize: 14,
-          fontWeight: 700,
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: C.pink,
-          background: `${C.pink}10`,
-          padding: '6px 20px',
-          borderRadius: 20,
-        }}>{showDash ? 'MAKER — DASHBOARD' : 'MAKER — WELCOME'}</span>
-      </div>
-
-      {/* Welcome screen */}
-      <div style={{
-        position: 'absolute',
-        opacity: 1 - crossfade,
-        transform: `scale(${1 - crossfade * 0.05})`,
-      }}>
-        <MockScreen title="Welcome" role="maker" delay={10}>
-          <WelcomeContent />
-        </MockScreen>
-      </div>
-
-      {/* Dashboard screen */}
-      {showDash && (
-        <div style={{
+    <AbsoluteFill
+      style={{
+        background: 'linear-gradient(135deg, #FAFAFA 0%, #FFF5F9 100%)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: exitOpacity,
+      }}
+    >
+      {/* Title label */}
+      <div
+        style={{
           position: 'absolute',
-          opacity: crossfade,
-          transform: `scale(${0.95 + crossfade * 0.05})`,
-        }}>
-          <MockScreen title="Dashboard" role="maker" delay={0}>
-            <DashboardContent />
-          </MockScreen>
+          top: 38,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          opacity: titleOpacity,
+          transform: `translateY(${titleY}px)`,
+          zIndex: 10,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase' as const,
+            color: C.pink,
+            background: `${C.pink}10`,
+            padding: '6px 20px',
+            borderRadius: 20,
+            fontFamily: headingFont,
+          }}
+        >
+          MAKER VIEW
+        </span>
+      </div>
+
+      {/* Browser frame container */}
+      <div
+        style={{
+          width: 960,
+          height: 580,
+          borderRadius: 16,
+          overflow: 'hidden',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.06)',
+          border: `1px solid ${C.border}`,
+          background: C.white,
+          marginTop: 20,
+          opacity: frameOpacity,
+          transform: `scale(${frameScale})`,
+        }}
+      >
+        {/* Fake browser chrome bar */}
+        <div
+          style={{
+            height: 36,
+            background: C.headerBg,
+            borderBottom: `1px solid ${C.border}`,
+            display: 'flex',
+            alignItems: 'center',
+            paddingLeft: 14,
+            gap: 7,
+          }}
+        >
+          <div style={{width: 11, height: 11, borderRadius: '50%', background: '#FF5F57'}} />
+          <div style={{width: 11, height: 11, borderRadius: '50%', background: '#FEBC2E'}} />
+          <div style={{width: 11, height: 11, borderRadius: '50%', background: '#28C840'}} />
+          <div
+            style={{
+              flex: 1,
+              marginLeft: 12,
+              marginRight: 14,
+              height: 22,
+              borderRadius: 6,
+              background: C.white,
+              border: `1px solid ${C.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 10,
+              fontSize: 11,
+              color: C.textTer,
+            }}
+          >
+            app.lemonade.com/maker
+          </div>
         </div>
-      )}
+
+        {/* Video viewport (overflow hidden clips the zoom/pan) */}
+        <div
+          style={{
+            width: '100%',
+            height: 'calc(100% - 36px)',
+            overflow: 'hidden',
+            position: 'relative',
+            background: '#f9f9f9',
+          }}
+        >
+          {/* Video element with zoom/pan transforms */}
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              transform: `scale(${videoScale}) translate(${videoTx}%, ${videoTy}%)`,
+              transformOrigin: 'center center',
+              willChange: 'transform',
+            }}
+          >
+            <Video
+              src={staticFile('screens/maker-recording.webm')}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
