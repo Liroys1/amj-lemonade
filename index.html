@@ -1173,6 +1173,7 @@ const TeamDash=({emps,onSel,leadNm,compareIds,onCompare,onShowCompare})=>{
   const byDept={};emps.forEach(e=>{if(!byDept[e.dp])byDept[e.dp]=[];byDept[e.dp].push(e)});
   const toggleCompare=(id)=>{if(!onCompare)return;if(compareIds.includes(id)){onCompare(compareIds.filter(x=>x!==id))}else if(compareIds.length<2){onCompare([...compareIds,id])}};
   return<div className="fi">
+  <RoleIntroBanner roleKey="lead" text="This is the Lead view — monitor your team's onboarding health, prep 1:1 coaching sessions, verify skills, and catch early warning signs before they become problems."/>
   <SpotlightCard emps={emps} onSel={onSel}/>
   <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Team Dashboard</h1><p className="text-[13px] sm:text-[14px] text-[#6B7280] mt-1">Monitor your direct reports' onboarding &mdash; {emps.length} reports</p></div>
     <div className="flex items-center gap-2">
@@ -1304,6 +1305,7 @@ const StratOver=({setScr,onSel})=>{
   const si=c=>sCol===c?(sDir==="asc"?"↑":"↓"):"";
   const sorted=[...E].sort((a,b)=>{const d=sDir==="asc"?1:-1;if(sCol==="nm")return a.nm.localeCompare(b.nm)*d;if(sCol==="rl")return a.rl.localeCompare(b.rl)*d;if(sCol==="dp")return a.dp.localeCompare(b.dp)*d;if(sCol==="day")return(a.day-b.day)*d;if(sCol==="hp")return(a.hp-b.hp)*d;if(sCol==="co")return(a.co.length-b.co.length)*d;return 0});
   return<div className="fi">
+    <RoleIntroBanner roleKey="strategy" text="This is the Strategy view — see onboarding performance across all teams and cohorts. Identify skill gaps, track program health, and make data-driven decisions about your L&D investment."/>
     <SpotlightCard emps={E} onSel={onSel}/>
     <div className="mb-6"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Strategy Overview</h1><p className="text-[14px] text-[#6B7280] mt-1">Organization-wide onboarding metrics &mdash; {E.length} active makers</p></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">{kpis.map((k,i)=><div key={i} className="bg-white border border-[#E5E7EB] rounded-[14px] p-5 shadow-sm">
@@ -1921,6 +1923,16 @@ const AIReview=({emp})=>{
   </div>
 };
 
+const RoleIntroBanner=({roleKey,text})=>{
+  const[dismissed,setDismissed]=usePersistedState('intro-'+roleKey,false);
+  if(dismissed)return null;
+  return<div className="bg-gradient-to-r from-[#F0F9FF] to-[#F0FDF4] border border-[#E0E7FF] rounded-[14px] p-4 mb-6 flex items-start gap-3">
+    <span className="text-lg mt-0.5">👋</span>
+    <p className="text-[13px] text-[#4B5563] leading-relaxed flex-1">{text}</p>
+    <button onClick={()=>setDismissed(true)} className="text-[#9CA3AF] hover:text-[#6B7280] transition-colors flex-shrink-0 mt-0.5" title="Dismiss">✕</button>
+  </div>
+};
+
 const MakerDash=({emp,setScr})=>{
   const avgAI=emp.co.length?Math.round(emp.co.reduce((s,c)=>s+c.ai,0)/emp.co.length):0;
   const streak=emp.co.filter(c=>c.da<=5).length;
@@ -1937,6 +1949,7 @@ const MakerDash=({emp,setScr})=>{
   const earned=BADGES.filter(b=>b.un(emp));
   const firstShip=emp.co.some(c=>c.st==="merged"||c.st==="shipped");
   return<div className="fi">
+    <RoleIntroBanner roleKey="maker" text="This is the Maker view — your personal onboarding cockpit. Track daily tasks, build skills through real contributions, and progress through your 30-day journey from Observer to Junior Peer."/>
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
       <div className="flex items-center gap-3 sm:gap-4"><LemonIll w={48} h={48}/><div><div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap"><h1 className="h-serif text-[22px] sm:text-[28px] font-bold text-[#1A1A2E]">Good morning, {emp.nm.split(" ")[0]}</h1><RoleBadge rl={emp.rl}/></div><p className="text-[13px] sm:text-[14px] text-[#6B7280]">Here's your onboarding snapshot</p></div></div>
       <div className="flex items-center gap-3 flex-wrap">
@@ -3073,10 +3086,44 @@ const SpotlightCard=({emps,onSel})=>{
   </div>
 };
 
+const LandingPage=({onEnter})=>{
+  const roles=[
+    {id:"maker",title:"New Employee",sub:"Maker View",desc:"Experience onboarding from Day 1–30. Track skills, log contributions, complete the review ritual, and connect with your buddy.",ic:"lemon",color:"#FF0083",bg:"linear-gradient(135deg,#FF008312,#FF008306)"},
+    {id:"lead",title:"Team Lead",sub:"Manager View",desc:"Monitor your team's progress, prep 1:1 coaching sessions, verify skills, and catch early warning signs before they become problems.",ic:"people",color:"#6366f1",bg:"linear-gradient(135deg,#6366f112,#6366f106)"},
+    {id:"strategy",title:"L&D Strategy",sub:"Strategy View",desc:"See the big picture: cohort analytics, skill gaps, attrition risk, and content intelligence across all teams.",ic:"chart",color:"#10b981",bg:"linear-gradient(135deg,#10b98112,#10b98106)"}
+  ];
+  return<div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+    <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16">
+      <div className="text-center mb-10 sm:mb-14">
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <span style={{fontFamily:"'Pacifico',cursive",fontSize:"32px",color:"#FF0083"}}>Lemonade</span>
+          <span className="text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
+        </div>
+        <h1 className="text-[28px] sm:text-[36px] font-bold text-[#1A1A2E] mb-3" style={{fontFamily:"'Merriweather',serif"}}>AMJ — Autonomous Maker Journey</h1>
+        <p className="text-[15px] sm:text-[17px] text-[#6B7280] max-w-xl mx-auto leading-relaxed mb-4">A smart onboarding platform that guides new hires through their first 30 days — with role-specific tasks, skill tracking, buddy connections, AI-native workflows, and manager oversight.</p>
+        <div className="inline-flex items-center gap-2 bg-[#FEF9C3] border border-[#FDE68A] rounded-xl px-4 py-2 text-[13px] text-[#92400E]">
+          <span>📋</span><span>Built as a companion to the take-home design document — this is a working interactive prototype</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 max-w-4xl w-full mb-12">
+        {roles.map(r=><button key={r.id} onClick={()=>onEnter(r.id)} className="text-left bg-white border border-[#E5E7EB] rounded-[18px] p-6 shadow-sm hover:shadow-lg hover:border-transparent hover:scale-[1.02] transition-all group" style={{borderTop:`3px solid ${r.color}`}}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:r.bg}}><CI n={r.ic} sz={20} co={r.color}/></div>
+            <div><h2 className="text-[16px] font-bold text-[#1A1A2E]">{r.title}</h2><p className="text-[11px] text-[#9CA3AF] font-medium">{r.sub}</p></div>
+          </div>
+          <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4">{r.desc}</p>
+          <span className="text-[13px] font-semibold group-hover:translate-x-1 transition-transform inline-block" style={{color:r.color}}>Enter {r.sub} →</span>
+        </button>)}
+      </div>
+      <p className="text-[12px] text-[#9CA3AF] text-center max-w-lg">10 simulated employees across 3 roles (Engineer, Designer, PM) at various stages of their 30-day journey. All data is stored locally in your browser.</p>
+    </div>
+  </div>
+};
+
 const App=()=>{
   const[appReady,setAppReady]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)},[]);
-  const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=usePersistedState("scr","welcome");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
+  const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=usePersistedState("scr","landing");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
   const setScr=useCallback((s)=>{_setScr(prev=>{setScrHist(h=>[...h.slice(-19),prev]);return s})},[_setScr]);
   const goBack=useCallback(()=>{if(scrHist.length>0){const prev=scrHist[scrHist.length-1];setScrHist(h=>h.slice(0,-1));_setScr(prev)}},[scrHist,_setScr]);
   const[toast,setToast]=useState(null);const[notifOpen,setNotifOpen]=useState(false);const[searchQ,setSearchQ]=useState("");const[searchOpen,setSearchOpen]=useState(false);
@@ -3217,6 +3264,12 @@ const App=()=>{
   </div>
 </div>;
 
+  if(scr==="landing") return <LandingPage onEnter={(r)=>{
+    if(r==="maker"){setRole("maker");setScr("home")}
+    else if(r==="lead"){setRole("lead");setScr("team")}
+    else{setRole("strategy");setScr("overview")}
+  }}/>;
+
   return<div className="h-screen flex flex-col">
     <a href="#main-content" className="sr-only" style={{position:'absolute',top:'-40px',left:0,zIndex:300}} onFocus={e=>{e.target.style.position='static';e.target.style.background='#FF0083';e.target.style.color='white';e.target.style.padding='8px 16px';e.target.style.borderRadius='8px';e.target.style.fontSize='14px';e.target.style.fontWeight='600'}} onBlur={e=>{e.target.style.position='absolute';e.target.style.top='-40px'}}>Skip to content</a>
     <CmdPalette open={cmdOpen} onClose={()=>setCmdOpen(false)} query={cmdQ} setQuery={setCmdQ} results={cmdResults} idx={cmdIdx} setIdx={setCmdIdx} onSelect={r=>{r.act();setCmdOpen(false);setCmdQ("")}}/>
@@ -3230,8 +3283,8 @@ const App=()=>{
         <button onClick={()=>setSidebarOpen(!sidebarOpen)} className="lg:hidden w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#FF0083] transition-colors shadow-sm" aria-label="Toggle sidebar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <span className="hidden sm:inline" style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
-        <span className="sm:hidden" style={{fontFamily:"'Pacifico',cursive",fontSize:"18px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
+        <span onClick={()=>setScr("landing")} className="hidden sm:inline cursor-pointer hover:opacity-80 transition-opacity" style={{fontFamily:"'Pacifico',cursive",fontSize:"22px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
+        <span onClick={()=>setScr("landing")} className="sm:hidden cursor-pointer hover:opacity-80 transition-opacity" style={{fontFamily:"'Pacifico',cursive",fontSize:"18px",color:"#FF0083",letterSpacing:"-0.01em"}}>Lemonade</span>
         <span className="hidden sm:inline text-[9px] font-semibold tracking-[.15em] border rounded-[4px] px-2 py-[3px] uppercase" style={{color:"#FF0083",borderColor:"#FF008360"}}>Internal</span>
       </div>
       <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
