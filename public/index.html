@@ -3123,7 +3123,7 @@ const LandingPage=({onEnter})=>{
 const App=()=>{
   const[appReady,setAppReady]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setAppReady(true),1600);return()=>clearTimeout(t)},[]);
-  const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=usePersistedState("scr","landing");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
+  const[role,setRole]=usePersistedState("role","maker");const[scr,_setScr]=useState("landing");const[scrHist,setScrHist]=useState([]);const[selId,setSelId]=useState(null);const[es,setEs]=useState(E);
   const setScr=useCallback((s)=>{_setScr(prev=>{setScrHist(h=>[...h.slice(-19),prev]);return s})},[_setScr]);
   const goBack=useCallback(()=>{if(scrHist.length>0){const prev=scrHist[scrHist.length-1];setScrHist(h=>h.slice(0,-1));_setScr(prev)}},[scrHist,_setScr]);
   const[toast,setToast]=useState(null);const[notifOpen,setNotifOpen]=useState(false);const[searchQ,setSearchQ]=useState("");const[searchOpen,setSearchOpen]=useState(false);
