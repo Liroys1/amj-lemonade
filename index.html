@@ -25,6 +25,7 @@
     select option{background:#FFFFFF;color:#1A1A2E}
     @keyframes pr{0%{box-shadow:0 0 0 0 rgba(255,0,131,.4)}70%{box-shadow:0 0 0 12px rgba(255,0,131,0)}100%{box-shadow:0 0 0 0 rgba(255,0,131,0)}}
     @keyframes fadeInBounce{0%{opacity:0;transform:translateY(-8px)}60%{opacity:1;transform:translateY(2px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 6px 28px rgba(255,0,131,0.35),0 2px 8px rgba(0,0,0,0.1);transform:translateX(-50%) scale(1)}50%{box-shadow:0 8px 36px rgba(255,0,131,0.5),0 2px 12px rgba(0,0,0,0.15);transform:translateX(-50%) scale(1.03)}}
     .pulse-p{animation:pr 2s ease-out infinite}
     @keyframes td{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-5px)}}
     .td1{animation:td 1.4s infinite 0s}.td2{animation:td 1.4s infinite .2s}.td3{animation:td 1.4s infinite .4s}
@@ -3285,13 +3286,13 @@ const VideoIntro=({onDone})=>{
           <div style={{width:0,height:0,borderTop:'14px solid transparent',borderBottom:'14px solid transparent',borderLeft:'22px solid white',marginLeft:5}}/>
         </div>}
       </div>
-      {/* Unmute hint + button — top right */}
-      {isMuted&&<div onClick={toggleMute} style={{position:'absolute',top:isMobile?10:18,right:isMobile?10:18,display:'flex',alignItems:'center',gap:8,background:'rgba(255,255,255,0.92)',border:'1px solid #E5E7EB',borderRadius:24,padding:isMobile?'6px 14px 6px 8px':'8px 16px 8px 10px',cursor:'pointer',boxShadow:'0 2px 16px rgba(0,0,0,0.1)',backdropFilter:'blur(10px)',zIndex:10,animation:'fadeInBounce .6s ease'}}>
-        <svg width={isMobile?16:18} height={isMobile?16:18} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* Unmute banner — centered, prominent */}
+      {isMuted&&<div onClick={toggleMute} style={{position:'absolute',bottom:isMobile?60:80,left:'50%',transform:'translateX(-50%)',display:'flex',alignItems:'center',gap:12,background:'rgba(255,0,131,0.95)',borderRadius:32,padding:isMobile?'12px 24px':'14px 32px',cursor:'pointer',boxShadow:'0 6px 28px rgba(255,0,131,0.35), 0 2px 8px rgba(0,0,0,0.1)',zIndex:10,animation:'pulseGlow 2s ease-in-out infinite',whiteSpace:'nowrap'}}>
+        <svg width={isMobile?20:24} height={isMobile?20:24} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
           <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
         </svg>
-        <span style={{fontSize:isMobile?11:12,fontWeight:600,color:'#6B7280',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>Tap for sound 🔊</span>
+        <span style={{fontSize:isMobile?14:16,fontWeight:700,color:'white',fontFamily:'Lato,sans-serif'}}>Tap for sound — it's worth it 🎵</span>
       </div>}
       {!isMuted&&<button onClick={toggleMute} style={{position:'absolute',top:isMobile?10:18,right:isMobile?10:18,width:40,height:40,borderRadius:20,background:'rgba(255,255,255,0.9)',border:'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:'0 2px 12px rgba(0,0,0,0.08)',backdropFilter:'blur(8px)',zIndex:10}}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF0083" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
