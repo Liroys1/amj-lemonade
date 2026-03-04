@@ -70,26 +70,55 @@ export const AIIntegration: React.FC = () => {
         })}
       </div>
 
-      {/* Chat bubble from Lemi */}
+      {/* Chat bubble from Lemi with avatar */}
       {frame > 90 && (
         <div style={{
           position: 'absolute',
-          bottom: 80,
-          right: 120,
+          bottom: 70,
+          right: 100,
           opacity: spring({frame: frame - 90, fps, config: {damping: 15}}),
           transform: `scale(${spring({frame: frame - 90, fps, config: {damping: 12, stiffness: 100}})})`,
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 10,
         }}>
+          {/* Lemi Avatar - pink circle with robot icon */}
           <div style={{
-            background: C.white,
-            borderRadius: '20px 20px 4px 20px',
-            padding: '14px 20px',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
-            border: `1px solid ${C.border}`,
-            maxWidth: 280,
+            width: 42,
+            height: 42,
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, ${C.pink}, #FF6BB5)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(255,0,131,0.3)',
+            flexShrink: 0,
           }}>
-            <p style={{fontSize: 13, color: C.textSec}}>
-              <span style={{color: C.pink, fontWeight: 700}}>Lemi:</span> "Hey Maya! Your Fresh Eyes Audit is due in 3 days. Want me to help you structure it?"
-            </p>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="4" y="8" width="16" height="12" rx="3" />
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="15" cy="14" r="1.5" />
+              <line x1="12" y1="4" x2="12" y2="8" />
+              <circle cx="12" cy="3" r="1" />
+            </svg>
+          </div>
+          <div>
+            {/* Name label */}
+            <div style={{fontSize: 11, fontWeight: 700, color: C.pink, marginBottom: 4, marginLeft: 6}}>
+              Lemi
+            </div>
+            <div style={{
+              background: C.white,
+              borderRadius: '20px 20px 4px 20px',
+              padding: '14px 20px',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
+              border: `1px solid ${C.border}`,
+              maxWidth: 280,
+            }}>
+              <p style={{fontSize: 13, color: C.textSec}}>
+                "Hey Maya! Your Fresh Eyes Audit is due in 3 days. Want me to help you structure it?"
+              </p>
+            </div>
           </div>
         </div>
       )}

@@ -174,8 +174,8 @@ const FinalFrame: React.FC = () => {
         <p style={{fontSize: 15, color: C.textTer}}>
           Built with 🍋 for Lemonade
         </p>
-        <p style={{fontSize: 13, color: C.textTer, marginTop: 8, opacity: 0.7}}>
-          liran shaked — 2026
+        <p style={{fontSize: 16, color: C.textSec, marginTop: 8}}>
+          Liran Shaked — 2026
         </p>
       </div>
     </AbsoluteFill>
@@ -194,15 +194,15 @@ export const Closing: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sequence from={0} durationInFrames={540} name="Key Differentiators">
+      <Sequence from={0} durationInFrames={300} name="Key Differentiators">
         <KeyDifferentiators />
       </Sequence>
 
-      <Sequence from={480} durationInFrames={480} name="Personal Statement">
+      <Sequence from={270} durationInFrames={210} name="Personal Statement">
         <PersonalStatement />
       </Sequence>
 
-      <Sequence from={900} durationInFrames={540} name="Final Frame">
+      <Sequence from={450} durationInFrames={210} name="Final Frame">
         <FinalFrame />
       </Sequence>
     </AbsoluteFill>

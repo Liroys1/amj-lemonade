@@ -81,37 +81,40 @@ async function run() {
   await page.screenshot({ path: `${OUT}/maker-skills.png`, type: 'png' });
   console.log('  ✅ maker-skills.png');
 
-  // 4. Open Lemi companion
+  // 4. Navigate to Dashboard first (has "Ask Lemi" quick action), then open Lemi
+  await dashLink.click();
+  await page.waitForTimeout(1000);
+  // Click the floating Lemi button (bottom-right pink circle)
   try {
-    // Look for the Lemi/companion button (usually bottom-right or in nav)
-    const lemiBtn = page.locator('[aria-label*="ompanion"], [aria-label*="Lemi"], text=Lemi').first();
-    if (await lemiBtn.isVisible({ timeout: 1000 })) {
-      await lemiBtn.click();
-      await page.waitForTimeout(1000);
-    } else {
-      // Try the chat icon button
-      const chatBtn = page.locator('text=Ask Lemi').first();
-      if (await chatBtn.isVisible({ timeout: 1000 })) {
-        await chatBtn.click();
-        await page.waitForTimeout(1000);
-      }
-    }
-  } catch {}
+    const lemiBtn = page.locator('[aria-label="Open AI Assistant Lemi"]');
+    await lemiBtn.click({ timeout: 3000 });
+    await page.waitForTimeout(1500);
+  } catch (e) {
+    console.log('  ⚠️ Could not click Lemi button:', e.message);
+  }
   await page.screenshot({ path: `${OUT}/maker-lemi.png`, type: 'png' });
   console.log('  ✅ maker-lemi.png');
 
-  // Close companion if open
+  // Close companion
   try {
-    const closeBtn = page.locator('[aria-label*="close"], [aria-label*="Close"]').first();
-    if (await closeBtn.isVisible({ timeout: 500 })) await closeBtn.click();
+    const closeComp = page.locator('text=✕').first();
+    if (await closeComp.isVisible({ timeout: 500 })) await closeComp.click();
   } catch {}
 
   // ═══════════════════════ LEAD SCREENS ═══════════════════════
   console.log('📸 Capturing Lead screens...');
 
-  // Switch to Lead role via role tabs
-  const leadTab = page.locator('text=Lead').last();
-  await leadTab.click();
+  // Reload and enter as Lead from landing page (avoids overlay issues)
+  await page.goto(APP);
+  await page.waitForTimeout(2000);
+  // Skip video if shown
+  try {
+    const skipV2 = page.locator('text=Skip Video');
+    if (await skipV2.isVisible({ timeout: 2000 })) { await skipV2.click(); await page.waitForTimeout(500); }
+  } catch {}
+  await page.waitForTimeout(1000);
+  const leadCard = page.locator('text=Team Lead').first();
+  await leadCard.click();
   await page.waitForTimeout(1500);
 
   // Navigate past onboarding setup if it shows
@@ -148,9 +151,16 @@ async function run() {
   // ═══════════════════════ STRATEGY SCREENS ═══════════════════════
   console.log('📸 Capturing Strategy screens...');
 
-  // Switch to Strategy role
-  const stratTab = page.locator('text=Strategy').last();
-  await stratTab.click();
+  // Reload and enter as Strategy from landing page
+  await page.goto(APP);
+  await page.waitForTimeout(2000);
+  try {
+    const skipV3 = page.locator('text=Skip Video');
+    if (await skipV3.isVisible({ timeout: 2000 })) { await skipV3.click(); await page.waitForTimeout(500); }
+  } catch {}
+  await page.waitForTimeout(1000);
+  const stratCard = page.locator('text=L&D Strategy').first();
+  await stratCard.click();
   await page.waitForTimeout(1500);
 
   // Navigate past welcome if it shows

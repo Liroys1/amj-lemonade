@@ -106,18 +106,22 @@ export const StrategyView: React.FC = () => {
         <span
           style={{
             fontFamily: headingFont,
-            fontSize: 14,
+            fontSize: 22,
             fontWeight: 700,
-            letterSpacing: '0.22em',
+            letterSpacing: '0.15em',
             textTransform: 'uppercase' as const,
-            color: C.pink,
-            background: `${C.pink}12`,
-            padding: '6px 22px',
-            borderRadius: 20,
+            color: C.white,
+            background: C.pink,
+            padding: '10px 32px',
+            borderRadius: 28,
+            boxShadow: '0 4px 16px rgba(255,0,131,0.25)',
           }}
         >
-          STRATEGY VIEW
+          📊 STRATEGY VIEW
         </span>
+        <div style={{fontSize: 13, color: C.textSec, marginTop: 8, fontWeight: 500}}>
+          L&D Analytics
+        </div>
       </div>
 
       {/* ---- Browser-like frame ---- */}
@@ -292,7 +296,7 @@ export const StrategyView: React.FC = () => {
           : calloutOpacity * calloutFadeOut;
 
         // Only render when roughly in range
-        if (localFrame < 0 || localFrame > FEATURE_DURATION + 5) {
+        if (localFrame < CALLOUT_DELAY || localFrame > FEATURE_DURATION + 5) {
           return null;
         }
 

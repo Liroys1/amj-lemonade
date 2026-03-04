@@ -94,17 +94,21 @@ export const LeadView: React.FC = () => {
       }}>
         <span style={{
           fontFamily: headingFont,
-          fontSize: 15,
+          fontSize: 22,
           fontWeight: 700,
-          letterSpacing: '0.22em',
+          letterSpacing: '0.15em',
           textTransform: 'uppercase' as const,
-          color: C.pink,
-          background: `${C.pink}12`,
-          padding: '7px 24px',
-          borderRadius: 22,
+          color: C.white,
+          background: C.pink,
+          padding: '10px 32px',
+          borderRadius: 28,
+          boxShadow: '0 4px 16px rgba(255,0,131,0.25)',
         }}>
-          LEAD VIEW
+          👥 LEAD VIEW
         </span>
+        <div style={{fontSize: 13, color: C.textSec, marginTop: 8, fontWeight: 500}}>
+          Manager Dashboard
+        </div>
       </div>
 
       {/* Browser frame */}
@@ -260,7 +264,7 @@ export const LeadView: React.FC = () => {
         const finalOpacity = Math.min(calloutOpacity, calloutFadeOut);
 
         // Only render when approximately visible
-        if (localFrame < CALLOUT_DELAY - 5 || localFrame > FEATURE_DURATION + 5) return null;
+        if (localFrame < CALLOUT_DELAY || localFrame > FEATURE_DURATION + 5) return null;
 
         return (
           <div

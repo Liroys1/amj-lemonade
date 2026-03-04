@@ -2,6 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring, staticFile} from 'remotion';
 import {LogoReveal} from './scenes/LogoReveal';
 import {TheAssignment} from './scenes/TheAssignment';
+import {CoreConcept} from './scenes/CoreConcept';
 import {DesignPhilosophy} from './scenes/DesignPhilosophy';
 import {MeetAMJ} from './scenes/MeetAMJ';
 import {MakerView} from './scenes/MakerView';
@@ -11,17 +12,18 @@ import {AIIntegration} from './scenes/AIIntegration';
 import {Closing} from './scenes/Closing';
 
 // Scene timing in frames (30fps)
-// Total: 120 seconds = 3600 frames
+// Total: ~104 seconds = 3120 frames
 const SCENES = {
   logo:       {from: 0,    dur: 120},   // 0-4s
   assignment: {from: 120,  dur: 240},   // 4-12s
-  philosophy: {from: 360,  dur: 300},   // 12-22s
-  amj:        {from: 660,  dur: 180},   // 22-28s
-  maker:      {from: 840,  dur: 420},   // 28-42s
-  lead:       {from: 1260, dur: 300},   // 42-52s
-  strategy:   {from: 1560, dur: 240},   // 52-60s
-  ai:         {from: 1800, dur: 360},   // 60-72s
-  closing:    {from: 2160, dur: 1440},  // 72-120s
+  concept:    {from: 360,  dur: 300},   // 12-22s  (NEW: core design principles)
+  philosophy: {from: 660,  dur: 300},   // 22-32s  (30-day journey timeline)
+  amj:        {from: 960,  dur: 180},   // 32-38s
+  maker:      {from: 1140, dur: 420},   // 38-52s
+  lead:       {from: 1560, dur: 300},   // 52-62s
+  strategy:   {from: 1860, dur: 240},   // 62-70s
+  ai:         {from: 2100, dur: 360},   // 70-82s
+  closing:    {from: 2460, dur: 660},   // 82-104s
 };
 
 // Global background with subtle gradient
@@ -54,6 +56,10 @@ export const AMJShowcase: React.FC = () => {
 
       <Sequence from={SCENES.assignment.from} durationInFrames={SCENES.assignment.dur} name="The Assignment">
         <TheAssignment />
+      </Sequence>
+
+      <Sequence from={SCENES.concept.from} durationInFrames={SCENES.concept.dur} name="Core Concept">
+        <CoreConcept />
       </Sequence>
 
       <Sequence from={SCENES.philosophy.from} durationInFrames={SCENES.philosophy.dur} name="Design Philosophy">

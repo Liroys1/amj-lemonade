@@ -3273,8 +3273,12 @@ const VideoIntro=({onDone})=>{
     {/* Video area */}
     <div style={{flex:1,position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,#FFFFFF 0%,#FFF5F9 40%,#FAFAFA 100%)'}}>
       <video ref={videoRef} src="amj-showcase.mp4" playsInline
-        style={{width:isMobile?'250%':'100%',height:'100%',objectFit:isMobile?'cover':'contain',maxHeight:'calc(100vh - 60px)'}}
+        style={{width:'100%',height:'100%',objectFit:'contain',maxHeight:'calc(100vh - 60px)'}}
       />
+      {/* Mobile: rotate hint */}
+      {isMobile&&<div style={{position:'absolute',bottom:12,left:'50%',transform:'translateX(-50%)',background:'rgba(0,0,0,0.6)',color:'white',padding:'6px 16px',borderRadius:20,fontSize:11,fontWeight:600,fontFamily:'Lato,sans-serif',display:'flex',alignItems:'center',gap:6,opacity:0.9,animation:'fadeInBounce .6s ease',whiteSpace:'nowrap'}}>
+        <span style={{display:'inline-block',transform:'rotate(90deg)',fontSize:14}}>📱</span> Rotate for best view
+      </div>}
       {/* Play/Pause overlay */}
       <div onClick={togglePlay} style={{position:'absolute',inset:0,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
         {!isPlaying&&<div style={{width:72,height:72,borderRadius:36,background:'rgba(255,0,131,0.9)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 6px 24px rgba(255,0,131,0.3)'}}>
@@ -3298,12 +3302,11 @@ const VideoIntro=({onDone})=>{
     </div>
     {/* Buttons bar */}
     <div style={{flexShrink:0,display:'flex',gap:12,alignItems:'center',justifyContent:'center',padding:'10px 16px',paddingBottom:'max(10px, env(safe-area-inset-bottom))',background:'#FAFAFA',borderTop:'1px solid #E5E7EB',zIndex:10000}}>
-      {showCta&&<button onClick={skip} style={{padding:'12px 28px',borderRadius:12,background:'#FF0083',color:'white',border:'none',fontSize:isMobile?15:18,fontWeight:800,cursor:'pointer',boxShadow:'0 4px 16px rgba(255,0,131,.25)',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
+      {showCta?<button onClick={skip} style={{padding:'12px 28px',borderRadius:12,background:'#FF0083',color:'white',border:'none',fontSize:isMobile?15:18,fontWeight:800,cursor:'pointer',boxShadow:'0 4px 16px rgba(255,0,131,.25)',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
         Enter the App →
-      </button>}
-      <button onClick={skip} style={{padding:'10px 18px',borderRadius:10,background:'rgba(0,0,0,.03)',color:'#9CA3AF',border:'1px solid #E5E7EB',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
+      </button>:<button onClick={skip} style={{padding:'10px 18px',borderRadius:10,background:'rgba(0,0,0,.03)',color:'#9CA3AF',border:'1px solid #E5E7EB',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Lato,sans-serif',whiteSpace:'nowrap'}}>
         Skip Video
-      </button>
+      </button>}
     </div>
   </div>
 };

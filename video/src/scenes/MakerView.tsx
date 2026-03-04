@@ -96,19 +96,23 @@ export const MakerView: React.FC = () => {
       >
         <span
           style={{
-            fontSize: 14,
+            fontSize: 22,
             fontWeight: 700,
-            letterSpacing: '0.2em',
+            letterSpacing: '0.15em',
             textTransform: 'uppercase' as const,
-            color: C.pink,
-            background: `${C.pink}10`,
-            padding: '6px 20px',
-            borderRadius: 20,
+            color: C.white,
+            background: C.pink,
+            padding: '10px 32px',
+            borderRadius: 28,
             fontFamily: headingFont,
+            boxShadow: '0 4px 16px rgba(255,0,131,0.25)',
           }}
         >
-          MAKER VIEW
+          👤 MAKER VIEW
         </span>
+        <div style={{fontSize: 13, color: C.textSec, marginTop: 8, fontWeight: 500}}>
+          New Employee Experience
+        </div>
       </div>
 
       {/* Browser frame container */}
@@ -249,8 +253,8 @@ export const MakerView: React.FC = () => {
         const localFrame = frame - feature.start;
         const cardLocalFrame = localFrame - CARD_DELAY;
 
-        // Only show during this feature's window
-        if (localFrame < 0 || localFrame > FEATURE_DURATION) {
+        // Only show during this feature's window (start after CARD_DELAY to prevent flicker)
+        if (localFrame < CARD_DELAY || localFrame > FEATURE_DURATION) {
           return null;
         }
 
