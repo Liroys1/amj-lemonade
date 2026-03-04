@@ -198,23 +198,23 @@ export const StrategyView: React.FC = () => {
         >
           {FEATURES.map((feature, i) => {
             const localFrame = frame - feature.startFrame;
-
-            // Cross-fade opacity: fade in over first 12 frames, fade out over last 12
-            const fadeIn = interpolate(
-              localFrame,
-              [0, FADE_IN_FRAMES],
-              [0, 1],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
-            const fadeOut = interpolate(
-              localFrame,
-              [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION],
-              [1, 0],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
-            // For the last feature, let exit fade handle disappearance
+            const isFirst = i === 0;
             const isLast = i === FEATURES.length - 1;
-            const imgOpacity = isLast ? fadeIn : Math.min(fadeIn, fadeOut);
+
+            // Only render when roughly in range (with some buffer)
+            if (localFrame < -FADE_IN_FRAMES || localFrame > FEATURE_DURATION + FADE_OUT_FRAMES) {
+              return null;
+            }
+
+            // Cross-fade opacity: overlap to prevent white flash at transitions
+            const fadeIn = isFirst
+              ? interpolate(localFrame, [0, FADE_IN_FRAMES], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+              : interpolate(localFrame, [-FADE_IN_FRAMES, 0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+            // For the last feature, let exit fade handle disappearance
+            const fadeOut = isLast
+              ? 1
+              : interpolate(localFrame, [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+            const imgOpacity = Math.min(fadeIn, fadeOut);
 
             // Ken Burns: scale 1.0 -> 1.06 over the feature duration
             const kenBurnsProgress = interpolate(
@@ -226,11 +226,6 @@ export const StrategyView: React.FC = () => {
             const kenBurnsScale = 1.0 + kenBurnsProgress * 0.06;
             const kenBurnsTx = kenBurnsProgress * feature.tx;
             const kenBurnsTy = kenBurnsProgress * feature.ty;
-
-            // Only render when roughly in range (with some buffer)
-            if (localFrame < -5 || localFrame > FEATURE_DURATION + 5) {
-              return null;
-            }
 
             return (
               <div
@@ -270,10 +265,16 @@ export const StrategyView: React.FC = () => {
       {/* ---- Text callout cards ---- */}
       {FEATURES.map((feature, i) => {
         const localFrame = frame - feature.startFrame;
+        const calloutLocalFrame = localFrame - CALLOUT_DELAY;
+
+        // Strict guard: don't mount DOM until well past delay (prevents backdrop-filter flicker)
+        if (calloutLocalFrame < 2 || localFrame > FEATURE_DURATION - 2) {
+          return null;
+        }
 
         // Callout appears with a spring, delayed by CALLOUT_DELAY after image fades in
         const calloutSpring = spring({
-          frame: localFrame - CALLOUT_DELAY,
+          frame: calloutLocalFrame,
           fps,
           config: {damping: 18, stiffness: 120, mass: 0.8},
         });
@@ -291,14 +292,12 @@ export const StrategyView: React.FC = () => {
         );
         // For the last feature, let exit fade handle disappearance
         const isLast = i === FEATURES.length - 1;
-        const finalCalloutOpacity = isLast
+        const rawOpacity = isLast
           ? calloutOpacity
           : calloutOpacity * calloutFadeOut;
 
-        // Only render when roughly in range
-        if (localFrame < CALLOUT_DELAY || localFrame > FEATURE_DURATION + 5) {
-          return null;
-        }
+        // Hard clamp: ensure zero opacity in first few spring frames
+        const safeOpacity = calloutLocalFrame < 3 ? 0 : rawOpacity;
 
         return (
           <div
@@ -311,15 +310,13 @@ export const StrategyView: React.FC = () => {
               display: 'flex',
               justifyContent: 'center',
               zIndex: 20,
-              opacity: finalCalloutOpacity,
+              opacity: safeOpacity,
               transform: `translateY(${calloutY}px)`,
             }}
           >
             <div
               style={{
-                background: 'rgba(255,255,255,0.92)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
+                background: 'rgba(255,255,255,0.95)',
                 borderRadius: 16,
                 padding: '16px 24px',
                 boxShadow:
@@ -327,7 +324,7 @@ export const StrategyView: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 14,
-                border: `1px solid rgba(255,255,255,0.6)`,
+                border: `1px solid rgba(0,0,0,0.06)`,
               }}
             >
               {/* Pink dot */}

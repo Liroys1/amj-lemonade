@@ -181,30 +181,26 @@ export const MakerView: React.FC = () => {
         >
           {FEATURES.map((feature, i) => {
             const localFrame = frame - feature.start;
+            const isFirst = i === 0;
+            const isLast = i === FEATURES.length - 1;
 
-            // --- Cross-fade opacity ---
-            // Fade in over the first CROSSFADE_FRAMES
-            const fadeIn = interpolate(
-              localFrame,
-              [0, CROSSFADE_FRAMES],
-              [0, 1],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
-
-            // Fade out over the last CROSSFADE_FRAMES
-            const fadeOut = interpolate(
-              localFrame,
-              [FEATURE_DURATION - CROSSFADE_FRAMES, FEATURE_DURATION],
-              [1, 0],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
-
-            const imgOpacity = Math.min(fadeIn, fadeOut);
-
-            // Clamp: only render during this feature's range (with small buffer for crossfade)
+            // Only render when roughly in range
             if (localFrame < -CROSSFADE_FRAMES || localFrame > FEATURE_DURATION + CROSSFADE_FRAMES) {
               return null;
             }
+
+            // --- Cross-fade opacity ---
+            // Fade in: first feature starts immediately, others cross-fade BEFORE their start
+            const fadeIn = isFirst
+              ? interpolate(localFrame, [0, CROSSFADE_FRAMES], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+              : interpolate(localFrame, [-CROSSFADE_FRAMES, 0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+
+            // Fade out: last feature stays (exit fade handles it), others fade out
+            const fadeOut = isLast
+              ? 1
+              : interpolate(localFrame, [FEATURE_DURATION - CROSSFADE_FRAMES, FEATURE_DURATION], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+
+            const imgOpacity = Math.min(fadeIn, fadeOut);
 
             // --- Ken Burns zoom: scale 1.0 -> 1.08, subtle drift ---
             const progress = Math.max(0, Math.min(1, localFrame / FEATURE_DURATION));
@@ -253,8 +249,8 @@ export const MakerView: React.FC = () => {
         const localFrame = frame - feature.start;
         const cardLocalFrame = localFrame - CARD_DELAY;
 
-        // Only show during this feature's window (start after CARD_DELAY to prevent flicker)
-        if (localFrame < CARD_DELAY || localFrame > FEATURE_DURATION) {
+        // Strict guard: don't mount DOM until well past delay (prevents backdrop-filter flicker)
+        if (cardLocalFrame < 2 || localFrame > FEATURE_DURATION - 2) {
           return null;
         }
 
@@ -275,6 +271,10 @@ export const MakerView: React.FC = () => {
           {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
         );
 
+        // Hard clamp: ensure zero opacity in first few spring frames
+        const rawOpacity = Math.min(cardOpacity, cardExitOpacity);
+        const safeOpacity = cardLocalFrame < 3 ? 0 : rawOpacity;
+
         return (
           <div
             key={`card-${i}`}
@@ -283,19 +283,17 @@ export const MakerView: React.FC = () => {
               bottom: 44,
               left: '50%',
               transform: `translateX(-50%) translateY(${cardY}px)`,
-              opacity: Math.min(cardOpacity, cardExitOpacity),
+              opacity: safeOpacity,
               zIndex: 20,
             }}
           >
             <div
               style={{
-                background: 'rgba(255,255,255,0.92)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
+                background: 'rgba(255,255,255,0.95)',
                 borderRadius: 16,
                 padding: '16px 24px',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.05)',
-                border: `1px solid rgba(255,255,255,0.6)`,
+                border: `1px solid rgba(0,0,0,0.06)`,
                 display: 'flex',
                 flexDirection: 'column' as const,
                 alignItems: 'center',

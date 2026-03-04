@@ -166,24 +166,21 @@ export const LeadView: React.FC = () => {
         }}>
           {FEATURES.map((feature, idx) => {
             const localFrame = frame - feature.startFrame;
+            const isFirst = idx === 0;
+            const isLast = idx === FEATURES.length - 1;
 
-            // Image opacity: fade in first 15 frames, fade out last 15 frames
-            const fadeIn = interpolate(
-              localFrame,
-              [0, FADE_IN_FRAMES],
-              [0, 1],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
-            const fadeOut = interpolate(
-              localFrame,
-              [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION],
-              [1, 0],
-              {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
-            );
+            // Only render when approximately visible
+            if (localFrame < -FADE_IN_FRAMES || localFrame > FEATURE_DURATION + FADE_OUT_FRAMES) return null;
+
+            // Image opacity: cross-fade overlap to prevent white flash
+            const fadeIn = isFirst
+              ? interpolate(localFrame, [0, FADE_IN_FRAMES], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+              : interpolate(localFrame, [-FADE_IN_FRAMES, 0], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
             // Last feature: don't fade out (the exit fade handles it)
-            const imgOpacity = idx === FEATURES.length - 1
-              ? fadeIn
-              : Math.min(fadeIn, fadeOut);
+            const fadeOut = isLast
+              ? 1
+              : interpolate(localFrame, [FEATURE_DURATION - FADE_OUT_FRAMES, FEATURE_DURATION], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+            const imgOpacity = Math.min(fadeIn, fadeOut);
 
             // Ken Burns: scale 1.0 -> 1.08 over the feature duration
             const kenBurnsScale = interpolate(
@@ -206,9 +203,6 @@ export const LeadView: React.FC = () => {
               [0, feature.zoomTy],
               {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
             );
-
-            // Only render when approximately visible
-            if (localFrame < -5 || localFrame > FEATURE_DURATION + 5) return null;
 
             return (
               <div
@@ -241,10 +235,14 @@ export const LeadView: React.FC = () => {
       {/* Text callout cards */}
       {FEATURES.map((feature, idx) => {
         const localFrame = frame - feature.startFrame;
+        const calloutLocalFrame = localFrame - CALLOUT_DELAY;
+
+        // Strict guard: don't mount DOM until well past delay (prevents backdrop-filter flicker)
+        if (calloutLocalFrame < 2 || localFrame > FEATURE_DURATION - 2) return null;
 
         // Callout appears with a spring ~20 frames after the image fades in
         const calloutSpring = spring({
-          frame: localFrame - CALLOUT_DELAY,
+          frame: calloutLocalFrame,
           fps,
           config: {damping: 18, stiffness: 120, mass: 0.8},
         });
@@ -261,10 +259,9 @@ export const LeadView: React.FC = () => {
               {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
             );
 
-        const finalOpacity = Math.min(calloutOpacity, calloutFadeOut);
-
-        // Only render when approximately visible
-        if (localFrame < CALLOUT_DELAY || localFrame > FEATURE_DURATION + 5) return null;
+        // Hard clamp: ensure zero opacity in first few spring frames
+        const rawOpacity = Math.min(calloutOpacity, calloutFadeOut);
+        const safeOpacity = calloutLocalFrame < 3 ? 0 : rawOpacity;
 
         return (
           <div
@@ -277,19 +274,17 @@ export const LeadView: React.FC = () => {
               display: 'flex',
               justifyContent: 'center',
               zIndex: 20,
-              opacity: finalOpacity,
+              opacity: safeOpacity,
               transform: `translateY(${calloutY}px)`,
               pointerEvents: 'none' as const,
             }}
           >
             <div style={{
-              background: 'rgba(255,255,255,0.92)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              background: 'rgba(255,255,255,0.95)',
               borderRadius: 16,
               padding: '16px 24px',
               boxShadow: '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04)',
-              border: `1px solid rgba(255,255,255,0.6)`,
+              border: `1px solid rgba(0,0,0,0.06)`,
               display: 'flex',
               alignItems: 'center',
               gap: 14,
